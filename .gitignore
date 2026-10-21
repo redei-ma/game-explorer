@@ -426,3 +426,29 @@ FodyWeavers.xsd
 
 # Official VS Code C# Dev Kit Extension exclusion
 #*.lscache
+
+# ------------------------------------------------------------
+# Game Explorer additions
+# ------------------------------------------------------------
+
+# Environment variables (secrets): only the example is committed
+.env
+.env.*
+!.env.example
+
+# Angular / Node
+.angular/
+dist/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# JetBrains Rider
+.idea/
+
+# Personal AI assistant config (each member keeps their own)
+CLAUDE.md
+CLAUDE.local.md
+.claude/
