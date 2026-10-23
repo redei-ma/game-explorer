@@ -7,7 +7,7 @@ COPY CatalogService.csproj .
 RUN dotnet restore
 
 COPY . .
-RUN dotnet publish -c Release -o /app --no-restore
+RUN dotnet publish -c Release -o /app --no-restore /p:UseAppHost=false
 
 # Runtime stage: only the ASP.NET Core runtime, much smaller than the SDK
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
