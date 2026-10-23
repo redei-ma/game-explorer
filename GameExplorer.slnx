@@ -3,4 +3,7 @@
   <Folder Name="/services/catalog-service/">
     <Project Path="services/catalog-service/CatalogService.csproj" />
   </Folder>
+  <Folder Name="/services/library-service/">
+    <Project Path="services/library-service/LibraryService.csproj" />
+  </Folder>
 </Solution>
