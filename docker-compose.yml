@@ -26,7 +26,8 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     ports:
-      # Temporary: removed once the nginx gateway is in front of the services
+      # Exposed for local development: the ng serve proxy and Postman call
+      # the services directly
       - "127.0.0.1:5001:8080"
 
   library-service:
@@ -40,8 +41,22 @@ services:
       sqlserver:
         condition: service_healthy
     ports:
-      # Temporary: removed once the nginx gateway is in front of the services
+      # Exposed for local development: the ng serve proxy and Postman call
+      # the services directly
       - "127.0.0.1:5003:8080"
+
+  gateway:
+    build:
+      # Built from the repository root: the image needs both frontend/ and gateway/
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "127.0.0.1:8080:80"
+    depends_on:
+      # Start order only: nginx resolves service names per request, so it also
+      # works while a service is down
+      - catalog-service
+      - library-service
 
 volumes:
   sqlserver-data:
