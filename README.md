@@ -36,6 +36,48 @@ Planned extras:
 - **Database:** SQL Server Express
 - **Infrastructure:** Docker Compose, nginx as gateway
 
+## Getting started
+
+You need **Docker** (with Compose). To work on the code outside Docker you also need
+the **.NET SDK 10** and **Node.js 24**.
+
+### Run everything
+
+```bash
+cp .env.example .env          # then set MSSQL_SA_PASSWORD in .env
+docker compose up -d --build
+```
+
+Open http://localhost:8080. Stop with `docker compose down` (the database is kept;
+add `-v` to delete it).
+
+### Develop
+
+Run in Docker what you are not changing, and locally what you are working on:
+
+- **Frontend:** with the stack running, `cd frontend && npm ci && npm start`, then open
+  http://localhost:4200. API calls are proxied to the services (`frontend/proxy.conf.json`).
+- **A backend service:** stop its container (e.g. `docker compose stop catalog-service`),
+  then `cd services/catalog-service && dotnet watch`. It listens on the same port.
+
+| Address | What |
+| ------- | ---- |
+| http://localhost:8080 | the app, through the nginx gateway |
+| http://localhost:4200 | Angular dev server (`npm start`) |
+| http://localhost:5001 | catalog-service (direct access, e.g. Postman) |
+| http://localhost:5003 | library-service (direct access) |
+| localhost:1433 | SQL Server |
+
+### Project structure
+
+```
+frontend/                 Angular app
+gateway/                  nginx: serves the app and forwards calls to the services
+services/catalog-service/ games data from RAWG
+services/library-service/ favorites and wishlist
+docker-compose.yml        the whole stack
+```
+
 ## Contributing
 
 - `main` is stable; `dev` is the integration branch.
