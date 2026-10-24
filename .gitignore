@@ -436,6 +436,11 @@ FodyWeavers.xsd
 .env.*
 !.env.example
 
+# Private keys and certificates
+secrets/
+*.pem
+*.key
+
 # Angular / Node
 .angular/
 dist/
