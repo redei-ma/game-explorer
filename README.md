@@ -82,14 +82,17 @@ Backend tests use xUnit. A new test project goes in `tests/` and runs only once
 it is added to the solution:
 
 ```bash
-dotnet new xunit -o tests/LibraryService.IntegrationTests
-dotnet add tests/LibraryService.IntegrationTests reference services/library-service/LibraryService.csproj
-dotnet sln GameExplorer.slnx add tests/LibraryService.IntegrationTests
+dotnet new xunit -o tests/CatalogService.UnitTests
+dotnet add tests/CatalogService.UnitTests reference services/catalog-service/CatalogService.csproj
+dotnet sln GameExplorer.slnx add tests/CatalogService.UnitTests
 ```
 
-The template adds `UnitTest1.cs`, an empty test that always passes: replace it
-with real tests. Integration tests start the service in memory with
-`WebApplicationFactory` (package `Microsoft.AspNetCore.Mvc.Testing`): see
+Then delete `UnitTest1.cs`, an empty test that always passes, and the unused
+`coverlet.collector` package from the `.csproj`. Once the project exists, a new
+test is just a new class with `[Fact]` methods in it.
+
+Integration tests start the service in memory with `WebApplicationFactory`
+(package `Microsoft.AspNetCore.Mvc.Testing`): see
 `tests/CatalogService.IntegrationTests`.
 
 ### Project structure
