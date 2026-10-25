@@ -75,6 +75,8 @@ dotnet test GameExplorer.slnx              # every test project in the solution
 cd frontend && npm test -- --watch=false   # every *.spec.ts under frontend/src
 ```
 
+`dotnet test` needs Docker running: the library-service tests start their own
+SQL Server in a container ([Testcontainers](https://dotnet.testcontainers.org/)).
 Every Pull Request into `dev` or `main` runs the same builds and tests in the CI
 (`.github/workflows/ci.yml`).
 
@@ -93,7 +95,8 @@ test is just a new class with `[Fact]` methods in it.
 
 Integration tests start the service in memory with `WebApplicationFactory`
 (package `Microsoft.AspNetCore.Mvc.Testing`): see
-`tests/CatalogService.IntegrationTests`.
+`tests/CatalogService.IntegrationTests`, and `tests/LibraryService.IntegrationTests`
+for a service with a database.
 
 ### Project structure
 

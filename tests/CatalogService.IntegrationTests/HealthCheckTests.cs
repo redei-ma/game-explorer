@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace CatalogService.IntegrationTests;
 
-// The gateway and Docker rely on /health to know whether the service is up
 public class HealthCheckTests(WebApplicationFactory<Program> factory)
     : IClassFixture<WebApplicationFactory<Program>>
 {
