@@ -6,4 +6,7 @@
   <Folder Name="/services/library-service/">
     <Project Path="services/library-service/LibraryService.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CatalogService.IntegrationTests/CatalogService.IntegrationTests.csproj" />
+  </Folder>
 </Solution>
