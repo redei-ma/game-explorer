@@ -68,6 +68,17 @@ Run in Docker what you are not changing, and locally what you are working on:
 | http://localhost:5003 | library-service (direct access) |
 | localhost:1433 | SQL Server |
 
+### Tests
+
+```bash
+dotnet test GameExplorer.slnx              # every test project in the solution
+cd frontend && npm test -- --watch=false   # every *.spec.ts under frontend/src
+```
+
+Every Pull Request into `dev` or `main` runs the same builds and tests in the CI
+(`.github/workflows/ci.yml`). A new backend test project runs only once it is
+added to the solution: `dotnet sln GameExplorer.slnx add <path-to-project>`.
+
 ### Project structure
 
 ```
@@ -81,11 +92,10 @@ docker-compose.yml        the whole stack
 ## Contributing
 
 - `main` is stable; `dev` is the integration branch.
-- Work on a branch created from `dev` (`feat/...`, `fix/...`, `docs/...`, `chore/...`)
-  and open a Pull Request into `dev`. At least one approval is required.
-- Commits in English, [Conventional Commits](https://www.conventionalcommits.org/)
+- Work on a branch created from `dev` and open a Pull Request into `dev`: it
+  needs one approval and the CI checks to pass.
+- Commits in [Conventional Commits](https://www.conventionalcommits.org/)
   format: `feat(catalog): add genre filter`.
-- Everything in the repository (code, comments, docs) is written in English.
 
 ## Team
 
