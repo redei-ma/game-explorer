@@ -76,8 +76,21 @@ cd frontend && npm test -- --watch=false   # every *.spec.ts under frontend/src
 ```
 
 Every Pull Request into `dev` or `main` runs the same builds and tests in the CI
-(`.github/workflows/ci.yml`). A new backend test project runs only once it is
-added to the solution: `dotnet sln GameExplorer.slnx add <path-to-project>`.
+(`.github/workflows/ci.yml`).
+
+Backend tests use xUnit. A new test project goes in `tests/` and runs only once
+it is added to the solution:
+
+```bash
+dotnet new xunit -o tests/LibraryService.IntegrationTests
+dotnet add tests/LibraryService.IntegrationTests reference services/library-service/LibraryService.csproj
+dotnet sln GameExplorer.slnx add tests/LibraryService.IntegrationTests
+```
+
+The template adds `UnitTest1.cs`, an empty test that always passes: replace it
+with real tests. Integration tests start the service in memory with
+`WebApplicationFactory` (package `Microsoft.AspNetCore.Mvc.Testing`): see
+`tests/CatalogService.IntegrationTests`.
 
 ### Project structure
 
@@ -86,6 +99,7 @@ frontend/                 Angular app
 gateway/                  nginx: serves the app and forwards calls to the services
 services/catalog-service/ games data from RAWG
 services/library-service/ favorites and wishlist
+tests/                    backend test projects, one per service and test type
 docker-compose.yml        the whole stack
 ```
 
