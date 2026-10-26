@@ -68,6 +68,36 @@ Run in Docker what you are not changing, and locally what you are working on:
 | http://localhost:5003 | library-service (direct access) |
 | localhost:1433 | SQL Server |
 
+### Tests
+
+```bash
+dotnet test GameExplorer.slnx              # every test project in the solution
+cd frontend && npm test -- --watch=false   # every *.spec.ts under frontend/src
+```
+
+`dotnet test` needs Docker running: the library-service tests start their own
+SQL Server in a container ([Testcontainers](https://dotnet.testcontainers.org/)).
+Every Pull Request into `dev` or `main` runs the same builds and tests in the CI
+(`.github/workflows/ci.yml`).
+
+Backend tests use xUnit. A new test project goes in `tests/` and runs only once
+it is added to the solution:
+
+```bash
+dotnet new xunit -o tests/CatalogService.UnitTests
+dotnet add tests/CatalogService.UnitTests reference services/catalog-service/CatalogService.csproj
+dotnet sln GameExplorer.slnx add tests/CatalogService.UnitTests
+```
+
+Then delete `UnitTest1.cs`, an empty test that always passes, and the unused
+`coverlet.collector` package from the `.csproj`. Once the project exists, a new
+test is just a new class with `[Fact]` methods in it.
+
+Integration tests start the service in memory with `WebApplicationFactory`
+(package `Microsoft.AspNetCore.Mvc.Testing`): see
+`tests/CatalogService.IntegrationTests`, and `tests/LibraryService.IntegrationTests`
+for a service with a database.
+
 ### Project structure
 
 ```
@@ -75,17 +105,17 @@ frontend/                 Angular app
 gateway/                  nginx: serves the app and forwards calls to the services
 services/catalog-service/ games data from RAWG
 services/library-service/ favorites and wishlist
+tests/                    backend test projects, one per service and test type
 docker-compose.yml        the whole stack
 ```
 
 ## Contributing
 
 - `main` is stable; `dev` is the integration branch.
-- Work on a branch created from `dev` (`feat/...`, `fix/...`, `docs/...`, `chore/...`)
-  and open a Pull Request into `dev`. At least one approval is required.
-- Commits in English, [Conventional Commits](https://www.conventionalcommits.org/)
+- Work on a branch created from `dev` and open a Pull Request into `dev`: it
+  needs one approval and the CI checks to pass.
+- Commits in [Conventional Commits](https://www.conventionalcommits.org/)
   format: `feat(catalog): add genre filter`.
-- Everything in the repository (code, comments, docs) is written in English.
 
 ## Team
 
