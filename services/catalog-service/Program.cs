@@ -1,3 +1,5 @@
+using CatalogService.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -7,6 +9,14 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 // Used by Docker and the gateway to know whether the service is up
 builder.Services.AddHealthChecks();
+
+
+// Registers RawgClient so ASP.NET can inject it into controllers
+// and configures the HttpClient it receives.
+builder.Services.AddHttpClient<RawgClient>(client =>
+{
+    client.BaseAddress = new Uri("https://api.rawg.io/api/"); // trailing slash matters
+});
 
 var app = builder.Build();
 
