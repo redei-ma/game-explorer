@@ -32,6 +32,30 @@ export interface GamesPage {
 	results: Game[];
 }
 
+// Templates for Genres and Platforms (required for search filters)
+export interface Genre {
+	id: number;
+	name: string;
+	slug: string;
+}
+
+export interface PlatformItem {
+	id: number;
+	name: string;
+	slug: string;
+}
+
+// Pagination for Genres and Platforms following the GamesPage pattern
+export interface GenresPage {
+	count: number;
+	results: Genre[];
+}
+
+export interface PlatformsPage {
+	count: number;
+	results: PlatformItem[];
+}
+
 // Query parameters accepted by GET /api/games (same names as RAWG's /games)
 export interface GamesQuery {
 	search?: string;
@@ -62,5 +86,13 @@ export class GamesApi {
 		}
 		return this.http.get<GamesPage>('/api/games', { params });
 	}
-	// TODO: getGame(id), getScreenshots(id), getGenres(), getPlatforms()
+
+	// Methods for retrieving curtain filter data
+	getGenres(): Observable<GenresPage> {
+		return this.http.get<GenresPage>('/api/genres');
+	}
+	getPlatforms(): Observable<PlatformsPage> {
+		return this.http.get<PlatformsPage>('/api/platforms');
+	}
+	// TODO: getGame(id), getScreenshots(id)
 }
