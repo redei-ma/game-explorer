@@ -27,6 +27,7 @@ services:
     build: ./services/catalog-service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      Rawg__ApiKey: ${RAWG_API_KEY:?RAWG_API_KEY is not set in .env}
     ports:
       # Exposed for local development: the ng serve proxy and Postman call
       # the services directly

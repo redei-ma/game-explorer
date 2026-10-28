@@ -19,12 +19,14 @@ public record GameListResponse(int Count, List<GameSummary> Results);
 /// <param name="Released">Release date as text, or null if unknown.</param>
 /// <param name="Rating">Average user rating.</param>
 /// <param name="BackgroundImage">URL of the cover image, or null if missing.</param>
+/// <param name="ParentPlatforms">Main platform families (PC, PlayStation...); maps to JSON "parent_platforms".</param>
 public record GameSummary(
     int Id,
     string Name,
     string? Released,
     double Rating,
-    string? BackgroundImage);
+    string? BackgroundImage,
+    List<PlatformEntry>? ParentPlatforms);
 
 
 /// <summary>
@@ -44,8 +46,11 @@ public record GameDetail(
     List<NamedItem> Publishers,
     List<PlatformEntry> Platforms);
 
-/// <summary>A simple { id, name } object. Reused for genres, developers and publishers.</summary>
-public record NamedItem(int Id, string Name);
+/// <summary>
+/// A simple { id, name, slug } object returned by RAWG for genres, developers,
+/// publishers and platforms. The slug is a stable, URL-friendly identifier.
+/// </summary>
+public record NamedItem(int Id, string Name, string? Slug);
 
 /// <summary>RAWG wraps each platform as { "platform": { id, name } }, so we model that wrapper.</summary>
 public record PlatformEntry(NamedItem Platform);
