@@ -1,31 +1,46 @@
-<a class="game-card" [routerLink]="['/games', game().id]">
-	<span class="ph-poster" [class.ph-poster--cover]="game().background_image">
-	@if (game().background_image) {
-		<img [src]="game().background_image" [alt]="'Copertina di ' + game().name" loading="lazy" />
-	}
-	@if (label()) {
-		<span class="ph-poster__n">{{ label() }}</span>
-	}
-	</span>
-	<span class="game-card__body">
-	<strong class="game-card__title">{{ game().name }}</strong>
-	<span class="game-card__meta">
-		@if (game().released) {
-		{{ game().released | date: 'd MMM y' }}
+<!-- Wrapper added to position the absolute favorite button relative to the card -->
+<div class="game-card-container">
+	<a class="game-card" [routerLink]="['/games', game().id]">
+		<span class="ph-poster" [class.ph-poster--cover]="game().background_image">
+		@if (game().background_image) {
+			<img [src]="game().background_image" [alt]="'Copertina di ' + game().name" loading="lazy" />
 		}
-		@else {
-			Data n.d.
+		@if (label()) {
+			<span class="ph-poster__n">{{ label() }}</span>
 		}
-		&middot;
-		@if (game().rating > 0) {
-		<span class="game-card__rating">★ {{ game().rating | number: '1.1-1' }}</span>
+		</span>
+		<span class="game-card__body">
+		<strong class="game-card__title">{{ game().name }}</strong>
+		<span class="game-card__meta">
+			@if (game().released) {
+			{{ game().released | date: 'd MMM y' }}
+			}
+			@else {
+				Data n.d.
+			}
+			&middot;
+			@if (game().rating > 0) {
+			<span class="game-card__rating">★ {{ game().rating | number: '1.1-1' }}</span>
+			}
+			@else {
+				n.d.
+			}
+		</span>
+		@if (platforms()) {
+			<span class="game-card__platforms">{{ platforms() }}</span>
 		}
-		@else {
-			n.d.
-		}
-	</span>
-	@if (platforms()) {
-		<span class="game-card__platforms">{{ platforms() }}</span>
-	}
-	</span>
-</a>
+		</span>
+	</a>
+
+	<!-- Favorite Heart Button. Placed alongside the anchor tag for valid HTML -->
+	<button 
+		type="button" 
+		class="fav-btn" 
+		[class.fav-btn--active]="isFavorite()" 
+		(click)="toggleFavorite($event)"
+		[attr.aria-label]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+		[title]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+	>
+		♥
+	</button>
+</div>

@@ -6,7 +6,7 @@
 	</button>
 
 	<!-- Skeleton Loader -->
-	<div class="skeleton-container" *ngIf="isLoading">
+	<div class="skeleton-container" *ngIf="isLoading()">
 		<div class="skeleton-hero"></div>
 		<div class="skeleton-content">
 			<div class="skeleton-line"></div>
@@ -15,27 +15,40 @@
 	</div>
 
 	<!-- Error Banner -->
-	<div class="state-banner error-banner" *ngIf="!isLoading && hasError">
+	<div class="state-banner error-banner" *ngIf="!isLoading() && hasError()">
 		<div class="banner-content">
 			<h2>Impossibile caricare le informazioni del gioco</h2>
 			<p>Si è verificato un errore di connessione con il server.</p>
-			<button class="btn-primary" (click)="gameId && fetchGameDetails(gameId)">Riprova</button>
+			<button class="btn-primary" (click)="gameId() && fetchGameDetails(gameId()!)">Riprova</button>
 		</div>
 	</div>
 
 	<!-- Game Detail Content -->
-	<div class="detail-content" *ngIf="!isLoading && !hasError && game">
+	<div class="detail-content" *ngIf="!isLoading() && !hasError() && game(); let g">
 		<!-- HERO HEADER -->
-		<header class="hero-header" [style.background-image]="game.background_image ? 'linear-gradient(to bottom, rgba(18,18,18,0.3), rgba(18,18,18,0.95)), url(' + game.background_image + ')' : 'none'">
+		<header class="hero-header" [style.background-image]="g.background_image ? 'linear-gradient(to bottom, rgba(18,18,18,0.3), rgba(18,18,18,0.95)), url(' + g.background_image + ')' : 'none'">
 			<div class="hero-body">
-				<h1 class="game-title">{{ game.name }}</h1>
-				<div class="game-subtext" *ngIf="game.developers && game.developers.length > 0">
-					<span>Sviluppato da: </span>
-					<strong *ngFor="let dev of game.developers; let last = last">{{ dev.name }}{{ last ? '' : ', ' }}</strong>
+				<!-- Added layout flex wrapper to align title and favorite button -->
+				<div class="hero-header-top">
+					<h1 class="game-title">{{ g.name }}</h1>
+					<button 
+						type="button" 
+						class="btn-fav-detail" 
+						[class.btn-fav-detail--active]="isFavorite()" 
+						(click)="toggleFavorite()"
+					>
+						<span class="fav-icon">♥</span>
+						{{ isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti' }}
+					</button>
 				</div>
-				<div class="game-subtext" *ngIf="game.publishers && game.publishers.length > 0">
+				
+				<div class="game-subtext" *ngIf="g.developers && g.developers.length > 0">
+					<span>Sviluppato da: </span>
+					<strong *ngFor="let dev of g.developers; let last = last">{{ dev.name }}{{ last ? '' : ', ' }}</strong>
+				</div>
+				<div class="game-subtext" *ngIf="g.publishers && g.publishers.length > 0">
 					<span>Publisher: </span>
-					<strong *ngFor="let pub of game.publishers; let last = last">{{ pub.name }}{{ last ? '' : ', ' }}</strong>
+					<strong *ngFor="let pub of g.publishers; let last = last">{{ pub.name }}{{ last ? '' : ', ' }}</strong>
 				</div>
 			</div>
 		</header>
@@ -44,44 +57,44 @@
 		<section class="meta-section">
 			<div class="meta-card">
 				<span class="meta-label">Metacritic</span>
-				<span class="metacritic-badge" [ngClass]="getMetacriticClass(game.metacritic)">
-					{{ game.metacritic !== null ? game.metacritic : 'N/D' }}
+				<span class="metacritic-badge" [ngClass]="getMetacriticClass(g.metacritic)">
+					{{ g.metacritic !== null ? g.metacritic : 'N/D' }}
 				</span>
 			</div>
 			<div class="meta-card">
 				<span class="meta-label">Valutazione Utenti</span>
-				<span class="meta-value">{{ game.rating ? game.rating + ' / 5' : 'N/D' }}</span>
+				<span class="meta-value">{{ g.rating ? g.rating + ' / 5' : 'N/D' }}</span>
 			</div>
 			<div class="meta-card">
 				<span class="meta-label">Data di Uscita</span>
-				<span class="meta-value">{{ game.released || 'N/D' }}</span>
+				<span class="meta-value">{{ g.released || 'N/D' }}</span>
 			</div>
-			<div class="meta-card" *ngIf="game.genres && game.genres.length > 0">
+			<div class="meta-card" *ngIf="g.genres && g.genres.length > 0">
 				<span class="meta-label">Generi</span>
 				<div class="tags-list">
-					<span class="tag-badge" *ngFor="let g of game.genres">{{ g.name }}</span>
+					<span class="tag-badge" *ngFor="let genre of g.genres">{{ genre.name }}</span>
 				</div>
 			</div>
-			<div class="meta-card" *ngIf="game.parent_platforms && game.parent_platforms.length > 0">
+			<div class="meta-card" *ngIf="g.parent_platforms && g.parent_platforms.length > 0">
 				<span class="meta-label">Piattaforme</span>
 				<div class="tags-list">
-					<span class="tag-badge platform" *ngFor="let p of game.parent_platforms">{{ p.platform.name }}</span>
+					<span class="tag-badge platform" *ngFor="let p of g.parent_platforms">{{ p.platform.name }}</span>
 				</div>
 			</div>
 		</section>
 
 		<!-- Description Section -->
-		<section class="description-section" *ngIf="game.description_raw">
+		<section class="description-section" *ngIf="g.description_raw">
 			<h2>Informazioni sul gioco</h2>
-			<p class="description-text">{{ game.description_raw }}</p>
+			<p class="description-text">{{ g.description_raw }}</p>
 		</section>
 
 		<!-- Screenshots Gallery -->
-		<section class="gallery-section" *ngIf="screenshots && screenshots.length > 0">
+		<section class="gallery-section" *ngIf="screenshots() && screenshots().length > 0">
 			<h2>Galleria Screenshot</h2>
 			<div class="screenshots-grid">
-				<div class="screenshot-item" *ngFor="let shot of screenshots">
-					<img [src]="shot.image" [alt]="'Screenshot ' + game.name" loading="lazy" />
+				<div class="screenshot-item" *ngFor="let shot of screenshots()">
+					<img [src]="shot.image" [alt]="'Screenshot ' + g.name" loading="lazy" />
 				</div>
 			</div>
 		</section>

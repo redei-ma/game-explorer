@@ -234,3 +234,44 @@
 .btn-primary:hover {
 	background-color: #00457a;
 }
+
+/* Layout and styling for the favorite button in the details page */
+.hero-header-top {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.btn-fav-detail {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	background: rgba(255, 255, 255, 0.1);
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	color: #fff;
+	padding: 0.6rem 1.2rem;
+	border-radius: 20px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.btn-fav-detail:hover {
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-fav-detail--active {
+	background: #ff4757;
+	border-color: #ff4757;
+	color: #fff;
+}
+
+.btn-fav-detail--active:hover {
+	background: #ff2e43;
+}
+
+.fav-icon {
+	font-size: 1.1rem;
+}

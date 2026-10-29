@@ -1,14 +1,16 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { Subject, forkJoin } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { GamesApi, GameDetailData, Screenshot } from './games.api';
+import { Subject, forkJoin, of } from 'rxjs';
+import { catchError, takeUntil } from 'rxjs/operators';
+import { GamesApi, GameDetailData, Screenshot, Game } from './games.api';
+import { FavoritesService } from './favorites.service';
 
 @Component({
 	selector: 'app-game-detail',
 	standalone: true,
 	imports: [CommonModule, RouterModule],
+	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './game-detail.html',
 	styleUrls: ['./game-detail.css']
 })
@@ -17,22 +19,31 @@ export class GameDetail implements OnInit, OnDestroy {
 	private readonly route = inject(ActivatedRoute);
 	readonly location = inject(Location);
 	private readonly destroy$ = new Subject<void>();
+	private readonly favoritesService = inject(FavoritesService);
 
-	gameId: number | null = null;
-	game: GameDetailData | null = null;
-	screenshots: Screenshot[] = [];
-	isLoading = true;
-	hasError = false;
+	// State converted to signals to fix zoneless change detection issues
+	readonly gameId = signal<number | null>(null);
+	readonly game = signal<GameDetailData | null>(null);
+	readonly screenshots = signal<Screenshot[]>([]);
+	readonly isLoading = signal<boolean>(true);
+	readonly hasError = signal<boolean>(false);
+
+	// Reactive signal to compute favorite status
+	readonly isFavorite = computed(() => {
+		const g = this.game();
+		return g ? this.favoritesService.isFavorite(g.id) : false;
+	});
 
 	ngOnInit(): void {
 		this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
 			const idParam = params.get('id');
 			if (idParam) {
-				this.gameId = parseInt(idParam, 10);
-				this.fetchGameDetails(this.gameId);
+				const id = parseInt(idParam, 10);
+				this.gameId.set(id);
+				this.fetchGameDetails(id);
 			} else {
-				this.isLoading = false;
-				this.hasError = true;
+				this.isLoading.set(false);
+				this.hasError.set(true);
 			}
 		});
 	}
@@ -43,24 +54,43 @@ export class GameDetail implements OnInit, OnDestroy {
 	}
 
 	fetchGameDetails(id: number): void {
-		this.isLoading = true;
-		this.hasError = false;
+		this.isLoading.set(true);
+		this.hasError.set(false);
 
 		// Run the request for basic information and screenshots in parallel
+		// Added catchError to screenshots to prevent the entire page from failing if images fail
 		forkJoin({
 			detail: this.gamesApi.getGame(id),
-			screenshotsRes: this.gamesApi.getScreenshots(id)
+			screenshotsRes: this.gamesApi.getScreenshots(id).pipe(catchError(() => of(null)))
 		}).subscribe({
 			next: ({ detail, screenshotsRes }) => {
-				this.game = detail;
-				this.screenshots = screenshotsRes?.results || [];
-				this.isLoading = false;
+				this.game.set(detail);
+				this.screenshots.set(screenshotsRes?.results || []);
+				this.isLoading.set(false);
 			},
 			error: () => {
-				this.isLoading = false;
-				this.hasError = true;
+				this.isLoading.set(false);
+				this.hasError.set(true);
 			}
 		});
+	}
+
+	// Extracts base game data to store in favorites without unnecessary heavy details
+	toggleFavorite(): void {
+		const g = this.game();
+		if (!g) return;
+
+		const gameSummary: Game = {
+			id: g.id,
+			name: g.name,
+			slug: g.slug,
+			released: g.released,
+			background_image: g.background_image,
+			rating: g.rating,
+			metacritic: g.metacritic
+		};
+
+		this.favoritesService.toggleFavorite(gameSummary);
 	}
 
 /* 	MI SERVIVA PER TESTARE, DA TOGLIERE POI
@@ -69,8 +99,7 @@ export class GameDetail implements OnInit, OnDestroy {
 	this.hasError = false;
 	this.game = {
 		id: id,
-		name: 'The Legend of Zelda: Tears of the Kingdom',
-		slug: 'zelda-totk',
+		name: 'The Legend of Zelda: Tears of the Kingdom',		slug: 'zelda-totk',
 		released: '2023-05-12',
 		background_image: 'https://media.rawg.io/media/games/f99/f997966e3f22d05779ec364bc9a5f22e.jpg',
 		rating: 4.8,
