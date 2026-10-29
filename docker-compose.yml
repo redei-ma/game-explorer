@@ -40,6 +40,7 @@ services:
       # Connects as "sa", the SQL Server administrator. A production setup would
       # use a dedicated login with access to this database only.
       ConnectionStrings__AuthDb: "Server=sqlserver;Database=AuthDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY in .env (see .env.example)}
     depends_on:
       sqlserver:
         condition: service_healthy

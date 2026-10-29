@@ -44,7 +44,7 @@ the **.NET SDK 10** and **Node.js 24**.
 ### Run everything
 
 ```bash
-cp .env.example .env          # then set MSSQL_SA_PASSWORD in .env
+cp .env.example .env          # then fill in every value (see the comments)
 docker compose up -d --build
 ```
 
@@ -59,9 +59,10 @@ Run in Docker what you are not changing, and locally what you are working on:
   http://localhost:4200. API calls are proxied to the services (`frontend/proxy.conf.json`).
 - **A backend service:** stop its container (e.g. `docker compose stop catalog-service`),
   then `cd services/catalog-service && dotnet watch`. It listens on the same port.
-- **auth-service outside Docker:** it reads its connection string from user secrets. Once
-  per machine, in `services/auth-service`:
-  `dotnet user-secrets set "ConnectionStrings:AuthDb" "Server=localhost,1433;Database=AuthDb;User Id=sa;Password=<MSSQL_SA_PASSWORD>;TrustServerCertificate=True"`.
+- **auth-service outside Docker:** it reads its connection string and JWT key from user
+  secrets. Once per machine, in `services/auth-service`:
+  `dotnet user-secrets set "ConnectionStrings:AuthDb" "Server=localhost,1433;Database=AuthDb;User Id=sa;Password=<MSSQL_SA_PASSWORD>;TrustServerCertificate=True"`
+  and `dotnet user-secrets set "Jwt:Key" "$(grep '^JWT_KEY=' ../../.env | cut -d= -f2-)"`.
 - **Database migrations:** creating one needs the EF Core tool
   (`dotnet tool install --global dotnet-ef`); see `services/auth-service/Data/Migrations`.
   Services apply pending migrations at startup.

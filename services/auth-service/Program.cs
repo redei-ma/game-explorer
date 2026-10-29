@@ -1,4 +1,5 @@
 using AuthService.Data;
+using AuthService.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,13 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
         options.User.RequireUniqueEmail = true;
     })
     .AddEntityFrameworkStores<AuthDbContext>();
+
+// Validated at startup, so a missing or short key stops the service instead
+// of failing at the first login.
+builder.Services.AddOptions<JwtOptions>()
+    .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 // Used by Docker and the gateway to know whether the service is up. The
 // DbContext check reports Unhealthy when the database is unreachable.
