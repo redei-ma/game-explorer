@@ -37,6 +37,12 @@ services:
     build: ./services/auth-service
     environment:
       ASPNETCORE_ENVIRONMENT: Development
+      # Connects as "sa", the SQL Server administrator. A production setup would
+      # use a dedicated login with access to this database only.
+      ConnectionStrings__AuthDb: "Server=sqlserver;Database=AuthDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     ports:
       # Exposed for local development: the ng serve proxy and Postman call
       # the services directly
