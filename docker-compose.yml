@@ -33,6 +33,15 @@ services:
       # the services directly
       - "127.0.0.1:5001:8080"
 
+  auth-service:
+    build: ./services/auth-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      # Exposed for local development: the ng serve proxy and Postman call
+      # the services directly
+      - "127.0.0.1:5002:8080"
+
   library-service:
     build: ./services/library-service
     environment:
@@ -59,6 +68,7 @@ services:
       # Start order only: nginx resolves service names per request, so it also
       # works while a service is down
       - catalog-service
+      - auth-service
       - library-service
 
 volumes:

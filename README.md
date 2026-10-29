@@ -65,6 +65,7 @@ Run in Docker what you are not changing, and locally what you are working on:
 | http://localhost:8080 | the app, through the nginx gateway |
 | http://localhost:4200 | Angular dev server (`npm start`) |
 | http://localhost:5001 | catalog-service (direct access, e.g. Postman) |
+| http://localhost:5002 | auth-service (direct access) |
 | http://localhost:5003 | library-service (direct access) |
 | localhost:1433 | SQL Server |
 
@@ -104,6 +105,7 @@ for a service with a database.
 frontend/                 Angular app
 gateway/                  nginx: serves the app and forwards calls to the services
 services/catalog-service/ games data from RAWG
+services/auth-service/    registration, login and JWT
 services/library-service/ favorites and wishlist
 tests/                    backend test projects, one per service and test type
 docker-compose.yml        the whole stack
