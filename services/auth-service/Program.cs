@@ -27,13 +27,15 @@ builder.Services.AddDbContext<AuthDbContext>(options =>
 
 // Identity without cookies or UI: user management (UserManager) and the
 // password check with lockout (SignInManager), since this API signs users in
-// with JWTs. Users log in by email, so it must be unique.
+// with JWTs. Users log in by email, so it must be unique. The token providers
+// issue the one-time token that Identity requires to reset a password.
 builder.Services.AddIdentityCore<IdentityUser>(options =>
     {
         options.User.RequireUniqueEmail = true;
     })
     .AddEntityFrameworkStores<AuthDbContext>()
-    .AddSignInManager();
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer();
@@ -73,6 +75,8 @@ builder.Services.AddOptions<JwtOptions>()
     .ValidateOnStart();
 
 builder.Services.AddScoped<TokenService>();
+
+builder.Services.AddScoped<RecoveryCodeService>();
 
 // Used by Docker and the gateway to know whether the service is up. The
 // DbContext check reports Unhealthy when the database is unreachable.
