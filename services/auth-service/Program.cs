@@ -78,8 +78,8 @@ builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddScoped<RecoveryCodeService>();
 
-// Used by Docker and the gateway to know whether the service is up. The
-// DbContext check reports Unhealthy when the database is unreachable.
+// Called by the gateway on /health/auth. The DbContext check reports Unhealthy
+// when the database is unreachable.
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AuthDbContext>();
 
@@ -102,9 +102,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// CSRF protection: a browser can't add a custom header to a cross-site request
-// without a CORS permission, which this API never grants, so the header's
-// presence proves the request came from our own app. The value doesn't matter.
+// CSRF protection: a cross-site request can't carry a custom header without a
+// CORS permission, and this API grants none. Only the header's presence is
+// checked, not its value.
 app.Use(async (context, next) =>
 {
     var method = context.Request.Method;

@@ -5,7 +5,7 @@ namespace AuthService.Services;
 
 /// <summary>
 /// Creates and checks the code that lets a user reset a forgotten password.
-/// Only its hash is saved, so the database alone can't be used to reset one.
+/// Only its hash is saved: reading the database doesn't reveal a usable code.
 /// </summary>
 public class RecoveryCodeService(
     UserManager<IdentityUser> userManager,
@@ -19,8 +19,7 @@ public class RecoveryCodeService(
     /// </summary>
     public async Task<string> CreateAsync(IdentityUser user)
     {
-        // 32 hex characters are 128 random bits: too many to guess, and the code
-        // never needs to be typed from memory.
+        // 128 random bits, encoded as 32 hex characters.
         var code = RandomNumberGenerator.GetHexString(32, lowercase: true);
         var hash = passwordHasher.HashPassword(user, code);
         await userManager.SetAuthenticationTokenAsync(user, LoginProvider, TokenName, hash);
@@ -34,7 +33,7 @@ public class RecoveryCodeService(
     {
         var hash = await userManager.GetAuthenticationTokenAsync(user, LoginProvider, TokenName);
 
-        // SuccessRehashNeeded is a match too, so only Failed rejects the code.
+        // SuccessRehashNeeded is also a match: only Failed rejects the code.
         return hash is not null
             && passwordHasher.VerifyHashedPassword(user, hash, code) != PasswordVerificationResult.Failed;
     }

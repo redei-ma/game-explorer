@@ -7,6 +7,9 @@ namespace AuthService.Services;
 /// </summary>
 public class JwtOptions
 {
+    /// <summary>
+    /// Name of the configuration section.
+    /// </summary>
     public const string SectionName = "Jwt";
 
     /// <summary>
