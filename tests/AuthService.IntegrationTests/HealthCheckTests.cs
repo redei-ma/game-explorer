@@ -2,6 +2,9 @@ using System.Net;
 
 namespace AuthService.IntegrationTests;
 
+/// <summary>
+/// Checks /health, which also reports whether the database is reachable.
+/// </summary>
 public class HealthCheckTests(AuthApiFactory factory) : IClassFixture<AuthApiFactory>
 {
     [Fact]

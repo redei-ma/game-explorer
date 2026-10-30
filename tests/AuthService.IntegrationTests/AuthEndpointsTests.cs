@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace AuthService.IntegrationTests;
 
+
+/// <summary>
+/// Register, login, logout and /me, over HTTP against a real database.
+/// </summary>
 public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiFactory>
 {
     private const string Password = "Secret123!";
@@ -94,6 +98,19 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         var body = await response.Content.ReadFromJsonAsync<AuthResponse>();
         Assert.Equal(user.Email, body!.User.Email);
+    }
+
+    [Fact]
+    public async Task Login_SetsTheCookie()
+    {
+        var user = NewUser();
+        await CreateClient().PostAsJsonAsync("/api/auth/register", user);
+
+        var response = await CreateClient().PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, user.Password));
+
+        var cookie = Assert.Single(response.Headers.GetValues("Set-Cookie"));
+        Assert.StartsWith("access_token=", cookie);
     }
 
     [Fact]
