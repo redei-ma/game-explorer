@@ -60,6 +60,8 @@ Run in Docker what you are not changing, and locally what you are working on:
   http://localhost:4200. API calls are proxied to the services (`frontend/proxy.conf.json`).
 - **A backend service:** stop its container (e.g. `docker compose stop catalog-service`),
   then `cd services/catalog-service && dotnet watch`. It listens on the same port.
+- **Calling auth-service directly (curl, Postman):** POST requests need an `X-CSRF-Token`
+  header, with any value. Without it the service answers `403`.
 - **auth-service outside Docker:** it reads its connection string and JWT key from user
   secrets. Once per machine, in `services/auth-service`:
   `dotnet user-secrets set "ConnectionStrings:AuthDb" "Server=localhost,1433;Database=AuthDb;User Id=sa;Password=<MSSQL_SA_PASSWORD>;TrustServerCertificate=True"`
