@@ -36,6 +36,12 @@ public record RecoverRequest(
     [Required] string NewPassword);
 
 /// <summary>
+/// Body of DELETE /api/auth/me.
+/// </summary>
+/// <param name="Password">Current password, asked again before an irreversible action.</param>
+public record DeleteAccountRequest([Required] string Password);
+
+/// <summary>
 /// Public data of a user, as returned by the API.
 /// </summary>
 /// <param name="Id">Identity's user id (a GUID), the same as the "sub" claim.</param>

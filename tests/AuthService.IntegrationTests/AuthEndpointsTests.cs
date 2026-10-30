@@ -8,7 +8,7 @@ namespace AuthService.IntegrationTests;
 
 
 /// <summary>
-/// Register, login, recovery, logout and /me, over HTTP against a real database.
+/// Register, login, recovery, deletion, logout and /me, over HTTP against a real database.
 /// </summary>
 public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiFactory>
 {
@@ -267,6 +267,48 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
 
         Assert.Equal(HttpStatusCode.BadRequest, weak.StatusCode);
         Assert.Equal(HttpStatusCode.OK, retry.StatusCode);
+    }
+
+    private HttpRequestMessage DeleteAccountRequestWith(string password) =>
+        new(HttpMethod.Delete, "/api/auth/me") { Content = JsonContent.Create(new DeleteAccountRequest(password)) };
+
+    [Fact]
+    public async Task DeleteAccount_RemovesTheAccount()
+    {
+        var client = CreateClient();
+        var (user, code) = await RegisterWithCode(client);
+
+        var response = await client.SendAsync(DeleteAccountRequestWith(user.Password));
+
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        var login = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, user.Password));
+        var recover = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, code, "NewSecret123!"));
+        Assert.Equal(HttpStatusCode.Unauthorized, login.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, recover.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeleteAccount_Returns403AndKeepsTheAccount_WhenThePasswordIsWrong()
+    {
+        var client = CreateClient();
+        var (user, _) = await RegisterWithCode(client);
+
+        var response = await client.SendAsync(DeleteAccountRequestWith("Wrong123!"));
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        var login = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, user.Password));
+        Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeleteAccount_Returns401_WithoutTheCookie()
+    {
+        var response = await CreateClient().SendAsync(DeleteAccountRequestWith(Password));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
     [Fact]

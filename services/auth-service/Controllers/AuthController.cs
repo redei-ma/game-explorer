@@ -9,9 +9,9 @@ using Microsoft.IdentityModel.JsonWebTokens;
 namespace AuthService.Controllers;
 
 /// <summary>
-/// Registration, login, logout and password recovery. The JWT travels in an
-/// HttpOnly cookie, never in the response body. Logs identify users by id, never
-/// by email, which is personal data.
+/// Registration, login, logout, password recovery and account deletion. The JWT
+/// travels in an HttpOnly cookie, never in the response body. Logs identify users
+/// by id, never by email, which is personal data.
 /// </summary>
 [ApiController]
 [Route("api/auth")]
@@ -149,6 +149,37 @@ public class AuthController(
         User.FindFirstValue(JwtRegisteredClaimNames.Sub)!,
         User.FindFirstValue(JwtRegisteredClaimNames.Email)!,
         User.FindFirstValue(JwtRegisteredClaimNames.UniqueName)!));
+
+    /// <summary>
+    /// Deletes the logged-in user's account. DELETE /api/auth/me
+    /// </summary>
+    /// <param name="request">Current password.</param>
+    [Authorize]
+    [HttpDelete("me")]
+    public async Task<IActionResult> DeleteAccount(DeleteAccountRequest request)
+    {
+        var user = await userManager.FindByIdAsync(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+        if (user is null)
+        {
+            return Problem("Account not found.", statusCode: StatusCodes.Status404NotFound);
+        }
+
+        // 403 and not 401: the session is valid, only the confirmation failed.
+        var check = await signInManager.CheckPasswordSignInAsync(
+            user, request.Password, lockoutOnFailure: true);
+        if (!check.Succeeded)
+        {
+            logger.LogWarning("Account deletion refused for user {UserId}", user.Id);
+            return Problem("Wrong password.", statusCode: StatusCodes.Status403Forbidden);
+        }
+
+        await userManager.DeleteAsync(user);
+        logger.LogInformation("User {UserId} deleted their account", user.Id);
+
+        // The cookie stays: the frontend still needs it to delete the user's data
+        // in library-service, then logs out.
+        return NoContent();
+    }
 
     /// <summary>
     /// Logs the user out by deleting the cookie. POST /api/auth/logout
