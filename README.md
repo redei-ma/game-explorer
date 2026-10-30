@@ -86,8 +86,8 @@ dotnet test GameExplorer.slnx              # every test project in the solution
 cd frontend && npm test -- --watch=false   # every *.spec.ts under frontend/src
 ```
 
-`dotnet test` needs Docker running: the library-service tests start their own
-SQL Server in a container ([Testcontainers](https://dotnet.testcontainers.org/)).
+`dotnet test` needs Docker running: the auth-service and library-service tests
+start their own SQL Server in a container ([Testcontainers](https://dotnet.testcontainers.org/)).
 Every Pull Request into `dev` or `main` runs the same builds and tests in the CI
 (`.github/workflows/ci.yml`).
 
