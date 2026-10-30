@@ -18,6 +18,7 @@ public class AuthController(
     UserManager<IdentityUser> userManager,
     SignInManager<IdentityUser> signInManager,
     TokenService tokenService,
+    RecoveryCodeService recoveryCodes,
     ILogger<AuthController> logger)
     : ControllerBase
 {
@@ -55,8 +56,13 @@ public class AuthController(
             return ValidationProblem(ModelState);
         }
 
+        var recoveryCode = await recoveryCodes.CreateAsync(user);
+        var session = StartSession(user);
+
         logger.LogInformation("User {UserId} registered", user.Id);
-        return StatusCode(StatusCodes.Status201Created, StartSession(user));
+        return StatusCode(
+            StatusCodes.Status201Created,
+            new RegisterResponse(session.ExpiresAt, session.User, recoveryCode));
     }
 
     /// <summary>

@@ -33,9 +33,18 @@ public record LoginRequest(
 public record UserResponse(string Id, string Email, string Username);
 
 /// <summary>
-/// Response of register and login. The token travels in an HttpOnly cookie,
-/// so it is not in the body.
+/// Response of login, and base of the register response. The token travels in
+/// an HttpOnly cookie, so it is not in the body.
 /// </summary>
 /// <param name="ExpiresAt">When the token expires (UTC); the user must log in again after it.</param>
 /// <param name="User">The user who is now logged in.</param>
 public record AuthResponse(DateTime ExpiresAt, UserResponse User);
+
+/// <summary>
+/// Response of register: the session plus the recovery code, shown only once.
+/// </summary>
+/// <param name="ExpiresAt">When the token expires (UTC).</param>
+/// <param name="User">The user who is now logged in.</param>
+/// <param name="RecoveryCode">Code to save: it resets the password if it gets lost.</param>
+public record RegisterResponse(DateTime ExpiresAt, UserResponse User, string RecoveryCode)
+    : AuthResponse(ExpiresAt, User);

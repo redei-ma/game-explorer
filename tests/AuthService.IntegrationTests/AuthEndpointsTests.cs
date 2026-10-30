@@ -53,6 +53,15 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
     }
 
     [Fact]
+    public async Task Register_ReturnsARecoveryCode()
+    {
+        var response = await CreateClient().PostAsJsonAsync("/api/auth/register", NewUser());
+
+        var body = await response.Content.ReadFromJsonAsync<RegisterResponse>();
+        Assert.Equal(32, body!.RecoveryCode.Length);
+    }
+
+    [Fact]
     public async Task Register_Returns409_WhenTheEmailIsTaken()
     {
         var client = CreateClient();
