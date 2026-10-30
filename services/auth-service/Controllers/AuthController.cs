@@ -9,8 +9,9 @@ using Microsoft.IdentityModel.JsonWebTokens;
 namespace AuthService.Controllers;
 
 /// <summary>
-/// Registration, login and logout. The JWT travels in an HttpOnly cookie,
-/// never in the response body.
+/// Registration, login, logout and password recovery. The JWT travels in an
+/// HttpOnly cookie, never in the response body. Logs identify users by id, never
+/// by email, which is personal data.
 /// </summary>
 [ApiController]
 [Route("api/auth")]
@@ -75,14 +76,13 @@ public class AuthController(
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
-            // The email stays out of the logs: it is personal data.
             logger.LogWarning("Login failed: unknown email");
             return InvalidCredentials();
         }
 
-        // Counts failed attempts and locks the account after too many. A locked
-        // account gets the same answer as a wrong password, so the response
-        // never reveals which emails are registered.
+        // lockoutOnFailure counts failed attempts toward the lockout. A locked
+        // account gets the same answer as a wrong password: a different message
+        // would reveal that the email is registered.
         var result = await signInManager.CheckPasswordSignInAsync(
             user, request.Password, lockoutOnFailure: true);
         if (!result.Succeeded)
@@ -94,6 +94,50 @@ public class AuthController(
 
         logger.LogInformation("User {UserId} logged in", user.Id);
         return Ok(StartSession(user));
+    }
+
+    /// <summary>
+    /// Sets a new password with the recovery code. POST /api/auth/recover
+    /// </summary>
+    /// <param name="request">Email, recovery code and new password.</param>
+    [HttpPost("recover")]
+    public async Task<IActionResult> Recover(RecoverRequest request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user is null)
+        {
+            logger.LogWarning("Recovery failed: unknown email");
+            return InvalidRecovery();
+        }
+
+        if (await userManager.IsLockedOutAsync(user))
+        {
+            logger.LogWarning("Recovery refused for locked user {UserId}", user.Id);
+            return InvalidRecovery();
+        }
+
+        // A wrong code counts toward the same lockout as a wrong password.
+        if (!await recoveryCodes.VerifyAsync(user, request.Code))
+        {
+            await userManager.AccessFailedAsync(user);
+            logger.LogWarning("Recovery failed for user {UserId}", user.Id);
+            return InvalidRecovery();
+        }
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var result = await userManager.ResetPasswordAsync(user, token, request.NewPassword);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(error.Code, error.Description);
+            }
+            return ValidationProblem(ModelState);
+        }
+
+        await userManager.ResetAccessFailedCountAsync(user);
+        logger.LogInformation("User {UserId} reset their password", user.Id);
+        return Ok(new RecoverResponse(await recoveryCodes.CreateAsync(user)));
     }
 
     /// <summary>
@@ -135,6 +179,12 @@ public class AuthController(
     /// </summary>
     private ObjectResult InvalidCredentials() =>
         Problem("Invalid email or password.", statusCode: StatusCodes.Status401Unauthorized);
+
+    /// <summary>
+    /// The single answer for every failed recovery.
+    /// </summary>
+    private ObjectResult InvalidRecovery() =>
+        Problem("Invalid email or recovery code.", statusCode: StatusCodes.Status401Unauthorized);
 
     /// <summary>
     /// The cookie's attributes, shared by login and logout so the cookie that

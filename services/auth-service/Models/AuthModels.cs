@@ -25,6 +25,17 @@ public record LoginRequest(
     [Required] string Password);
 
 /// <summary>
+/// Body of POST /api/auth/recover.
+/// </summary>
+/// <param name="Email">Login email.</param>
+/// <param name="Code">Recovery code received at registration or at the last recovery.</param>
+/// <param name="NewPassword">The new password, checked by Identity's rules.</param>
+public record RecoverRequest(
+    [Required, EmailAddress] string Email,
+    [Required] string Code,
+    [Required] string NewPassword);
+
+/// <summary>
 /// Public data of a user, as returned by the API.
 /// </summary>
 /// <param name="Id">Identity's user id (a GUID), the same as the "sub" claim.</param>
@@ -48,3 +59,9 @@ public record AuthResponse(DateTime ExpiresAt, UserResponse User);
 /// <param name="RecoveryCode">Code to save: it resets the password if it gets lost.</param>
 public record RegisterResponse(DateTime ExpiresAt, UserResponse User, string RecoveryCode)
     : AuthResponse(ExpiresAt, User);
+
+/// <summary>
+/// Response of recover: each code works once, so a new one replaces it.
+/// </summary>
+/// <param name="RecoveryCode">The new code to save.</param>
+public record RecoverResponse(string RecoveryCode);

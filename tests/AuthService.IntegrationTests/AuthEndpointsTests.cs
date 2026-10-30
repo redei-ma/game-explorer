@@ -8,7 +8,7 @@ namespace AuthService.IntegrationTests;
 
 
 /// <summary>
-/// Register, login, logout and /me, over HTTP against a real database.
+/// Register, login, recovery, logout and /me, over HTTP against a real database.
 /// </summary>
 public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiFactory>
 {
@@ -175,6 +175,98 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
         var response = await CreateClientWithoutCsrfHeader().PostAsync("/api/auth/logout", null);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    private async Task<(RegisterRequest User, string Code)> RegisterWithCode(HttpClient client)
+    {
+        var user = NewUser();
+        var response = await client.PostAsJsonAsync("/api/auth/register", user);
+        var body = await response.Content.ReadFromJsonAsync<RegisterResponse>();
+        return (user, body!.RecoveryCode);
+    }
+
+    [Fact]
+    public async Task Recover_SetsTheNewPassword_AndReplacesTheCode()
+    {
+        var client = CreateClient();
+        var (user, code) = await RegisterWithCode(client);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, code, "NewSecret123!"));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<RecoverResponse>();
+        Assert.NotEqual(code, body!.RecoveryCode);
+        var newLogin = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, "NewSecret123!"));
+        Assert.Equal(HttpStatusCode.OK, newLogin.StatusCode);
+        var oldLogin = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, user.Password));
+        Assert.Equal(HttpStatusCode.Unauthorized, oldLogin.StatusCode);
+    }
+
+    [Fact]
+    public async Task Recover_RejectsACodeAlreadyUsed()
+    {
+        var client = CreateClient();
+        var (user, code) = await RegisterWithCode(client);
+        await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, code, "NewSecret123!"));
+
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, code, "Another123!"));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Recover_GivesTheSameAnswer_ForWrongCodeAndUnknownEmail()
+    {
+        var client = CreateClient();
+        var (user, _) = await RegisterWithCode(client);
+
+        var wrongCode = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, "wrong", "NewSecret123!"));
+        var unknownEmail = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest("nobody@test.com", "wrong", "NewSecret123!"));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, wrongCode.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, unknownEmail.StatusCode);
+        var first = await wrongCode.Content.ReadFromJsonAsync<ProblemDetails>();
+        var second = await unknownEmail.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.Equal(first!.Detail, second!.Detail);
+    }
+
+    [Fact]
+    public async Task Recover_LocksTheAccount_AfterFiveWrongCodes()
+    {
+        var client = CreateClient();
+        var (user, code) = await RegisterWithCode(client);
+
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            await client.PostAsJsonAsync(
+                "/api/auth/recover", new RecoverRequest(user.Email, "wrong", "NewSecret123!"));
+        }
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, code, "NewSecret123!"));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Recover_KeepsTheCode_WhenTheNewPasswordIsWeak()
+    {
+        var client = CreateClient();
+        var (user, code) = await RegisterWithCode(client);
+
+        var weak = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, code, "secret"));
+        var retry = await client.PostAsJsonAsync(
+            "/api/auth/recover", new RecoverRequest(user.Email, code, "NewSecret123!"));
+
+        Assert.Equal(HttpStatusCode.BadRequest, weak.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, retry.StatusCode);
     }
 
     [Fact]
