@@ -48,8 +48,9 @@ cp .env.example .env          # then fill in every value (see the comments)
 docker compose up -d --build
 ```
 
-Open http://localhost:8080. Stop with `docker compose down` (the database is kept;
-add `-v` to delete it).
+Open http://localhost:8080 in Chrome or Firefox. Safari doesn't send `Secure` cookies to
+`http://localhost` ([WebKit bug 281149](https://webkit.org/b/281149)), so login doesn't
+last there. Stop with `docker compose down` (the database is kept; add `-v` to delete it).
 
 ### Develop
 
