@@ -1,0 +1,163 @@
+using System.Net;
+using System.Net.Http.Json;
+using AuthService.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Testing;
+
+namespace AuthService.IntegrationTests;
+
+public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiFactory>
+{
+    private const string Password = "Secret123!";
+
+    // The cookie is Secure, so the test client only sends it back over https.
+    private HttpClient CreateClient() => factory.CreateClient(
+        new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
+
+    // The database is shared by the tests in this class, so each one uses its own user.
+    private static RegisterRequest NewUser()
+    {
+        var id = Guid.NewGuid().ToString("N");
+        return new RegisterRequest($"{id}@test.com", id, Password);
+    }
+
+    [Fact]
+    public async Task Register_CreatesTheUserAndSetsTheCookie()
+    {
+        var user = NewUser();
+
+        var response = await CreateClient().PostAsJsonAsync("/api/auth/register", user);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+        var cookie = Assert.Single(response.Headers.GetValues("Set-Cookie"));
+        Assert.StartsWith("access_token=", cookie);
+        Assert.Contains("httponly", cookie);
+        Assert.Contains("secure", cookie);
+        Assert.Contains("samesite=strict", cookie);
+        Assert.Contains("path=/api", cookie);
+
+        var body = await response.Content.ReadFromJsonAsync<AuthResponse>();
+        Assert.Equal(user.Email, body!.User.Email);
+        Assert.Equal(user.Username, body.User.Username);
+    }
+
+    [Fact]
+    public async Task Register_Returns409_WhenTheEmailIsTaken()
+    {
+        var client = CreateClient();
+        var user = NewUser();
+        await client.PostAsJsonAsync("/api/auth/register", user);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/register", user with { Username = "other" + user.Username });
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Register_Returns400WithTheFailedRules_WhenThePasswordIsWeak()
+    {
+        var response = await CreateClient().PostAsJsonAsync(
+            "/api/auth/register", NewUser() with { Password = "secret" });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        Assert.Contains("PasswordRequiresDigit", problem!.Errors.Keys);
+    }
+
+    [Fact]
+    public async Task Register_Returns400_WhenTheUsernameDoesNotFitTheColumn()
+    {
+        var response = await CreateClient().PostAsJsonAsync(
+            "/api/auth/register", NewUser() with { Username = new string('a', 257) });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Login_ReturnsTheUser_WhenThePasswordIsRight()
+    {
+        var client = CreateClient();
+        var user = NewUser();
+        await client.PostAsJsonAsync("/api/auth/register", user);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, user.Password));
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var body = await response.Content.ReadFromJsonAsync<AuthResponse>();
+        Assert.Equal(user.Email, body!.User.Email);
+    }
+
+    [Fact]
+    public async Task Login_GivesTheSameAnswer_ForWrongPasswordAndUnknownEmail()
+    {
+        var client = CreateClient();
+        var user = NewUser();
+        await client.PostAsJsonAsync("/api/auth/register", user);
+
+        var wrongPassword = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, "Wrong123!"));
+        var unknownEmail = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest("nobody@test.com", "Wrong123!"));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, wrongPassword.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, unknownEmail.StatusCode);
+        var first = await wrongPassword.Content.ReadFromJsonAsync<ProblemDetails>();
+        var second = await unknownEmail.Content.ReadFromJsonAsync<ProblemDetails>();
+        Assert.Equal("Invalid email or password.", first!.Detail);
+        Assert.Equal(first.Detail, second!.Detail);
+    }
+
+    [Fact]
+    public async Task Login_LocksTheAccount_AfterFiveFailedAttempts()
+    {
+        var client = CreateClient();
+        var user = NewUser();
+        await client.PostAsJsonAsync("/api/auth/register", user);
+
+        for (var attempt = 0; attempt < 5; attempt++)
+        {
+            await client.PostAsJsonAsync("/api/auth/login", new LoginRequest(user.Email, "Wrong123!"));
+        }
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/login", new LoginRequest(user.Email, user.Password));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Me_Returns401_WithoutTheCookie()
+    {
+        var response = await CreateClient().GetAsync("/api/auth/me");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Me_ReturnsTheUser_AfterRegistering()
+    {
+        var client = CreateClient();
+        var user = NewUser();
+        var registered = await client.PostAsJsonAsync("/api/auth/register", user);
+        var expected = await registered.Content.ReadFromJsonAsync<AuthResponse>();
+
+        var response = await client.GetAsync("/api/auth/me");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        Assert.Equal(expected!.User, await response.Content.ReadFromJsonAsync<UserResponse>());
+    }
+
+    [Fact]
+    public async Task Logout_DeletesTheCookie()
+    {
+        var client = CreateClient();
+        await client.PostAsJsonAsync("/api/auth/register", NewUser());
+
+        var logout = await client.PostAsync("/api/auth/logout", null);
+        var me = await client.GetAsync("/api/auth/me");
+
+        Assert.Equal(HttpStatusCode.NoContent, logout.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, me.StatusCode);
+    }
+}

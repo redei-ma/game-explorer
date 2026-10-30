@@ -1,7 +1,7 @@
 services:
   sqlserver:
     # Pinned by digest like the Dockerfile base images. Keep in sync with
-    # tests/LibraryService.IntegrationTests/LibraryApiFactory.cs
+    # LibraryApiFactory.cs and AuthApiFactory.cs files in tests/
     image: mcr.microsoft.com/mssql/server:2022-CU27-GDR1-ubuntu-22.04@sha256:cf8f0ab2ebe61feec2eed2629061a07d247f791c2a8ddda74a4ac9f06a291718
     # The image is amd64-only: native on Intel/AMD, emulated (Rosetta) on Apple Silicon
     platform: linux/amd64
