@@ -17,7 +17,8 @@ namespace AuthService.Controllers;
 public class AuthController(
     UserManager<IdentityUser> userManager,
     SignInManager<IdentityUser> signInManager,
-    TokenService tokenService)
+    TokenService tokenService,
+    ILogger<AuthController> logger)
     : ControllerBase
 {
     /// <summary>
@@ -43,6 +44,7 @@ public class AuthController(
                 .ToList();
             if (duplicates.Count > 0)
             {
+                logger.LogWarning("Registration rejected: email or username already taken");
                 return Problem(string.Join(" ", duplicates), statusCode: StatusCodes.Status409Conflict);
             }
 
@@ -53,6 +55,7 @@ public class AuthController(
             return ValidationProblem(ModelState);
         }
 
+        logger.LogInformation("User {UserId} registered", user.Id);
         return StatusCode(StatusCodes.Status201Created, StartSession(user));
     }
 
@@ -66,6 +69,8 @@ public class AuthController(
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user is null)
         {
+            // The email stays out of the logs: it is personal data.
+            logger.LogWarning("Login failed: unknown email");
             return InvalidCredentials();
         }
 
@@ -76,9 +81,12 @@ public class AuthController(
             user, request.Password, lockoutOnFailure: true);
         if (!result.Succeeded)
         {
+            logger.LogWarning(
+                "Login failed for user {UserId}, locked out: {IsLockedOut}", user.Id, result.IsLockedOut);
             return InvalidCredentials();
         }
 
+        logger.LogInformation("User {UserId} logged in", user.Id);
         return Ok(StartSession(user));
     }
 

@@ -108,6 +108,8 @@ app.Use(async (context, next) =>
 
     if (!isSafe && !context.Request.Headers.ContainsKey("X-CSRF-Token"))
     {
+        app.Logger.LogWarning(
+            "Request blocked: {Method} {Path} has no X-CSRF-Token header", method, context.Request.Path);
         context.Response.StatusCode = StatusCodes.Status403Forbidden;
         return;
     }
