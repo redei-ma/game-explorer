@@ -98,6 +98,23 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+// CSRF protection: a browser can't add a custom header to a cross-site request
+// without a CORS permission, which this API never grants, so the header's
+// presence proves the request came from our own app. The value doesn't matter.
+app.Use(async (context, next) =>
+{
+    var method = context.Request.Method;
+    var isSafe = HttpMethods.IsGet(method) || HttpMethods.IsHead(method) || HttpMethods.IsOptions(method);
+
+    if (!isSafe && !context.Request.Headers.ContainsKey("X-CSRF-Token"))
+    {
+        context.Response.StatusCode = StatusCodes.Status403Forbidden;
+        return;
+    }
+
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
 

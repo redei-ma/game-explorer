@@ -11,8 +11,15 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
     private const string Password = "Secret123!";
 
     // The cookie is Secure, so the test client only sends it back over https.
-    private HttpClient CreateClient() => factory.CreateClient(
+    private HttpClient CreateClientWithoutCsrfHeader() => factory.CreateClient(
         new WebApplicationFactoryClientOptions { BaseAddress = new Uri("https://localhost") });
+
+    private HttpClient CreateClient()
+    {
+        var client = CreateClientWithoutCsrfHeader();
+        client.DefaultRequestHeaders.Add("X-CSRF-Token", "1");
+        return client;
+    }
 
     // The database is shared by the tests in this class, so each one uses its own user.
     private static RegisterRequest NewUser()
@@ -124,6 +131,24 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
             "/api/auth/login", new LoginRequest(user.Email, user.Password));
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Post_Returns403_WithoutTheCsrfHeader()
+    {
+        var response = await CreateClientWithoutCsrfHeader().PostAsJsonAsync(
+            "/api/auth/register", NewUser());
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task Logout_Returns403_WithoutTheCsrfHeader()
+    {
+        var response = await CreateClientWithoutCsrfHeader().PostAsync("/api/auth/logout", null);
+
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact]
