@@ -1,7 +1,12 @@
+using System.Text;
+using AuthService.Controllers;
 using AuthService.Data;
 using AuthService.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,8 +35,35 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddSignInManager();
 
-// Required by SignInManager, even though its sign-in cookies are not used.
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer();
+
+// Configured through the options system so that a bad key is reported by the
+// JwtOptions validation at startup.
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IOptions<JwtOptions>>((bearer, jwt) =>
+    {
+        // Keeps the claim names of the token ("sub", "email") instead of
+        // mapping them to long XML names.
+        bearer.MapInboundClaims = false;
+
+        bearer.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidIssuer = jwt.Value.Issuer,
+            ValidAudience = jwt.Value.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Value.Key)),
+        };
+
+        // The token travels in a cookie, not in the Authorization header.
+        bearer.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies[AuthController.CookieName];
+                return Task.CompletedTask;
+            },
+        };
+    });
 
 // Validated at startup, so a missing or short key stops the service instead
 // of failing at the first login.
@@ -66,6 +98,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

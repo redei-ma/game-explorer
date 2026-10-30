@@ -1,7 +1,10 @@
+using System.Security.Claims;
 using AuthService.Models;
 using AuthService.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace AuthService.Controllers;
 
@@ -17,7 +20,10 @@ public class AuthController(
     TokenService tokenService)
     : ControllerBase
 {
-    private const string CookieName = "access_token";
+    /// <summary>
+    /// Name of the cookie that holds the JWT.
+    /// </summary>
+    public const string CookieName = "access_token";
 
     /// <summary>
     /// Creates a user and logs them in. POST /api/auth/register
@@ -77,12 +83,22 @@ public class AuthController(
     }
 
     /// <summary>
+    /// Returns the logged-in user, read from the token. GET /api/auth/me
+    /// </summary>
+    [Authorize]
+    [HttpGet("me")]
+    public IActionResult Me() => Ok(new UserResponse(
+        User.FindFirstValue(JwtRegisteredClaimNames.Sub)!,
+        User.FindFirstValue(JwtRegisteredClaimNames.Email)!,
+        User.FindFirstValue(JwtRegisteredClaimNames.UniqueName)!));
+
+    /// <summary>
     /// Logs the user out by deleting the cookie. POST /api/auth/logout
     /// </summary>
     [HttpPost("logout")]
     public IActionResult Logout()
     {
-        Response.Cookies.Delete(CookieName,TokenCookieOptions());
+        Response.Cookies.Delete(CookieName, TokenCookieOptions());
         return NoContent();
     }
 
