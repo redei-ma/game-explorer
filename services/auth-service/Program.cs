@@ -11,18 +11,27 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi.
 builder.Services.AddOpenApi();
 
+// Every error response uses the ProblemDetails format (RFC 9457), so the
+// frontend handles all errors the same way.
+builder.Services.AddProblemDetails();
+
 // The connection string comes from configuration, so no password lives in the
 // code: user secrets with dotnet run, ConnectionStrings__AuthDb in Docker.
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("AuthDb")));
 
-// Identity without cookies or UI: only user management (UserManager), since
-// this API signs users in with JWTs. Users log in by email, so it must be unique.
+// Identity without cookies or UI: user management (UserManager) and the
+// password check with lockout (SignInManager), since this API signs users in
+// with JWTs. Users log in by email, so it must be unique.
 builder.Services.AddIdentityCore<IdentityUser>(options =>
     {
         options.User.RequireUniqueEmail = true;
     })
-    .AddEntityFrameworkStores<AuthDbContext>();
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddSignInManager();
+
+// Required by SignInManager, even though its sign-in cookies are not used.
+builder.Services.AddAuthentication();
 
 // Validated at startup, so a missing or short key stops the service instead
 // of failing at the first login.
@@ -30,6 +39,8 @@ builder.Services.AddOptions<JwtOptions>()
     .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
     .ValidateDataAnnotations()
     .ValidateOnStart();
+
+builder.Services.AddScoped<TokenService>();
 
 // Used by Docker and the gateway to know whether the service is up. The
 // DbContext check reports Unhealthy when the database is unreachable.
@@ -44,6 +55,10 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     db.Database.Migrate();
 }
+
+// Without these, unhandled exceptions and unknown routes return an empty body.
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
