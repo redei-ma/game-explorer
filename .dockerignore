@@ -1,6 +1,6 @@
 # Build context of the gateway image (it is built from the repository root).
-# Deny everything, then allow only what the image needs: secrets (.env),
-# local files and other services can never end up in the image.
+# Deny everything, then allow only what the image needs. This keeps the root
+# .env, local files and the other services out of the build context.
 *
 !frontend/
 !gateway/nginx.conf
