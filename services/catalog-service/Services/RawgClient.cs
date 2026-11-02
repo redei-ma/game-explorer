@@ -48,6 +48,7 @@ public class RawgClient(HttpClient http, IConfiguration config, IMemoryCache cac
     public Task<GameListResponse?> GetGamesAsync(
     string? search = null, string? ordering = null, string? dates = null,
     string? genres = null, string? parentPlatforms = null,
+    int? minMetacritic = null, int? maxMetacritic = null,
     int page = 1, int pageSize = 20, CancellationToken ct = default)
 {
     var query = new List<string> { $"key={_key}", $"page={page}", $"page_size={pageSize}" };
@@ -62,7 +63,9 @@ public class RawgClient(HttpClient http, IConfiguration config, IMemoryCache cac
         query.Add($"genres={Uri.EscapeDataString(genres)}");
     if (!string.IsNullOrWhiteSpace(parentPlatforms))
         query.Add($"parent_platforms={Uri.EscapeDataString(parentPlatforms)}");
-
+    // RAWG expects a single "min,max" range. If the caller gives only one end, the other is defaulted.
+    if (minMetacritic is not null || maxMetacritic is not null)
+        query.Add($"metacritic={minMetacritic ?? 0},{maxMetacritic ?? 100}"); // ?? means “use the left value, or the right one if the left is null”.
     return http.GetFromJsonAsync<GameListResponse>(
         $"games?{string.Join('&', query)}", JsonOptions, ct);
 }
