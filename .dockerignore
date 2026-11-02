@@ -9,3 +9,7 @@
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+
+
+# Script made for testing in development phase
+addMigration.sh

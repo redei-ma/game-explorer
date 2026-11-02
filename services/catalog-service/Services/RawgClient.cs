@@ -83,10 +83,10 @@ public class RawgClient(HttpClient http, IConfiguration config)
     private async Task<T?> GetOrNullAsync<T>(string url, CancellationToken ct) where T : class
     {
         using var response = await http.GetAsync(url, ct);
-    
+
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
-    
+
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions, ct);
     }

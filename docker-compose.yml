@@ -40,6 +40,7 @@ services:
       # "sa" is the SQL Server administrator: fine for local development; a production
       # setup would use a dedicated login with access to this database only
       ConnectionStrings__LibraryDb: "Server=sqlserver;Database=LibraryDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+      Services__Catalog__BaseUrl: "http://catalog-service:8080/"
     depends_on:
       sqlserver:
         condition: service_healthy
