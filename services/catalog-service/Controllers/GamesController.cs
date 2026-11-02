@@ -43,11 +43,12 @@ public class GamesController(RawgClient rawg) : ControllerBase
         }
     }
 
-    /// <summary>Returns the full details of one game. GET /api/games/3498</summary>
-    /// <param name="id">The RAWG game id.</param>
+    /// <summary>Returns the full details of one game. GET /api/games/3498
+    /// Throws "400 bad request" error with id <= 0 </summary>
+    /// <param name="id">The RAWG game id; must be 1 or greater.</param>
     /// <param name="ct">Cancellation token.</param>
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id, CancellationToken ct = default)
+    public async Task<IActionResult> GetById([Range(1, int.MaxValue)] int id, CancellationToken ct = default)
     {
         try
         {
