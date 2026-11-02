@@ -39,6 +39,9 @@ public class GamesController(RawgClient rawg) : ControllerBase
         pageSize = Math.Clamp(pageSize, 1, 40);
         page = Math.Max(page, 1);
 
+        if (minMetacritic is not null && maxMetacritic is not null && minMetacritic > maxMetacritic)
+            return BadRequest("minMetacritic cannot be greater than maxMetacritic.");
+
         if (year is not null && string.IsNullOrWhiteSpace(dates))
             dates = $"{year}-01-01,{year}-12-31";
 
