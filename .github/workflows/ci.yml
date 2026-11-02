@@ -2,8 +2,8 @@ name: CI
 
 # Checks every pull request into dev and main, the only way code reaches them.
 # Builds and tests the .NET services and the Angular app. The Docker images are
-# not built: they compile the same code, so a broken Dockerfile is the one
-# thing this does not catch.
+# not built, so errors in a Dockerfile, docker-compose.yml or nginx.conf are not
+# caught here.
 
 on:
   pull_request:
