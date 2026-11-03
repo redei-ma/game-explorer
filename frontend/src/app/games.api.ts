@@ -83,7 +83,8 @@ export interface ScreenshotsResponse {
 export interface GamesQuery {
 	search?: string;
 	genres?: string;
-	platforms?: string;
+	platforms?: string;// For specific game platforms (ps5, ps4...)
+	parentPlatforms?: string;
 	dates?: string;// "yyyy-mm-dd,yyyy-mm-dd"
 	ordering?: string;// e.g. "-added", "-rating", "name"
 	metacritic?: string;// "80,100"

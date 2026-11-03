@@ -30,7 +30,7 @@
 
 		<div class="filter-group">
 			<label for="platform-select">Piattaforma</label>
-			<select id="platform-select" [(ngModel)]="currentQuery.platforms" (change)="onFilterChange()">
+			<select id="platform-select" [(ngModel)]="currentQuery.parentPlatforms" (change)="onFilterChange()">
 				<option [ngValue]="undefined">Tutte le piattaforme</option>
 				<option *ngFor="let p of platforms" [value]="p.id">{{ p.name }}</option>
 			</select>
