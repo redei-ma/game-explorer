@@ -21,12 +21,13 @@ public record GameListResponse(int Count, List<GameSummary> Results);
 /// <param name="BackgroundImage">URL of the cover image, or null if missing.</param>
 /// <param name="ParentPlatforms">Main platform families (PC, PlayStation...); maps to JSON "parent_platforms".</param>
 public record GameSummary(
-    int Id,
-    string Name,
-    string? Released,
-    double Rating,
-    string? BackgroundImage,
-    List<PlatformEntry>? ParentPlatforms);
+    int                     Id,
+    string                  Name,
+    string?                 Released,
+    double                  Rating,
+    string?                 BackgroundImage,
+    List<PlatformEntry>?    ParentPlatforms,
+    int?                    Metacritic);
 
 
 /// <summary>
@@ -34,16 +35,16 @@ public record GameSummary(
 /// Property names are matched to RAWG's snake_case JSON by the serializer options in RawgClient.
 /// </summary>
 public record GameDetail(
-    int Id,
-    string Name,
-    string? DescriptionRaw,        // description_raw: plain-text description
-    string? Released,
-    double Rating,
-    int? Metacritic,               // nullable: many games have no score
-    string? BackgroundImage,
-    List<NamedItem> Genres,
-    List<NamedItem> Developers,
-    List<NamedItem> Publishers,
+    int                 Id,
+    string              Name,
+    string?             DescriptionRaw,        // description_raw: plain-text description
+    string?             Released,
+    double              Rating,
+    int?                Metacritic,               // nullable: many games have no score
+    string?             BackgroundImage,
+    List<NamedItem>     Genres,
+    List<NamedItem>     Developers,
+    List<NamedItem>     Publishers,
     List<PlatformEntry> Platforms);
 
 /// <summary>
@@ -80,9 +81,9 @@ public record GameListScreenshots(int Count, List<GameScreenshot> Results);
 
 // <summary>A single screenshot with its image URL and dimensions.</summary>
 public record GameScreenshot(
-    int Id,
-    string Image,
-    bool Hidden,                    // Default: false. Sets image as hidden or visible.
-    int Width,
-    int Height
+    int     Id,
+    string  Image,
+    bool    Hidden,                    // Default: false. Sets image as hidden or visible.
+    int     Width,
+    int     Height
 );
