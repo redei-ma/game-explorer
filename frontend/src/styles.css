@@ -10,6 +10,10 @@
 	--ge-muted: #8493a1;
 	--ge-accent: #00b06a;
 	--ge-accent-hover: #00c978;
+	--ge-primary: #005a9c;
+	--ge-primary-hover: #00457a;
+	--ge-info: #00a3e0;
+	--ge-danger: #ef4444;
 	--bs-body-bg: var(--ge-bg);
 	--bs-body-color: var(--ge-text);
 	--bs-body-font-family: 'DM Sans', system-ui, sans-serif;
