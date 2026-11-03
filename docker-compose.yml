@@ -1,7 +1,7 @@
 services:
   sqlserver:
     # Pinned by digest like the Dockerfile base images. Keep in sync with
-    # tests/LibraryService.IntegrationTests/LibraryApiFactory.cs
+    # LibraryApiFactory.cs and AuthApiFactory.cs files in tests/
     image: mcr.microsoft.com/mssql/server:2022-CU27-GDR1-ubuntu-22.04@sha256:cf8f0ab2ebe61feec2eed2629061a07d247f791c2a8ddda74a4ac9f06a291718
     # The image is amd64-only: native on Intel/AMD, emulated (Rosetta) on Apple Silicon
     platform: linux/amd64
@@ -33,6 +33,22 @@ services:
       # the services directly
       - "127.0.0.1:5001:8080"
 
+  auth-service:
+    build: ./services/auth-service
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      # Connects as "sa", the SQL Server administrator. A production setup would
+      # use a dedicated login with access to this database only.
+      ConnectionStrings__AuthDb: "Server=sqlserver;Database=AuthDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY in .env (see .env.example)}
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    ports:
+      # Exposed for local development: the ng serve proxy and Postman call
+      # the services directly
+      - "127.0.0.1:5002:8080"
+
   library-service:
     build: ./services/library-service
     environment:
@@ -59,6 +75,7 @@ services:
       # Start order only: nginx resolves service names per request, so it also
       # works while a service is down
       - catalog-service
+      - auth-service
       - library-service
 
 volumes:

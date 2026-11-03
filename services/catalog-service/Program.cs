@@ -15,6 +15,7 @@ builder.Services.AddOpenApi();
 // Used by Docker and the gateway to know whether the service is up
 builder.Services.AddHealthChecks();
 
+builder.Services.AddMemoryCache();
 
 // Registers RawgClient so ASP.NET can inject it into controllers
 // and configures the HttpClient it receives.

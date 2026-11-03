@@ -14,6 +14,10 @@
       "^/health/catalog": "/health"
     }
   },
+  "/health/auth": {
+    "target": "http://localhost:5002",
+    "pathRewrite": { "^/health/auth": "/health" }
+  },
   "/health/library": {
     "target": "http://localhost:5003",
     "pathRewrite": {
