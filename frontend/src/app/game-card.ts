@@ -32,7 +32,7 @@ export class GameCard {
 	});
 
 	protected readonly platforms = computed(() =>
-		(this.game().parentPlatforms ?? [])
+		(this.game().platforms ?? this.game().parentPlatforms ?? [])
 			.slice(0, 3)
 			.map((p) => p.platform.name)
 			.join(' · '),

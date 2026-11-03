@@ -14,6 +14,12 @@ export interface Platform {
 	slug: string;
 }
 
+export interface ParentPlatform extends Platform {}
+
+export interface GamePlatform {
+	platform: Platform;
+}
+
 export interface Game {
 	id: number;
 	name: string;
@@ -22,7 +28,8 @@ export interface Game {
 	backgroundImage: string | null;
 	rating: number;// 0-5, 0 when nobody rated it yet
 	metacritic: number | null;
-	parentPlatforms?: { platform: Platform }[];
+	parentPlatforms?: GamePlatform[];
+	platforms?: GamePlatform[];
 }
 
 export interface GamesPage {
@@ -83,8 +90,8 @@ export interface ScreenshotsResponse {
 export interface GamesQuery {
 	search?: string;
 	genres?: string;
-	platforms?: string;// For specific game platforms (ps5, ps4...)
-	parentPlatforms?: string;
+	platforms?: string;// Specific consoles (PS4, PS5, Xbox One...)
+	parentPlatforms?: string;// Platform families (PlayStation, Xbox, PC...)
 	dates?: string;// "yyyy-mm-dd,yyyy-mm-dd"
 	ordering?: string;// e.g. "-added", "-rating", "name"
 	metacritic?: string;// "80,100"

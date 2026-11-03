@@ -87,7 +87,9 @@ export class GameDetail implements OnInit, OnDestroy {
 			released: g.released,
 			backgroundImage: g.backgroundImage,
 			rating: g.rating,
-			metacritic: g.metacritic
+			metacritic: g.metacritic,
+			platforms: g.platforms,
+			parentPlatforms: g.parentPlatforms
 		};
 
 		this.favoritesService.toggleFavorite(gameSummary);

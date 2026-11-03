@@ -76,9 +76,15 @@
 				</div>
 			</div>
 			<div class="meta-card" *ngIf="g.parentPlatforms && g.parentPlatforms.length > 0">
-				<span class="meta-label">Piattaforme</span>
+				<span class="meta-label">Famiglie di piattaforme</span>
 				<div class="tags-list">
 					<span class="tag-badge platform" *ngFor="let p of g.parentPlatforms">{{ p.platform.name }}</span>
+				</div>
+			</div>
+			<div class="meta-card" *ngIf="g.platforms && g.platforms.length > 0">
+				<span class="meta-label">Console</span>
+				<div class="tags-list">
+					<span class="tag-badge platform" *ngFor="let p of g.platforms">{{ p.platform.name }}</span>
 				</div>
 			</div>
 		</section>

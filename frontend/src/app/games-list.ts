@@ -50,7 +50,8 @@ export class GamesList implements OnInit, OnDestroy {
 		this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
 			this.currentQuery.search = params['search'] || undefined;
 			this.currentQuery.genres = params['genres'] || undefined;
-			this.currentQuery.parentPlatforms = params['platforms'] || undefined;
+			this.currentQuery.parentPlatforms =
+				params['parentPlatforms'] || params['platforms'] || undefined;
 			this.selectedYear = params['year'] || '';
 			this.currentQuery.metacritic = params['metacritic'] || undefined;
 			this.currentQuery.ordering = params['ordering'] || '-rating';
@@ -143,7 +144,7 @@ export class GamesList implements OnInit, OnDestroy {
 		const queryParams = {
 			search: this.currentQuery.search || null,
 			genres: this.currentQuery.genres || null,
-			platforms: this.currentQuery.parentPlatforms || null,
+			parentPlatforms: this.currentQuery.parentPlatforms || null,
 			year: this.selectedYear || null,
 			metacritic: this.currentQuery.metacritic || null,
 			ordering: this.currentQuery.ordering !== '-rating' ? this.currentQuery.ordering : null,
