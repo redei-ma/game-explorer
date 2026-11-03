@@ -3,8 +3,8 @@
 	<header class="games-header">
 		<div class="header-title">
 			<h1>Esplora i Videogiochi</h1>
-			<span class="results-badge" *ngIf="!isLoading && !hasError">
-				{{ totalResults }} risultati trovati
+			<span class="results-badge" *ngIf="!isLoading() && !hasError()">
+				{{ totalResults() }} risultati trovati
 			</span>
 		</div>
 		<button class="btn-toggle-filters d-md-none" (click)="toggleMobileFilters()">
@@ -24,7 +24,7 @@
 			<label for="genre-select">Genere</label>
 			<select id="genre-select" [(ngModel)]="currentQuery.genres" (change)="onFilterChange()">
 				<option [ngValue]="undefined">Tutti i generi</option>
-				<option *ngFor="let g of genres" [value]="g.id">{{ g.name }}</option>
+				<option *ngFor="let g of genres()" [value]="g.id">{{ g.name }}</option>
 			</select>
 		</div>
 
@@ -32,7 +32,7 @@
 			<label for="platform-select">Famiglia di piattaforma</label>
 			<select id="platform-select" [(ngModel)]="currentQuery.parentPlatforms" (change)="onFilterChange()">
 				<option [ngValue]="undefined">Tutte le piattaforme</option>
-				<option *ngFor="let p of platforms" [value]="p.id">{{ p.name }}</option>
+				<option *ngFor="let p of platforms()" [value]="p.id">{{ p.name }}</option>
 			</select>
 		</div>
 
@@ -70,20 +70,20 @@
 	</section>
 
 	<!-- UI States (Loading, Error, Empty) -->
-	<section class="state-container" *ngIf="isLoading">
+	<section class="state-container" *ngIf="isLoading()">
 		<div class="games-grid">
 			<div class="card-skeleton" *ngFor="let item of [1,2,3,4,5,6,7,8,9,10,11,12]"></div>
 		</div>
 	</section>
 
-	<section class="state-container state-banner error-banner" *ngIf="!isLoading && hasError">
+	<section class="state-container state-banner error-banner" *ngIf="!isLoading() && hasError()">
 		<div class="banner-content">
 			<p>Si è verificato un errore durante il recupero dei dati.</p>
 			<button class="btn-primary" (click)="fetchGames()">Riprova</button>
 		</div>
 	</section>
 
-	<section class="state-container state-banner empty-banner" *ngIf="!isLoading && !hasError && games.length === 0">
+	<section class="state-container state-banner empty-banner" *ngIf="!isLoading() && !hasError() && games().length === 0">
 		<div class="banner-content">
 			<p>Nessun videogioco trovato con i criteri selezionati.</p>
 			<button class="btn-primary" (click)="resetFilters()">Azzera Filtri</button>
@@ -91,21 +91,21 @@
 	</section>
 
 	<!-- Games Grid -->
-	<main class="games-grid" *ngIf="!isLoading && !hasError && games.length > 0">
+	<main class="games-grid" *ngIf="!isLoading() && !hasError() && games().length > 0">
 		<!-- Selector of GameCard  -->
-		<app-game-card *ngFor="let game of games" [game]="game"></app-game-card>
+		<app-game-card *ngFor="let game of games()" [game]="game"></app-game-card>
 	</main>
 
 	<!-- Pagination Controls -->
-	<nav class="pagination-container" *ngIf="!isLoading && !hasError && totalPages > 1">
+	<nav class="pagination-container" *ngIf="!isLoading() && !hasError() && totalPages() > 1">
 		<button class="pagination-btn" [disabled]="currentQuery.page === 1" 
 			(click)="onPageChange((currentQuery.page || 1) - 1)">
 			Precedente
 		</button>
 		<span class="pagination-info">
-			Pagina {{ currentQuery.page }} di {{ totalPages }}
+			Pagina {{ currentQuery.page }} di {{ totalPages() }}
 		</span>
-		<button class="pagination-btn" [disabled]="currentQuery.page === totalPages" 
+		<button class="pagination-btn" [disabled]="currentQuery.page === totalPages()"
 			(click)="onPageChange((currentQuery.page || 1) + 1)">
 			Successiva
 		</button>

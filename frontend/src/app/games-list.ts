@@ -1,18 +1,19 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
+import { Subject, of } from 'rxjs';
+import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { GamesApi, Game, Genre, PlatformItem, GamesQuery } from './games.api';
-import { GameCard } from './game-card';// NB: assicurarsi che l'export si chiami GameCard
+import { GameCard } from './game-card';
 
 @Component({
-	selector: 'app-games-list',// NB: anche qui check se nel progetto si usano prefissi diversi
+	selector: 'app-games-list',
 	standalone: true,
 	imports: [CommonModule, FormsModule, RouterModule, GameCard],
 	templateUrl: './games-list.html',
-	styleUrls: ['./games-list.css']
+	styleUrls: ['./games-list.css'],
+	changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GamesList implements OnInit, OnDestroy {
 	private readonly gamesApi = inject(GamesApi);
@@ -20,16 +21,16 @@ export class GamesList implements OnInit, OnDestroy {
 	private readonly router = inject(Router);
 	private readonly destroy$ = new Subject<void>();
 
-	games: Game[] = [];
-	genres: Genre[] = [];
-	platforms: PlatformItem[] = [];
+	readonly games = signal<Game[]>([]);
+	readonly genres = signal<Genre[]>([]);
+	readonly platforms = signal<PlatformItem[]>([]);
 
-	totalResults = 0;
-	totalPages = 1;
+	readonly totalResults = signal(0);
+	readonly totalPages = signal(1);
 	pageSize = 24;
 
-	isLoading = true;
-	hasError = false;
+	readonly isLoading = signal(true);
+	readonly hasError = signal(false);
 	showMobileFilters = false;
 
 	// Filter Status mapped to your GamesQuery
@@ -46,25 +47,33 @@ export class GamesList implements OnInit, OnDestroy {
 		this.initYears();
 		this.loadGenresAndPlatforms();
 
-		// Listen for params queries from the URL to sync filters and launch the search
-		this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe(params => {
-			this.currentQuery.search = params['search'] || undefined;
-			this.currentQuery.genres = params['genres'] || undefined;
-			this.currentQuery.parentPlatforms =
-				params['parentPlatforms'] || params['platforms'] || undefined;
-			this.selectedYear = params['year'] || '';
-			this.currentQuery.metacritic = params['metacritic'] || undefined;
-			this.currentQuery.ordering = params['ordering'] || '-rating';
-			this.currentQuery.page = params['page'] ? parseInt(params['page'], 10) : 1;
-
-			// Rebuilds the 'dates' param as required by RAWG ("yyyy-mm-dd,yyyy-mm-dd")
-			if (this.selectedYear) {
-				this.currentQuery.dates = `${this.selectedYear}-01-01,${this.selectedYear}-12-31`;
+		// Keep the URL as the source of truth and cancel stale requests on new filters.
+		this.route.queryParams.pipe(
+			map(params => {
+				const query = this.queryFromParams(params);
+				this.currentQuery = query;
+				this.selectedYear = params['year'] || '';
+				this.isLoading.set(true);
+				this.hasError.set(false);
+				return query;
+			}),
+			switchMap(query => this.gamesApi.getGames(query).pipe(
+				map(response => ({ query, response })),
+				catchError(() => of({ query, response: null })),
+			)),
+			takeUntil(this.destroy$),
+		).subscribe(({ query, response }) => {
+			if (response === null) {
+				this.games.set([]);
+				this.totalResults.set(0);
+				this.totalPages.set(1);
+				this.hasError.set(true);
 			} else {
-				this.currentQuery.dates = undefined;
+				this.games.set(response.results || []);
+				this.totalResults.set(response.count || 0);
+				this.totalPages.set(Math.ceil((response.count || 0) / (query.pageSize || 24)) || 1);
 			}
-
-			this.fetchGames();
+			this.isLoading.set(false);
 		});
 	}
 
@@ -82,31 +91,30 @@ export class GamesList implements OnInit, OnDestroy {
 
 	private loadGenresAndPlatforms(): void {
 		this.gamesApi.getGenres().subscribe({
-			next: res => (this.genres = res.results || []),
+			next: res => this.genres.set(res.results || []),
 			error: () => console.error('Errore nel caricamento dei generi')
 		});
 
 		this.gamesApi.getPlatforms().subscribe({
-			next: res => (this.platforms = res.results || []),
+			next: res => this.platforms.set(res.results || []),
 			error: () => console.error('Errore nel caricamento delle piattaforme')
 		});
 	}
 
 	fetchGames(): void {
-		this.isLoading = true;
-		this.hasError = false;
+		this.isLoading.set(true);
+		this.hasError.set(false);
 
-		// Call the getGames() method you defined, using your GamesQuery interface
 		this.gamesApi.getGames(this.currentQuery).subscribe({
 			next: res => {
-				this.games = res.results || [];
-				this.totalResults = res.count || 0;
-				this.totalPages = Math.ceil(this.totalResults / (this.currentQuery.pageSize || 24)) || 1;
-				this.isLoading = false;
+				this.games.set(res.results || []);
+				this.totalResults.set(res.count || 0);
+				this.totalPages.set(Math.ceil((res.count || 0) / (this.currentQuery.pageSize || 24)) || 1);
+				this.isLoading.set(false);
 			},
 			error: () => {
-				this.isLoading = false;
-				this.hasError = true;
+				this.isLoading.set(false);
+				this.hasError.set(true);
 			}
 		});
 	}
@@ -121,7 +129,7 @@ export class GamesList implements OnInit, OnDestroy {
 	}
 
 	onPageChange(newPage: number): void {
-		if (newPage < 1 || newPage > this.totalPages) return;
+		if (newPage < 1 || newPage > this.totalPages()) return;
 		this.updateQueryParams(newPage);
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
@@ -156,5 +164,21 @@ export class GamesList implements OnInit, OnDestroy {
 			queryParams,
 			queryParamsHandling: 'merge'
 		});
+	}
+
+	private queryFromParams(params: Params): GamesQuery {
+		const selectedYear = params['year'] || '';
+		return {
+			search: params['search'] || undefined,
+			genres: params['genres'] || undefined,
+			parentPlatforms: params['parentPlatforms'] || params['platforms'] || undefined,
+			metacritic: params['metacritic'] || undefined,
+			ordering: params['ordering'] || '-rating',
+			page: params['page'] ? parseInt(params['page'], 10) : 1,
+			pageSize: this.pageSize,
+			dates: selectedYear
+				? `${selectedYear}-01-01,${selectedYear}-12-31`
+				: undefined,
+		};
 	}
 }

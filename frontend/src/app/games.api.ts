@@ -1,7 +1,7 @@
 // defines the RAWG data types (Game, GamesPage, GamesQuery) and a class with only
 // one method, getGames(query), which calls GET/api/games with the parameters to
 // keep API calls separate from graphics
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import {
@@ -139,7 +139,9 @@ export class GamesApi {
 	}
 	getPlatforms(): Observable<PlatformsPage> {
 		if (USE_MOCK_DATA) return of(MOCK_PLATFORMS);
-		return this.http.get<PlatformsPage>('/api/platforms');
+		// page_size=40 is the maximum allowed by RAWG, so we can get all platforms in one call
+		const params = new HttpParams().set('page_size', '40');
+		return this.http.get<PlatformsPage>('/api/platforms', { params });
 	}
 
 	// Methods for retrieving detail information and screenshots of the individual game
