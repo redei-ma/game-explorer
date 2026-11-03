@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject, forkJoin, of } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
 import { GamesApi, GameDetailData, Screenshot, Game } from './games.api';
@@ -17,6 +17,7 @@ import { FavoritesService } from './favorites.service';
 export class GameDetail implements OnInit, OnDestroy {
 	private readonly gamesApi = inject(GamesApi);
 	private readonly route = inject(ActivatedRoute);
+	private readonly router = inject(Router);
 	readonly location = inject(Location);
 	private readonly destroy$ = new Subject<void>();
 	private readonly favoritesService = inject(FavoritesService);
@@ -126,7 +127,12 @@ export class GameDetail implements OnInit, OnDestroy {
 	} */
 
 	goBack(): void {
-		this.location.back();
+		// Navigation id 1 means the detail page was opened directly
+		if (history.state?.navigationId > 1) {
+			this.location.back();
+			return ;
+		}
+		this.router.navigate(['/games']);
 	}
 
 	// Utility to determine the CSS class for the Metacritic score
