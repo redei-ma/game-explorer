@@ -14,7 +14,7 @@ function popularQuery(): GamesQuery {
 	const end = new Date();
 	const start = new Date();
 	start.setDate(end.getDate() - POPULAR_WINDOW_DAYS);
-	return { dates: `${isoDay(start)},${isoDay(end)}`, ordering: '-added', page_size: POPULAR_COUNT };
+	return { dates: `${isoDay(start)},${isoDay(end)}`, ordering: '-added', pageSize: POPULAR_COUNT };
 }
 
 @Component({

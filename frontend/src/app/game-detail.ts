@@ -85,7 +85,7 @@ export class GameDetail implements OnInit, OnDestroy {
 			name: g.name,
 			slug: g.slug,
 			released: g.released,
-			background_image: g.background_image,
+			backgroundImage: g.backgroundImage,
 			rating: g.rating,
 			metacritic: g.metacritic
 		};
@@ -101,17 +101,17 @@ export class GameDetail implements OnInit, OnDestroy {
 		id: id,
 		name: 'The Legend of Zelda: Tears of the Kingdom',		slug: 'zelda-totk',
 		released: '2023-05-12',
-		background_image: 'https://media.rawg.io/media/games/f99/f997966e3f22d05779ec364bc9a5f22e.jpg',
+		backgroundImage: 'https://media.rawg.io/media/games/f99/f997966e3f22d05779ec364bc9a5f22e.jpg',
 		rating: 4.8,
 		metacritic: 96,
-		description_raw: 'An epic adventure across the land and skies of Hyrule awaits in The Legend of Zelda: Tears of the Kingdom for Nintendo Switch. In this sequel to Breath of the Wild, you’ll decide your own path through the sprawling landscapes of Hyrule and the mysterious islands floating in the vast skies above.',
+		descriptionRaw: 'An epic adventure across the land and skies of Hyrule awaits in The Legend of Zelda: Tears of the Kingdom for Nintendo Switch. In this sequel to Breath of the Wild, you’ll decide your own path through the sprawling landscapes of Hyrule and the mysterious islands floating in the vast skies above.',
 		developers: [{ id: 1, name: 'Nintendo EPD', slug: 'nintendo-epd' }],
 		publishers: [{ id: 1, name: 'Nintendo', slug: 'nintendo' }],
 		genres: [
 		{ id: 1, name: 'Action', slug: 'action' },
 		{ id: 2, name: 'Adventure', slug: 'adventure' }
 		],
-		parent_platforms: [
+		parentPlatforms: [
 		{ platform: { id: 1, name: 'Nintendo Switch', slug: 'switch' } }
 		]
 	};

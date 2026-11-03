@@ -26,7 +26,7 @@
 	<!-- Game Detail Content -->
 	<div class="detail-content" *ngIf="!isLoading() && !hasError() && game(); let g">
 		<!-- HERO HEADER -->
-		<header class="hero-header" [style.background-image]="g.background_image ? 'linear-gradient(to bottom, rgba(18,18,18,0.3), rgba(18,18,18,0.95)), url(' + g.background_image + ')' : 'none'">
+		<header class="hero-header" [style.background-image]="g.backgroundImage ? 'linear-gradient(to bottom, rgba(18,18,18,0.3), rgba(18,18,18,0.95)), url(' + g.backgroundImage + ')' : 'none'">
 			<div class="hero-body">
 				<!-- Added layout flex wrapper to align title and favorite button -->
 				<div class="hero-header-top">
@@ -75,18 +75,18 @@
 					<span class="tag-badge" *ngFor="let genre of g.genres">{{ genre.name }}</span>
 				</div>
 			</div>
-			<div class="meta-card" *ngIf="g.parent_platforms && g.parent_platforms.length > 0">
+			<div class="meta-card" *ngIf="g.parentPlatforms && g.parentPlatforms.length > 0">
 				<span class="meta-label">Piattaforme</span>
 				<div class="tags-list">
-					<span class="tag-badge platform" *ngFor="let p of g.parent_platforms">{{ p.platform.name }}</span>
+					<span class="tag-badge platform" *ngFor="let p of g.parentPlatforms">{{ p.platform.name }}</span>
 				</div>
 			</div>
 		</section>
 
 		<!-- Description Section -->
-		<section class="description-section" *ngIf="g.description_raw">
+		<section class="description-section" *ngIf="g.descriptionRaw">
 			<h2>Informazioni sul gioco</h2>
-			<p class="description-text">{{ g.description_raw }}</p>
+			<p class="description-text">{{ g.descriptionRaw }}</p>
 		</section>
 
 		<!-- Screenshots Gallery -->

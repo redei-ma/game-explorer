@@ -1,9 +1,9 @@
 <!-- Wrapper added to position the absolute favorite button relative to the card -->
 <div class="game-card-container">
 	<a class="game-card" [routerLink]="['/games', game().id]">
-		<span class="ph-poster" [class.ph-poster--cover]="game().background_image">
-		@if (game().background_image) {
-			<img [src]="game().background_image" [alt]="'Copertina di ' + game().name" loading="lazy" />
+		<span class="ph-poster" [class.ph-poster--cover]="game().backgroundImage">
+		@if (game().backgroundImage) {
+			<img [src]="game().backgroundImage" [alt]="'Copertina di ' + game().name" loading="lazy" />
 		}
 		@if (label()) {
 			<span class="ph-poster__n">{{ label() }}</span>

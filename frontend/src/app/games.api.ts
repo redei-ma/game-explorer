@@ -19,10 +19,10 @@ export interface Game {
 	name: string;
 	slug: string;
 	released: string | null;// yyyy-mm-dd
-	background_image: string | null;
+	backgroundImage: string | null;
 	rating: number;// 0-5, 0 when nobody rated it yet
 	metacritic: number | null;
-	parent_platforms?: { platform: Platform }[];
+	parentPlatforms?: { platform: Platform }[];
 }
 
 export interface GamesPage {
@@ -69,7 +69,7 @@ export interface Screenshot {
 	image: string;
 }
 export interface GameDetailData extends Game {
-	description_raw?: string;
+	descriptionRaw?: string;
 	developers?: Developer[];
 	publishers?: Publisher[];
 	genres?: Genre[];
@@ -88,7 +88,7 @@ export interface GamesQuery {
 	ordering?: string;// e.g. "-added", "-rating", "name"
 	metacritic?: string;// "80,100"
 	page?: number;
-	page_size?: number;
+	pageSize?: number;
 }
 
 /*******************************************************************************

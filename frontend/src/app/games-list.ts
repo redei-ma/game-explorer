@@ -35,7 +35,7 @@ export class GamesList implements OnInit, OnDestroy {
 	// Filter Status mapped to your GamesQuery
 	currentQuery: GamesQuery = {
 		page: 1,
-		page_size: 24,
+		pageSize: 24,
 		ordering: '-rating'
 	};
 
@@ -100,7 +100,7 @@ export class GamesList implements OnInit, OnDestroy {
 			next: res => {
 				this.games = res.results || [];
 				this.totalResults = res.count || 0;
-				this.totalPages = Math.ceil(this.totalResults / (this.currentQuery.page_size || 24)) || 1;
+				this.totalPages = Math.ceil(this.totalResults / (this.currentQuery.pageSize || 24)) || 1;
 				this.isLoading = false;
 			},
 			error: () => {
