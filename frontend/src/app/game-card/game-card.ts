@@ -1,8 +1,8 @@
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Game } from './games.api';
-import { FavoritesService } from './favorites.service';
+import { Game } from '../games/games.api';
+import { FavoritesService } from '../favorites/favorites.service';
 
 /* Reusable game card: cover, title, release date, average rating, main platforms.
    Used by the Home grid now and by the search results list later */

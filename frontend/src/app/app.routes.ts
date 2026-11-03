@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
-import { Home } from './home';
-import { GamesList } from './games-list';
-import { GameDetail } from './game-detail';
-import { FavoritesList } from './favorites-list';
+import { Home } from './home/home';
+import { GamesList } from './games/games-list';
+import { GameDetail } from './game-detail/game-detail';
+import { FavoritesList } from './favorites/favorites-list';
 
 export const routes: Routes = [
 	{ path: '', component: Home, title: 'Gaming Explorer' },

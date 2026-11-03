@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FavoritesService } from './favorites.service';
-import { GameCard } from './game-card';
+import { GameCard } from '../game-card/game-card';
 
 // Component responsible for displaying the user's favorite games grid
 @Component({

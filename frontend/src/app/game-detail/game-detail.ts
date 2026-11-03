@@ -3,8 +3,8 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { Subject, forkJoin, of } from 'rxjs';
 import { catchError, takeUntil } from 'rxjs/operators';
-import { GamesApi, GameDetailData, Screenshot, Game } from './games.api';
-import { FavoritesService } from './favorites.service';
+import { GamesApi, GameDetailData, Screenshot, Game } from '../games/games.api';
+import { FavoritesService } from '../favorites/favorites.service';
 
 @Component({
 	selector: 'app-game-detail',

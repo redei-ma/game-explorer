@@ -1,7 +1,7 @@
 // Manages localStorage reactively using Angular Signals
 
 import { Injectable, signal } from '@angular/core';
-import { Game } from './games.api';
+import { Game } from '../games/games.api';
 
 // Key used to store favorites in the browser's Local Storage
 const STORAGE_KEY = 'ge_favorites';

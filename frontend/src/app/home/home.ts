@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { GameCard } from './game-card';
-import { GamesApi, GamesQuery } from './games.api';
+import { GameCard } from '../game-card/game-card';
+import { GamesApi, GamesQuery } from '../games/games.api';
 
 // Popular this week = most added games released in the last N days
 const POPULAR_WINDOW_DAYS = 7;

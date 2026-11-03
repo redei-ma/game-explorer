@@ -5,7 +5,7 @@ import { ActivatedRoute, Params, Router, RouterModule } from '@angular/router';
 import { Subject, of } from 'rxjs';
 import { catchError, map, switchMap, takeUntil } from 'rxjs/operators';
 import { GamesApi, Game, Genre, PlatformItem, GamesQuery } from './games.api';
-import { GameCard } from './game-card';
+import { GameCard } from '../game-card/game-card';
 
 @Component({
 	selector: 'app-games-list',
