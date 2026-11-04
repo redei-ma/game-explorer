@@ -95,7 +95,7 @@ export class GamesList implements OnInit, OnDestroy {
 			error: () => console.error('Errore nel caricamento dei generi')
 		});
 
-		this.gamesApi.getPlatforms().subscribe({
+		this.gamesApi.getParentPlatforms().subscribe({
 			next: res => this.platforms.set(res.results || []),
 			error: () => console.error('Errore nel caricamento delle piattaforme')
 		});
