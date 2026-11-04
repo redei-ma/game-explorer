@@ -1,19 +1,41 @@
-import { Component, signal } from '@angular/core';
-import { httpResource } from '@angular/common/http';
-import { RouterOutlet } from '@angular/router';
+import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
-  imports: [RouterOutlet],
-  selector: 'app-root',
-  styleUrl: './app.css',
-  templateUrl: './app.html',
+	imports: [RouterOutlet, RouterLink],
+	selector: 'app-root',
+	templateUrl: './app.html',
+	styleUrl: './app.css',
 })
 export class App {
-  protected readonly title = signal('Gaming Explorer');
+	private readonly router = inject(Router);
+	private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
-  // Temporary skeleton check: whether each backend service answers through the proxy
-  protected readonly services = [
-    { name: 'catalog-service', health: httpResource.text(() => '/health/catalog') },
-    { name: 'library-service', health: httpResource.text(() => '/health/library') },
-  ];
+	protected readonly menuOpen = signal(false);
+	protected readonly searchOpen = signal(false);
+
+	// Navigation links including the new Favorites route
+	protected readonly navLinks = [
+	{ label: 'Giochi', path: '/games' },
+	{ label: 'Preferiti', path: '/favorites' },
+	{ label: 'Recensioni', path: '/' },
+	{ label: 'Liste', path: '/' },
+	];
+	protected readonly footerLinks = ['Chi siamo', 'Aiuto', 'Termini', 'Privacy', 'Contatti'];
+
+	protected toggleSearch(): void {
+	this.searchOpen.update((open) => !open);
+	// The input exists only after the next render
+	setTimeout(() => this.searchInput()?.nativeElement.focus());
+	}
+
+	// Basic search: hands the term to the games list page (/games?search=...)
+	protected search(event: Event, term: string): void {
+	event.preventDefault();
+	const search = term.trim();
+	if (!search) return;
+	this.searchOpen.set(false);
+	this.menuOpen.set(false);
+	this.router.navigate(['/games'], { queryParams: { search } });
+	}
 }
