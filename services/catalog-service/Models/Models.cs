@@ -64,7 +64,8 @@ public record PlatformEntry(NamedItem Platform);
 /// <param name="Name">Display name (e.g. "Action", "PlayStation 5").</param>
 /// <param name="Slug">URL-friendly name (e.g. "action"); also accepted as a filter value.</param>
 /// <param name="GamesCount">How many games RAWG has for this entry.</param>
-public record CatalogItem(int Id, string Name, string Slug, int? GamesCount);
+/// <param name="Platforms">Child platforms (parent platforms only); null otherwise.</param>
+public record CatalogItem(int Id, string Name, string Slug, int? GamesCount, List<NamedItem>? Platforms = null);
 
 /// <summary>Paged list of genres or platforms, as returned by RAWG.</summary>
 /// <param name="Count">Total number of entries.</param>
