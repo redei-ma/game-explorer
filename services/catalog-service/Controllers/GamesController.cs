@@ -29,9 +29,9 @@ public class GamesController(RawgClient rawg) : ControllerBase
     public async Task<IActionResult> GetGames(
     [FromQuery] string? search = null, [FromQuery] string? ordering = null,
     [FromQuery] string? dates = null, [FromQuery] string? genres = null,
-    [FromQuery] string? parentPlatforms = null, [FromQuery] int page = 1,
-    [FromQuery, Range(0, 100)] int? minMetacritic = null,
-    [FromQuery, Range(0, 100)] int? maxMetacritic = null,
+    [FromQuery] string? parentPlatforms = null, [FromQuery] string? platforms = null,
+    [FromQuery] int page = 1, [FromQuery, Range(0, 100)]
+    int? minMetacritic = null, [FromQuery, Range(0, 100)] int? maxMetacritic = null,
     [FromQuery, Range(1970, 2100)] int? year = null,
     [FromQuery] int pageSize = 20, CancellationToken ct = default)
     {
@@ -49,7 +49,7 @@ public class GamesController(RawgClient rawg) : ControllerBase
         {
             return Ok(await rawg.GetGamesAsync(
             search: search, ordering: ordering, dates: dates,
-            genres: genres, parentPlatforms: parentPlatforms,
+            genres: genres, parentPlatforms: parentPlatforms, platforms: platforms,
             minMetacritic: minMetacritic, maxMetacritic: maxMetacritic,
             page: page, pageSize: pageSize, ct: ct));
         }
@@ -110,12 +110,20 @@ public class GamesController(RawgClient rawg) : ControllerBase
         }
     }
 
-    /// <summary>Lists platforms for the filter dropdown. GET /api/platforms</summary>
+    /// <summary>Lists platform families for the first dropdown. GET /api/parent-platforms</summary>
     /// <param name="ct">Cancellation token.</param>
-    /// <remarks>
-    /// The ~/ prefix tells ASP.NET to ignore the controller’s api/games
-    /// base route.
-    /// // </remarks>
+    [HttpGet("~/api/parent-platforms")]
+    public async Task<IActionResult> GetParentPlatforms(CancellationToken ct = default)
+    {
+        try { return Ok(await rawg.GetParentPlatformsAsync(ct)); }
+        catch (HttpRequestException ex)
+        {
+            return Problem($"Upstream API error: {ex.StatusCode}", statusCode: 502);
+        }
+    }
+    
+    /// <summary>Lists specific platforms. GET /api/platforms</summary>
+    /// <param name="ct">Cancellation token.</param>
     [HttpGet("~/api/platforms")]
     public async Task<IActionResult> GetPlatforms(CancellationToken ct = default)
     {
