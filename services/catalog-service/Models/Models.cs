@@ -21,12 +21,13 @@ public record GameListResponse(int Count, List<GameSummary> Results);
 /// <param name="BackgroundImage">URL of the cover image, or null if missing.</param>
 /// <param name="ParentPlatforms">Main platform families (PC, PlayStation...); maps to JSON "parent_platforms".</param>
 public record GameSummary(
-    int Id,
-    string Name,
-    string? Released,
-    double Rating,
-    string? BackgroundImage,
-    List<PlatformEntry>? ParentPlatforms);
+    int                     Id,
+    string                  Name,
+    string?                 Released,
+    double                  Rating,
+    string?                 BackgroundImage,
+    List<PlatformEntry>?    ParentPlatforms,
+    int?                    Metacritic);
 
 
 /// <summary>
@@ -34,16 +35,16 @@ public record GameSummary(
 /// Property names are matched to RAWG's snake_case JSON by the serializer options in RawgClient.
 /// </summary>
 public record GameDetail(
-    int Id,
-    string Name,
-    string? DescriptionRaw,        // description_raw: plain-text description
-    string? Released,
-    double Rating,
-    int? Metacritic,               // nullable: many games have no score
-    string? BackgroundImage,
-    List<NamedItem> Genres,
-    List<NamedItem> Developers,
-    List<NamedItem> Publishers,
+    int                 Id,
+    string              Name,
+    string?             DescriptionRaw,        // description_raw: plain-text description
+    string?             Released,
+    double              Rating,
+    int?                Metacritic,               // nullable: many games have no score
+    string?             BackgroundImage,
+    List<NamedItem>     Genres,
+    List<NamedItem>     Developers,
+    List<NamedItem>     Publishers,
     List<PlatformEntry> Platforms);
 
 /// <summary>
@@ -63,7 +64,8 @@ public record PlatformEntry(NamedItem Platform);
 /// <param name="Name">Display name (e.g. "Action", "PlayStation 5").</param>
 /// <param name="Slug">URL-friendly name (e.g. "action"); also accepted as a filter value.</param>
 /// <param name="GamesCount">How many games RAWG has for this entry.</param>
-public record CatalogItem(int Id, string Name, string Slug, int? GamesCount);
+/// <param name="Platforms">Child platforms (parent platforms only); null otherwise.</param>
+public record CatalogItem(int Id, string Name, string Slug, int? GamesCount, List<NamedItem>? Platforms = null);
 
 /// <summary>Paged list of genres or platforms, as returned by RAWG.</summary>
 /// <param name="Count">Total number of entries.</param>
@@ -80,9 +82,9 @@ public record GameListScreenshots(int Count, List<GameScreenshot> Results);
 
 // <summary>A single screenshot with its image URL and dimensions.</summary>
 public record GameScreenshot(
-    int Id,
-    string Image,
-    bool Hidden,                    // Default: false. Sets image as hidden or visible.
-    int Width,
-    int Height
+    int     Id,
+    string  Image,
+    bool    Hidden,                    // Default: false. Sets image as hidden or visible.
+    int     Width,
+    int     Height
 );

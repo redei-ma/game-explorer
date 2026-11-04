@@ -47,25 +47,31 @@ public class RawgClient(HttpClient http, IConfiguration config, IMemoryCache cac
     /// <param name="ct">Cancels the request if the caller disconnects.</param>
     public Task<GameListResponse?> GetGamesAsync(
     string? search = null, string? ordering = null, string? dates = null,
-    string? genres = null, string? parentPlatforms = null,
+    string? genres = null, string? parentPlatforms = null, string? platforms = null,
+    int? minMetacritic = null, int? maxMetacritic = null,
     int page = 1, int pageSize = 20, CancellationToken ct = default)
-{
-    var query = new List<string> { $"key={_key}", $"page={page}", $"page_size={pageSize}" };
+    {
+        var query = new List<string> { $"key={_key}", $"page={page}", $"page_size={pageSize}" };
 
-    if (!string.IsNullOrWhiteSpace(search))
-        query.Add($"search={Uri.EscapeDataString(search)}");
-    if (!string.IsNullOrWhiteSpace(ordering))
-        query.Add($"ordering={Uri.EscapeDataString(ordering)}");
-    if (!string.IsNullOrWhiteSpace(dates))
-        query.Add($"dates={Uri.EscapeDataString(dates)}");
-    if (!string.IsNullOrWhiteSpace(genres))
-        query.Add($"genres={Uri.EscapeDataString(genres)}");
-    if (!string.IsNullOrWhiteSpace(parentPlatforms))
-        query.Add($"parent_platforms={Uri.EscapeDataString(parentPlatforms)}");
-
-    return http.GetFromJsonAsync<GameListResponse>(
-        $"games?{string.Join('&', query)}", JsonOptions, ct);
-}
+        if (!string.IsNullOrWhiteSpace(search))
+            query.Add($"search={Uri.EscapeDataString(search)}");
+        if (!string.IsNullOrWhiteSpace(ordering))
+            query.Add($"ordering={Uri.EscapeDataString(ordering)}");
+        if (!string.IsNullOrWhiteSpace(dates))
+            query.Add($"dates={Uri.EscapeDataString(dates)}");
+        if (!string.IsNullOrWhiteSpace(genres))
+            query.Add($"genres={Uri.EscapeDataString(genres)}");
+        if (!string.IsNullOrWhiteSpace(parentPlatforms))
+            query.Add($"parent_platforms={Uri.EscapeDataString(parentPlatforms)}");
+        // Comma-separated specific platform ids, e.g. "18,187".
+        if (!string.IsNullOrWhiteSpace(platforms))
+            query.Add($"platforms={Uri.EscapeDataString(platforms)}");
+        // RAWG expects a single "min,max" range. If the caller gives only one end, the other is defaulted.
+        if (minMetacritic is not null || maxMetacritic is not null)
+            query.Add($"metacritic={minMetacritic ?? 0},{maxMetacritic ?? 100}"); // ?? means “use the left value, or the right one if the left is null”.
+        return http.GetFromJsonAsync<GameListResponse>(
+            $"games?{string.Join('&', query)}", JsonOptions, ct);
+    }
 
 
     /// <summary>
@@ -108,8 +114,13 @@ public class RawgClient(HttpClient http, IConfiguration config, IMemoryCache cac
 
     /// <summary>Returns the main platform families (PC, PlayStation, Xbox...), cached for 24 hours.</summary>
     /// <param name="ct">Cancellation token.</param>
+    public Task<CatalogListResponse?> GetParentPlatformsAsync(CancellationToken ct = default)
+    => GetCachedAsync("parent-platforms", $"platforms/lists/parents?key={_key}", ct);
+
+    /// <summary>Returns the specific platforms (PS5, Xbox One...), cached for 24 hours.</summary>
+    /// <param name="ct">Cancellation token.</param>
     public Task<CatalogListResponse?> GetPlatformsAsync(CancellationToken ct = default)
-        => GetCachedAsync("parent-platforms", $"platforms/lists/parents?key={_key}&page_size=50", ct);
+        => GetCachedAsync("platforms", $"platforms?key={_key}&page_size=50", ct);
 
     /// <summary>
     /// Returns the cached value for <paramref name="cacheKey"/>; on a miss, calls RAWG once,
