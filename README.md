@@ -60,12 +60,20 @@ Run in Docker what you are not changing, and locally what you are working on:
   http://localhost:4200. API calls are proxied to the services (`frontend/proxy.conf.json`).
 - **A backend service:** stop its container (e.g. `docker compose stop catalog-service`),
   then `cd services/catalog-service && dotnet watch`. It listens on the same port.
+  Outside Docker each service reads its secrets from user secrets, loaded in the
+  `Development` environment set by `Properties/launchSettings.json`. Copy them from
+  `.env` once per machine, and again after changing it, from the repository root:
+
+  ```bash
+  SA_PASSWORD="$(grep '^MSSQL_SA_PASSWORD=' .env | cut -d= -f2-)"
+  dotnet user-secrets set "Rawg:ApiKey" "$(grep '^RAWG_API_KEY=' .env | cut -d= -f2-)" --project services/catalog-service
+  dotnet user-secrets set "ConnectionStrings:AuthDb" "Server=localhost,1433;Database=AuthDb;User Id=sa;Password=$SA_PASSWORD;TrustServerCertificate=True" --project services/auth-service
+  dotnet user-secrets set "Jwt:Key" "$(grep '^JWT_KEY=' .env | cut -d= -f2-)" --project services/auth-service
+  dotnet user-secrets set "ConnectionStrings:LibraryDb" "Server=localhost,1433;Database=LibraryDb;User Id=sa;Password=$SA_PASSWORD;TrustServerCertificate=True" --project services/library-service
+  ```
+
 - **Calling auth-service directly (curl, Postman):** POST requests need an `X-CSRF-Token`
   header, with any value. Without it the service answers `403`.
-- **auth-service outside Docker:** it reads its connection string and JWT key from user
-  secrets. Once per machine, in `services/auth-service`:
-  `dotnet user-secrets set "ConnectionStrings:AuthDb" "Server=localhost,1433;Database=AuthDb;User Id=sa;Password=<MSSQL_SA_PASSWORD>;TrustServerCertificate=True"`
-  and `dotnet user-secrets set "Jwt:Key" "$(grep '^JWT_KEY=' ../../.env | cut -d= -f2-)"`.
 - **Database migrations:** creating one needs the EF Core tool
   (`dotnet tool install --global dotnet-ef`); see `services/auth-service/Data/Migrations`.
   Services apply pending migrations at startup.
