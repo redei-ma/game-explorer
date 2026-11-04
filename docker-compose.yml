@@ -25,6 +25,9 @@ services:
 
   catalog-service:
     build: ./services/catalog-service
+    # Without an init process, a crash at startup leaves the container up but not
+    # answering; with it, the container exits (code 134)
+    init: true
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       Rawg__ApiKey: ${RAWG_API_KEY:?RAWG_API_KEY is not set in .env}
@@ -35,6 +38,7 @@ services:
 
   auth-service:
     build: ./services/auth-service
+    init: true
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       # Connects as "sa", the SQL Server administrator. A production setup would
@@ -51,6 +55,7 @@ services:
 
   library-service:
     build: ./services/library-service
+    init: true
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       # "sa" is the SQL Server administrator: fine for local development; a production
