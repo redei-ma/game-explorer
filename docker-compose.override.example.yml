@@ -1,0 +1,27 @@
+# Development settings on top of docker-compose.yml. Copy this file to
+# docker-compose.override.yml (ignored by Git): Compose loads it on its own, so
+# the usual commands pick it up. Without it, only the gateway is reachable.
+services:
+  sqlserver:
+    ports:
+      # For services started with `dotnet run` and for database tools
+      - "127.0.0.1:1433:1433"
+
+  catalog-service:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      # The ng serve proxy and Postman call the services directly
+      - "127.0.0.1:5001:8080"
+
+  auth-service:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "127.0.0.1:5002:8080"
+
+  library-service:
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+    ports:
+      - "127.0.0.1:5003:8080"

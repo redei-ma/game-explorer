@@ -56,6 +56,12 @@ last there. Stop with `docker compose down` (the database is kept; add `-v` to d
 
 Run in Docker what you are not changing, and locally what you are working on:
 
+- **Development override:** copy it once with
+  `cp docker-compose.override.example.yml docker-compose.override.yml`. Compose loads it
+  on its own with every command: it publishes the services on ports 5001–5003 and SQL
+  Server on 1433, and runs the services in `Development`. Without it only the gateway is
+  reachable, as in the delivered setup; with it, `docker compose -f docker-compose.yml up -d`
+  still runs the delivered setup.
 - **Frontend:** with the stack running, `cd frontend && npm ci && npm start`, then open
   http://localhost:4200. API calls are proxied to the services (`frontend/proxy.conf.json`).
 - **A backend service:** stop its container (e.g. `docker compose stop catalog-service`),
@@ -86,6 +92,8 @@ Run in Docker what you are not changing, and locally what you are working on:
 | http://localhost:5002 | auth-service (direct access) |
 | http://localhost:5003 | library-service (direct access) |
 | localhost:1433 | SQL Server |
+
+Ports 5001–5003 and 1433 are published only with the development override.
 
 ### Tests
 

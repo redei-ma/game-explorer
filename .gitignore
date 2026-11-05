@@ -431,6 +431,9 @@ FodyWeavers.xsd
 .env.*
 !.env.example
 
+# Personal Compose settings for development: only the example is committed
+docker-compose.override.yml
+
 # Private keys and certificates
 secrets/
 *.pem
