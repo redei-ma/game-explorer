@@ -48,9 +48,11 @@ cp .env.example .env          # then fill in every value (see the comments)
 docker compose up -d --build
 ```
 
-Open http://localhost:8080 in Chrome or Firefox. Safari doesn't send `Secure` cookies to
-`http://localhost` ([WebKit bug 281149](https://webkit.org/b/281149)), so login doesn't
-last there. Stop with `docker compose down` (the database is kept; add `-v` to delete it).
+Open https://localhost:8443 (http://localhost:8080 redirects there). The certificate is
+self-signed, generated when the gateway image is built, so the browser shows a warning:
+accept it once to continue. A build without cache (`--no-cache`) generates a new
+certificate, and the warning comes back. Stop with `docker compose down` (the database is
+kept; add `-v` to delete it).
 
 ### Develop
 
@@ -72,7 +74,8 @@ Run in Docker what you are not changing, and locally what you are working on:
 
 | Address | What |
 | ------- | ---- |
-| http://localhost:8080 | the app, through the nginx gateway |
+| https://localhost:8443 | the app, through the nginx gateway |
+| http://localhost:8080 | redirects to https://localhost:8443 |
 | http://localhost:4200 | Angular dev server (`npm start`) |
 | http://localhost:5001 | catalog-service (direct access, e.g. Postman) |
 | http://localhost:5002 | auth-service (direct access) |
