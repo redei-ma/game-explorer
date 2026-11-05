@@ -439,11 +439,6 @@ secrets/
 *.pem
 *.key
 
-# Angular / Node
-.angular/
-dist/
-coverage/
-
 # OS files
 .DS_Store
 Thumbs.db
