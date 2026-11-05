@@ -5,6 +5,8 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-CU27-GDR1-ubuntu-22.04@sha256:cf8f0ab2ebe61feec2eed2629061a07d247f791c2a8ddda74a4ac9f06a291718
     # The image is amd64-only: native on Intel/AMD, emulated (Rosetta) on Apple Silicon
     platform: linux/amd64
+    # Restarted after a crash or a Docker restart, not after `docker compose stop`
+    restart: unless-stopped
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_PID: Express
@@ -24,12 +26,14 @@ services:
     # Without an init process, a crash at startup leaves the container up but not
     # answering; with it, the container exits (code 134)
     init: true
+    restart: unless-stopped
     environment:
       Rawg__ApiKey: ${RAWG_API_KEY:?RAWG_API_KEY is not set in .env}
 
   auth-service:
     build: ./services/auth-service
     init: true
+    restart: unless-stopped
     environment:
       # Connects as "sa", the SQL Server administrator. A production setup would
       # use a dedicated login with access to this database only.
@@ -42,6 +46,7 @@ services:
   library-service:
     build: ./services/library-service
     init: true
+    restart: unless-stopped
     environment:
       # "sa" is the SQL Server administrator: fine for local development; a production
       # setup would use a dedicated login with access to this database only
@@ -55,6 +60,7 @@ services:
       # Built from the repository root: the image needs both frontend/ and gateway/
       context: .
       dockerfile: gateway/Dockerfile
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8080:80"
     depends_on:

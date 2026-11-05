@@ -3,11 +3,14 @@
 # the usual commands pick it up. Without it, only the gateway is reachable.
 services:
   sqlserver:
+    # No automatic restart in development: a crash stays visible as Exited
+    restart: "no"
     ports:
       # For services started with `dotnet run` and for database tools
       - "127.0.0.1:1433:1433"
 
   catalog-service:
+    restart: "no"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     ports:
@@ -15,13 +18,18 @@ services:
       - "127.0.0.1:5001:8080"
 
   auth-service:
+    restart: "no"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     ports:
       - "127.0.0.1:5002:8080"
 
   library-service:
+    restart: "no"
     environment:
       ASPNETCORE_ENVIRONMENT: Development
     ports:
       - "127.0.0.1:5003:8080"
+
+  gateway:
+    restart: "no"
