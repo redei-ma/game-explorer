@@ -1,0 +1,71 @@
+/* Container and layout for the favorites page */
+.favorites-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 1.5rem 1rem;
+}
+
+.favorites-header {
+	margin-bottom: 2rem;
+}
+
+.favorites-header h1 {
+	font-size: 1.8rem;
+	font-weight: 700;
+	margin-bottom: 0.25rem;
+}
+
+.favorites-count {
+	color: var(--ge-muted, #888);
+	font-size: 0.9rem;
+}
+
+/* Responsive grid for the favorite game cards */
+.games-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	gap: 1.25rem;
+}
+
+/* Empty state styling */
+.empty-state {
+	text-align: center;
+	padding: 4rem 1rem;
+	background: var(--ge-card-bg, rgba(255, 255, 255, 0.03));
+	border-radius: 12px;
+	border: 1px solid var(--ge-border, rgba(255, 255, 255, 0.08));
+}
+
+.empty-icon {
+	font-size: 3rem;
+	color: var(--ge-muted, #666);
+	margin-bottom: 1rem;
+}
+
+.empty-state h2 {
+	font-size: 1.4rem;
+	margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+	color: var(--ge-muted, #aaa);
+	margin-bottom: 1.5rem;
+	max-width: 450px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.btn-primary {
+	display: inline-block;
+	background: var(--ge-accent, #00a3e0);
+	color: #fff;
+	padding: 0.6rem 1.4rem;
+	border-radius: 6px;
+	text-decoration: none;
+	font-weight: 600;
+	transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+	opacity: 0.9;
+}

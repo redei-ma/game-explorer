@@ -1,0 +1,33 @@
+/* Favorite button styling and positioning */
+.game-card-container { position: relative; display: block; }
+
+.fav-btn {
+	position: absolute;
+	top: 0.4rem;
+	right: 0.4rem;
+	z-index: 3;
+	background: rgba(0, 0, 0, 0.65);
+	backdrop-filter: blur(4px);
+	border: 1px solid rgba(255, 255, 255, 0.2);
+	border-radius: 50%;
+	width: 2.2rem;
+	height: 2.2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #ffffff;
+	font-size: 1.1rem;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.fav-btn:hover {
+	transform: scale(1.1);
+	background: rgba(0, 0, 0, 0.85);
+}
+
+.fav-btn--active {
+	color: #ff4757;
+	border-color: #ff4757;
+	background: rgba(255, 71, 87, 0.25);
+}

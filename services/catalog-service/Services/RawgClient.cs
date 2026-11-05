@@ -1,6 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Net;
+using Microsoft.Extensions.Caching.Memory;
 using CatalogService.Models;
 
 // Namespace: same as the models, so both files can see each other without extra imports.
@@ -14,8 +15,9 @@ namespace CatalogService.Services;
 /// <remarks>
 /// The HttpClient and IConfiguration parameters are supplied automatically by
 /// ASP.NET Core (dependency injection), so you never create them yourself.
+/// Games data are cached for 24 hours to avoid redundant RAWG calls.
 /// </remarks>
-public class RawgClient(HttpClient http, IConfiguration config)
+public class RawgClient(HttpClient http, IConfiguration config, IMemoryCache cache)
 {
     // Settings that tell the JSON deserializer how to read RAWG's responses.
     // RAWG writes names in snake_case (background_image), while C# uses
@@ -34,27 +36,41 @@ public class RawgClient(HttpClient http, IConfiguration config)
         ?? throw new InvalidOperationException("Rawg:ApiKey is missing.");
 
     /// <summary>
-    /// Searches RAWG for games whose name matches the given text.
+    /// Gets a page of games from RAWG. Every filter is optional, so the same method serves
+    /// the home page (no filters, ordered by rating) and the search page (with a search text).
     /// </summary>
-    /// <param name="search">Full or partial game name typed by the user.</param>
-    /// <param name="page">Page number of results (starts at 1).</param>
+    /// <param name="search">Text to look for in game names, or null for no text filter.</param>
+    /// <param name="ordering">RAWG sort field; a leading "-" means descending (e.g. "-rating").</param>
+    /// <param name="dates">Release range as "yyyy-MM-dd,yyyy-MM-dd", or null for any date.</param>
+    /// <param name="page">Page number, starting at 1.</param>
+    /// <param name="pageSize">How many games per page.</param>
     /// <param name="ct">Cancels the request if the caller disconnects.</param>
-    /// <returns>The matching games, or null if RAWG returned an empty body.</returns>
-    /// <exception cref="HttpRequestException">
-    /// Thrown when RAWG answers with an error status code (e.g. 401, 429, 500).
-    /// </exception>
-    public Task<GameListResponse?> SearchGamesAsync(
-        string search, int page = 1, CancellationToken ct = default)
+    public Task<GameListResponse?> GetGamesAsync(
+    string? search = null, string? ordering = null, string? dates = null,
+    string? genres = null, string? parentPlatforms = null, string? platforms = null,
+    int? minMetacritic = null, int? maxMetacritic = null,
+    int page = 1, int pageSize = 20, CancellationToken ct = default)
     {
-        // Build the relative URL (the base address is set in Program.cs).
-        // EscapeDataString makes user text safe, e.g. "mario & luigi" would
-        // otherwise break the query string.
-        var url = $"games?key={_key}" +
-                  $"&search={Uri.EscapeDataString(search)}" +
-                  $"&page={page}&page_size=20";
+        var query = new List<string> { $"key={_key}", $"page={page}", $"page_size={pageSize}" };
 
-        // Sends a GET request and converts the JSON response into C# objects.
-        return http.GetFromJsonAsync<GameListResponse>(url, JsonOptions, ct);
+        if (!string.IsNullOrWhiteSpace(search))
+            query.Add($"search={Uri.EscapeDataString(search)}");
+        if (!string.IsNullOrWhiteSpace(ordering))
+            query.Add($"ordering={Uri.EscapeDataString(ordering)}");
+        if (!string.IsNullOrWhiteSpace(dates))
+            query.Add($"dates={Uri.EscapeDataString(dates)}");
+        if (!string.IsNullOrWhiteSpace(genres))
+            query.Add($"genres={Uri.EscapeDataString(genres)}");
+        if (!string.IsNullOrWhiteSpace(parentPlatforms))
+            query.Add($"parent_platforms={Uri.EscapeDataString(parentPlatforms)}");
+        // Comma-separated specific platform ids, e.g. "18,187".
+        if (!string.IsNullOrWhiteSpace(platforms))
+            query.Add($"platforms={Uri.EscapeDataString(platforms)}");
+        // RAWG expects a single "min,max" range. If the caller gives only one end, the other is defaulted.
+        if (minMetacritic is not null || maxMetacritic is not null)
+            query.Add($"metacritic={minMetacritic ?? 0},{maxMetacritic ?? 100}"); // ?? means “use the left value, or the right one if the left is null”.
+        return http.GetFromJsonAsync<GameListResponse>(
+            $"games?{string.Join('&', query)}", JsonOptions, ct);
     }
 
 
@@ -90,4 +106,33 @@ public class RawgClient(HttpClient http, IConfiguration config)
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadFromJsonAsync<T>(JsonOptions, ct);
     }
+
+    /// <summary>Returns all genres, cached for 24 hours.</summary>
+    /// <param name="ct">Cancellation token.</param>
+    public Task<CatalogListResponse?> GetGenresAsync(CancellationToken ct = default)
+        => GetCachedAsync("genres", $"genres?key={_key}", ct);
+
+    /// <summary>Returns the main platform families (PC, PlayStation, Xbox...), cached for 24 hours.</summary>
+    /// <param name="ct">Cancellation token.</param>
+    public Task<CatalogListResponse?> GetParentPlatformsAsync(CancellationToken ct = default)
+    => GetCachedAsync("parent-platforms", $"platforms/lists/parents?key={_key}", ct);
+
+    /// <summary>Returns the specific platforms (PS5, Xbox One...), cached for 24 hours.</summary>
+    /// <param name="ct">Cancellation token.</param>
+    public Task<CatalogListResponse?> GetPlatformsAsync(CancellationToken ct = default)
+        => GetCachedAsync("platforms", $"platforms?key={_key}&page_size=50", ct);
+
+    /// <summary>
+    /// Returns the cached value for <paramref name="cacheKey"/>; on a miss, calls RAWG once,
+    /// stores the answer for 24 hours and returns it.
+    /// </summary>
+    /// <param name="cacheKey">Unique name under which the result is stored in memory.</param>
+    /// <param name="url">RAWG path to call when the cache is empty.</param>
+    /// <param name="ct">Cancellation token.</param>
+    private Task<CatalogListResponse?> GetCachedAsync(string cacheKey, string url, CancellationToken ct)
+        => cache.GetOrCreateAsync(cacheKey, entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(24);
+            return GetOrNullAsync<CatalogListResponse>(url, ct);
+        });
 };
