@@ -62,7 +62,9 @@ services:
       dockerfile: gateway/Dockerfile
     restart: unless-stopped
     ports:
+      # 8080 only redirects to 8443
       - "127.0.0.1:8080:80"
+      - "127.0.0.1:8443:443"
     depends_on:
       # Start order only: nginx resolves service names per request, so it also
       # works while a service is down
