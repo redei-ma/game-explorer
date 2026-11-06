@@ -103,12 +103,15 @@ Ports 5001–5003 and 1433 are published only with the development override.
 ```bash
 dotnet test GameExplorer.slnx              # every test project in the solution
 cd frontend && npm test -- --watch=false   # every *.spec.ts under frontend/src
+./scripts/smoke-test.sh                    # after docker compose up -d: the stack through the gateway
 ```
 
 `dotnet test` needs Docker running: the auth-service and library-service tests
 start their own SQL Server in a container ([Testcontainers](https://dotnet.testcontainers.org/)).
 Every Pull Request into `dev` or `main` runs the same builds and tests in the CI
-(`.github/workflows/ci.yml`).
+(`.github/workflows/ci.yml`), then builds the Docker images and runs the smoke test
+on the stack as delivered. Run the smoke test at most once a minute: the login rate
+limit remembers the attempts.
 
 Backend tests use xUnit. A new test project goes in `tests/` and runs only once
 it is added to the solution:
@@ -137,6 +140,7 @@ services/catalog-service/             games data from RAWG
 services/auth-service/                registration, login and JWT
 services/library-service/             favorites and wishlist
 tests/                                backend test projects, one per service and test type
+scripts/                              smoke test of the running stack
 docker-compose.yml                    the whole stack, as delivered
 docker-compose.override.example.yml   ports and Development for local work
 ```
