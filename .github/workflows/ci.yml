@@ -1,8 +1,8 @@
 name: CI
 
 # Checks every pull request into dev and main, the only way code reaches them.
-# Builds and tests the .NET services and the Angular app, and builds the Docker
-# images of the delivered setup.
+# Builds and tests the .NET services and the Angular app on the runner, then
+# builds the Docker images and runs a smoke test on the stack as delivered.
 
 on:
   pull_request:
@@ -65,3 +65,10 @@ jobs:
         run: docker compose config --quiet
       - name: Build the images
         run: docker compose build
+      - name: Start the delivered stack
+        run: docker compose up -d
+      - name: Smoke test
+        run: ./scripts/smoke-test.sh
+      - name: Show the logs
+        if: failure()
+        run: docker compose logs
