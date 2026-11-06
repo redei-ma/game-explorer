@@ -28,7 +28,8 @@ services:
     init: true
     restart: unless-stopped
     environment:
-      Rawg__ApiKey: ${RAWG_API_KEY:?RAWG_API_KEY is not set in .env}
+      Igdb__ClientId: ${IGDB_CLIENT_ID?IGDB_CLIENT_ID is not set in .env}
+      Igdb__ClientSecret: ${IGDB_CLIENT_SECRET?IGDB_CLIENT_SECRETIGDB_CLIENT_ID is not set in .env}
 
   auth-service:
     build: ./services/auth-service
