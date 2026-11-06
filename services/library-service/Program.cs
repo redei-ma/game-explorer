@@ -1,4 +1,5 @@
 using LibraryService.Data;
+using LibraryService.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -5,8 +5,6 @@ namespace LibraryService.Services;
 
 /// <summary>
 /// The part of a game that library-service needs from catalog-service.
-/// Defined here on purpose instead of sharing catalog's class: services must
-/// not depend on each other's code, only on the JSON contract.
 /// Fields that don't appear here are ignored while reading the JSON.
 /// </summary>
 /// <param name="Id">RAWG's game ID.</param>
