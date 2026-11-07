@@ -16,14 +16,13 @@ builder.Services.AddOpenApi();
 builder.Services.AddDbContext<LibraryDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("LibraryDb")));
 
-// Typed HTTP client for catalog-service. The base address comes from configuration
-// (Services__Catalog__BaseUrl in docker-compose), never hardcoded.
-builder.Services.AddHttpClient<CatalogClient>(client =>
+// Typed HTTP client for catalog-service. The URL comes from configuration
+// (set in docker-compose), and the timeout stops a hung catalog from hanging us too.
+builder.Services.AddHttpClient<ICatalogClient, CatalogClient>(client =>
 {
-    var baseUrl = builder.Configuration["Services:Catalog:BaseUrl"]
-        ?? throw new InvalidOperationException("Services:Catalog:BaseUrl is not configured.");
-    client.BaseAddress = new Uri(baseUrl);
-    client.Timeout = TimeSpan.FromSeconds(5); // fail fast instead of hanging if catalog is stuck
+    client.BaseAddress = new Uri(builder.Configuration["Catalog:BaseUrl"]
+        ?? throw new InvalidOperationException("Catalog:BaseUrl is not configured"));
+    client.Timeout = TimeSpan.FromSeconds(5);
 });
 
 // Used by Docker and the gateway to know whether the service is up;

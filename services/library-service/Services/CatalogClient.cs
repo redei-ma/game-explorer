@@ -1,42 +1,33 @@
 using System.Net;
 
-// Code that talks to other services over HTTP.
+// Code that talks to other services
 namespace LibraryService.Services;
 
-/// <summary>
-/// The part of a game that library-service needs from catalog-service.
-/// Fields that don't appear here are ignored while reading the JSON.
-/// </summary>
-/// <param name="Id">RAWG's game ID.</param>
-/// <param name="Name">Title of the game.</param>
-/// <param name="Released">Release date as text (yyyy-MM-dd), or null.</param>
-/// <param name="Rating">Average user rating.</param>
-/// <param name="BackgroundImage">Cover image URL, or null.</param>
-public record CatalogGame(int Id, string Name, string? Released, double Rating, string? BackgroundImage);
+/// <summary>The part of catalog-service's game-detail response that library-service needs.</summary>
+public record CatalogGame(int Id, string Name, DateOnly? Released, double? Rating, string? BackgroundImage);
 
-/// <summary>
-/// Typed HTTP client for catalog-service. ASP.NET injects a ready-to-use
-/// <see cref="HttpClient"/> whose address and timeout are set in Program.cs.
-/// </summary>
-public class CatalogClient(HttpClient http)
+/// <summary>Contract for asking catalog-service about games. An interface lets tests replace it with a fake.</summary>
+public interface ICatalogClient
+{
+    /// <summary>Returns the game, or null if catalog-service says it doesn't exist.</summary>
+    Task<CatalogGame?> GetGameAsync(int gameId, CancellationToken ct);
+}
+
+/// <summary>Calls catalog-service over HTTP.</summary>
+public class CatalogClient(HttpClient http) : ICatalogClient
 {
     /// <summary>
-    /// Asks catalog-service for one game.
+    /// Fetches one game. 404 becomes null; any other failure throws HttpRequestException,
+    /// which the controller turns into a 502 response.
     /// </summary>
-    /// <param name="gameId">RAWG's ID of the game.</param>
-    /// <param name="ct">Cancels the call if the browser disconnects.</param>
-    /// <returns>The game, or null if the catalog says it doesn't exist.</returns>
-    /// <exception cref="HttpRequestException">The catalog failed or can't be reached.</exception>
     public async Task<CatalogGame?> GetGameAsync(int gameId, CancellationToken ct)
     {
-        using var response = await http.GetAsync($"games/{gameId}", ct);
+        using var response = await http.GetAsync($"api/games/{gameId}", ct);   // <-- the catalog route
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
 
-        // Any other error status (500, 429...) becomes an exception.
         response.EnsureSuccessStatusCode();
-
         return await response.Content.ReadFromJsonAsync<CatalogGame>(ct);
     }
 }

@@ -1,35 +1,30 @@
 using LibraryService.Models;
 using Microsoft.EntityFrameworkCore;
 
-// Database access code for library-service.
 namespace LibraryService.Data;
 
 /// <summary>
-/// Entry point to the library database. Each DbSet is one table.
-/// The wishlist will be added here later as a second DbSet.
+/// Entry point to the library database. Each DbSet is a table;
+/// the wishlist will be added here as another DbSet.
 /// </summary>
 public class LibraryDbContext(DbContextOptions<LibraryDbContext> options) : DbContext(options)
 {
     /// <summary>The Favorites table.</summary>
-    public DbSet<FavoriteGame> Favorites => Set<FavoriteGame>();
+    public DbSet<Favorite> Favorites => Set<Favorite>();
 
     /// <summary>
-    /// Describes table details that C# types alone can't express:
-    /// the primary key and column size limits.
+    /// Describes details the conventions can't guess: column sizes and the unique index.
     /// </summary>
-    /// <param name="modelBuilder">EF Core's builder for the database model.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<FavoriteGame>(entity =>
+        modelBuilder.Entity<Favorite>(entity =>
         {
-            entity.ToTable("Favorites");
+            entity.Property(f => f.Name).IsRequired().HasMaxLength(300);
+            entity.Property(f => f.CoverUrl).HasMaxLength(500);
 
-            // Composite primary key: a browser can favorite a game only once.
-            // The database itself rejects duplicates, even under concurrent requests.
-            entity.HasKey(f => new { f.ClientId, f.GameId });
-
-            entity.Property(f => f.Name).HasMaxLength(300).IsRequired();
-            entity.Property(f => f.CoverUrl).HasMaxLength(2048);
+            // A browser can favorite a game only once. The database enforces it,
+            // so even two simultaneous requests can't create a duplicate row.
+            entity.HasIndex(f => new { f.ClientId, f.GameId }).IsUnique();
         });
     }
 }
