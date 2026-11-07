@@ -29,7 +29,8 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
     private static RegisterRequest NewUser()
     {
         var id = Guid.NewGuid().ToString("N");
-        return new RegisterRequest($"{id}@test.com", id, Password);
+        // 20 characters: usernames are at most 30, also with the "other" prefix used below.
+        return new RegisterRequest($"{id}@test.com", id[..20], Password);
     }
 
     [Fact]
@@ -75,6 +76,19 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
     }
 
     [Fact]
+    public async Task Register_Returns409_WhenTheUsernameIsTaken()
+    {
+        var client = CreateClient();
+        var user = NewUser();
+        await client.PostAsJsonAsync("/api/auth/register", user);
+
+        var response = await client.PostAsJsonAsync(
+            "/api/auth/register", user with { Email = "other" + user.Email });
+
+        Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Register_Returns400WithTheFailedRules_WhenThePasswordIsWeak()
     {
         var response = await CreateClient().PostAsJsonAsync(
@@ -85,13 +99,17 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
         Assert.Contains("PasswordRequiresDigit", problem!.Errors.Keys);
     }
 
-    [Fact]
-    public async Task Register_Returns400_WhenTheUsernameDoesNotFitTheColumn()
+    [Theory]
+    [InlineData(2)]
+    [InlineData(31)]
+    public async Task Register_Returns400_WhenTheUsernameIsNot3To30Characters(int length)
     {
         var response = await CreateClient().PostAsJsonAsync(
-            "/api/auth/register", NewUser() with { Username = new string('a', 257) });
+            "/api/auth/register", NewUser() with { Username = new string('a', length) });
 
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        Assert.Contains("Username", problem!.Errors.Keys);
     }
 
     [Fact]
