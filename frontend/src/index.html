@@ -10,10 +10,28 @@
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Inter:wght@500;600;700;800&display=swap" rel="stylesheet">
+	<style>
+		/* Shown only if Angular needs more than a second to start: before that it would just flash */
+		.app-loading {
+			opacity: 0;
+			animation: app-loading-in 0.3s ease-out 1s forwards;
+		}
+		@keyframes app-loading-in {
+			to {
+				opacity: 1;
+			}
+		}
+		/* styles.css turns animations off for these users, so the spinner must be visible without one */
+		@media (prefers-reduced-motion: reduce) {
+			.app-loading {
+				opacity: 1;
+			}
+		}
+	</style>
 </head>
 <body>
 	<app-root>
-		<div class="d-flex flex-column align-items-center justify-content-center gap-3 vh-100 text-body-secondary" data-bs-theme="dark" role="status">
+		<div class="app-loading d-flex flex-column align-items-center justify-content-center gap-3 vh-100 text-body-secondary" data-bs-theme="dark" role="status">
 			<div class="spinner-border" aria-hidden="true"></div>
 			Caricamento…
 		</div>
