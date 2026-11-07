@@ -7,8 +7,9 @@ namespace CatalogService.Services;
 /// </summary>
 /// <remarks>
 /// IGDB groups consoles into "platform families" (PlayStation, Xbox, Nintendo, Sega, Linux),
-/// but PC, Mac, iOS and Android belong to NO family. To keep the frontend's first
-/// dropdown and the platform icons on the cards, we add those four as hand-made groups.
+/// but PC, Mac and iOS belong to NO family, and Android is filed under Linux, which is
+/// wrong for a game catalog. To keep the frontend's first dropdown and the platform icons
+/// on the cards, we define those four as hand-made groups that override IGDB's family.
 /// Their group ids are 1000 + the IGDB platform id, so they can never clash with real
 /// family ids (which are small numbers).
 /// One instance is built from the full IGDB platform list and cached for 24 hours by IgdbClient.
@@ -65,10 +66,13 @@ public sealed class PlatformCatalog
         {
             NamedItem? group = null;
 
-            if (p.PlatformFamily is { } family)                       // console with a family
-                group = new NamedItem(family.Id, family.Name, family.Slug);
-            else if (StandaloneGroups.TryGetValue(p.Id, out var s))   // PC, Mac, iOS, Android
+            // The hand-made groups are checked FIRST, so they win over IGDB's family.
+            // This matters for Android: IGDB puts it in the Linux family, which would
+            // make Linux filters return Android games and Android cards show "Linux".
+            if (StandaloneGroups.TryGetValue(p.Id, out var s))        // PC, Mac, iOS, Android
                 group = new NamedItem(s.GroupId, s.Name, s.Slug);
+            else if (p.PlatformFamily is { } family)                  // console with a family
+                group = new NamedItem(family.Id, family.Name, family.Slug);
 
             if (group is null)
                 continue;                                             // arcade, obscure systems...

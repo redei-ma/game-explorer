@@ -196,7 +196,7 @@ from `/api/genres`, `/api/platforms` and `/api/parent-platforms`, so it needed n
 | Release date      | `"yyyy-MM-dd"`                | Unix timestamp                         | converted to `"yyyy-MM-dd"`                                                                   |
 | Images            | full URL                      | `image_id` only                        | URL built from `images.igdb.com`; cards use the cover, the detail page uses an artwork        |
 | Developer / publisher | two lists                 | one `involved_companies` list with flags | split by the `developer` and `publisher` flags                                              |
-| Parent platforms  | built in                      | "platform families" (no PC/Mac/mobile) | families + hand-made groups for PC, Mac, iOS and Android (ids 1006, 1014, 1039, 1034)         |
+| Parent platforms  | built in                      | "platform families": no PC, Mac or iOS; Android filed under Linux | families + hand-made groups for PC, Mac, iOS and Android (ids 1006, 1014, 1039, 1034), which take priority over IGDB's family |
 | Total results     | `count` in the same answer    | separate `/games/count` call           | both calls are sent at the same time                                                          |
 | Search + sorting  | combinable                    | `search` cannot be sorted              | name search uses `name ~ *"word"*` for each word, which can be sorted                         |
 | DLCs, bundles     | mostly hidden                 | returned as separate games             | only main games, standalone expansions, remakes, remasters and expanded games are kept        |
