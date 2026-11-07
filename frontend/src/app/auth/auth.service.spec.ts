@@ -2,7 +2,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
-import { AuthService, User } from './auth.service';
+import { User } from './auth.models';
+import { AuthService } from './auth.service';
 
 const mario: User = { id: '1', email: 'mario@example.com', username: 'mario' };
 
@@ -54,5 +55,66 @@ describe('AuthService', () => {
 
     expect(await result).toBeNull();
     expect(auth.currentUser()).toBeNull();
+  });
+
+  it('logs in and keeps only the user from the response', async () => {
+    const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
+    const request = http.expectOne('/api/auth/login');
+    expect(request.request.method).toBe('POST');
+    expect(request.request.body).toEqual({ email: 'mario@example.com', password: 'Secret1!' });
+    request.flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });
+
+    expect(await result).toEqual(mario);
+    expect(auth.currentUser()).toEqual(mario);
+  });
+
+  it('passes a failed login on to the caller and leaves the user unchanged', async () => {
+    const result = firstValueFrom(auth.login('mario@example.com', 'wrong'));
+    http
+      .expectOne('/api/auth/login')
+      .flush({ detail: 'Invalid email or password.' }, { status: 401, statusText: 'Unauthorized' });
+
+    await expect(result).rejects.toMatchObject({ status: 401 });
+    expect(auth.currentUser()).toBeUndefined();
+  });
+
+  it('registers and returns the whole response with the recovery code', async () => {
+    const result = firstValueFrom(auth.register('mario@example.com', 'mario', 'Secret1!'));
+    const request = http.expectOne('/api/auth/register');
+    expect(request.request.body).toEqual({
+      email: 'mario@example.com',
+      username: 'mario',
+      password: 'Secret1!',
+    });
+    request.flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario, recoveryCode: 'ABCD-1234' });
+
+    expect((await result).recoveryCode).toBe('ABCD-1234');
+    expect(auth.currentUser()).toEqual(mario);
+  });
+
+  it('logs out and becomes a guest once the server answers', async () => {
+    const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
+    http.expectOne('/api/auth/login').flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });
+    await result;
+
+    const logout = firstValueFrom(auth.logout());
+    const request = http.expectOne('/api/auth/logout');
+    expect(auth.currentUser()).toEqual(mario);
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    await logout;
+    expect(auth.currentUser()).toBeNull();
+  });
+
+  it('stays logged in when the logout fails', async () => {
+    const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
+    http.expectOne('/api/auth/login').flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });
+    await result;
+
+    const logout = firstValueFrom(auth.logout());
+    http.expectOne('/api/auth/logout').error(new ProgressEvent('error'));
+
+    await expect(logout).rejects.toMatchObject({ status: 0 });
+    expect(auth.currentUser()).toEqual(mario);
   });
 });

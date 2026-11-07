@@ -1,12 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Service, inject, signal } from '@angular/core';
-import { Observable, catchError, of, tap } from 'rxjs';
-
-export interface User {
-  id: string;
-  email: string;
-  username: string;
-}
+import { Observable, catchError, map, of, tap } from 'rxjs';
+import { AuthResponse, RegisterResponse, User } from './auth.models';
 
 @Service()
 export class AuthService {
@@ -27,5 +22,28 @@ export class AuthService {
       catchError(() => of(null)),
       tap((user) => this._currentUser.set(user)),
     );
+  }
+
+  // No catchError: on a 401 the error must reach the login page, which shows the message.
+  login(email: string, password: string): Observable<User> {
+    return this.http.post<AuthResponse>('/api/auth/login', { email, password }).pipe(
+      map((response) => response.user),
+      tap((user) => this._currentUser.set(user)),
+    );
+  }
+
+  // The server logs the new user in. The recovery code is in this response only, so the
+  // whole response goes to the caller, which shows the code once.
+  register(email: string, username: string, password: string): Observable<RegisterResponse> {
+    return this.http
+      .post<RegisterResponse>('/api/auth/register', { email, username, password })
+      .pipe(tap((response) => this._currentUser.set(response.user)));
+  }
+
+  // Only the server can delete the HttpOnly cookie: until it answers, the session still exists.
+  logout(): Observable<void> {
+    return this.http
+      .post<void>('/api/auth/logout', {})
+      .pipe(tap(() => this._currentUser.set(null)));
   }
 }
