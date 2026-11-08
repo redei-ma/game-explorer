@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryService.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20261107164525_AddFavorites")]
+    [Migration("20261108171302_AddFavorites")]
     partial class AddFavorites
     {
         /// <inheritdoc />
@@ -36,9 +36,6 @@ namespace LibraryService.Migrations
                     b.Property<DateTimeOffset>("AddedAt")
                         .HasColumnType("datetimeoffset");
 
-                    b.Property<Guid>("ClientId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CoverUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -57,9 +54,14 @@ namespace LibraryService.Migrations
                     b.Property<DateOnly?>("ReleaseDate")
                         .HasColumnType("date");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ClientId", "GameId")
+                    b.HasIndex("UserId", "GameId")
                         .IsUnique();
 
                     b.ToTable("Favorites");

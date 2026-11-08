@@ -22,9 +22,12 @@ public class LibraryDbContext(DbContextOptions<LibraryDbContext> options) : DbCo
             entity.Property(f => f.Name).IsRequired().HasMaxLength(300);
             entity.Property(f => f.CoverUrl).HasMaxLength(500);
 
-            // A browser can favorite a game only once. The database enforces it,
+            // 450 is the length of the user ID column in Identity (AuthDb)
+            entity.Property(f => f.UserId).IsRequired().HasMaxLength(450);
+
+            // A user can favorite a game only once. The database enforces it,
             // so even two simultaneous requests can't create a duplicate row.
-            entity.HasIndex(f => new { f.ClientId, f.GameId }).IsUnique();
+            entity.HasIndex(f => new { f.UserId, f.GameId }).IsUnique();
         });
     }
 }

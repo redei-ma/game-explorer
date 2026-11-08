@@ -17,7 +17,7 @@ namespace LibraryService.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: false),
                     GameId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(300)", maxLength: 300, nullable: false),
                     CoverUrl = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
@@ -31,9 +31,9 @@ namespace LibraryService.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Favorites_ClientId_GameId",
+                name: "IX_Favorites_UserId_GameId",
                 table: "Favorites",
-                columns: new[] { "ClientId", "GameId" },
+                columns: new[] { "UserId", "GameId" },
                 unique: true);
         }
 

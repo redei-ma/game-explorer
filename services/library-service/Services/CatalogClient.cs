@@ -22,7 +22,8 @@ public class CatalogClient(HttpClient http) : ICatalogClient
     /// </summary>
     public async Task<CatalogGame?> GetGameAsync(int gameId, CancellationToken ct)
     {
-        using var response = await http.GetAsync($"api/games/{gameId}", ct);   // <-- the catalog route
+        // the gateway forwards /api/games unchanged, so catalog's route starts with api/games
+        using var response = await http.GetAsync($"api/games/{gameId}", ct);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
