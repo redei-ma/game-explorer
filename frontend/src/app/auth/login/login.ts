@@ -1,14 +1,14 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormField, FormRoot, email, form, required } from '@angular/forms/signals';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
 import { AuthService } from '../auth.service';
 
 @Component({
   selector: 'app-login',
-  imports: [FormField, FormRoot],
+  imports: [FormField, FormRoot, RouterLink],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })

@@ -44,6 +44,12 @@ describe('Login', () => {
     return { fixture, page };
   }
 
+  it('links to the registration page', async () => {
+    const { page } = await render();
+
+    expect(page.querySelector('a[href="/register"]')?.textContent).toContain('Crea il tuo account');
+  });
+
   it('shows no error before the user touches a field', async () => {
     const { page } = await render();
 
