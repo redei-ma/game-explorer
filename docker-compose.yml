@@ -48,9 +48,6 @@ services:
     build: ./services/library-service
     init: true
     restart: unless-stopped
-    # Port temporarily added for testing. To be removed.
-    ports:
-      - "127.0.0.1:5001:8080"
     environment:
       # "sa" is the SQL Server administrator: fine for local development; a production
       # setup would use a dedicated login with access to this database only
