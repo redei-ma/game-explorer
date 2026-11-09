@@ -3,17 +3,7 @@
 // keep API calls separate from graphics
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import {
-	MOCK_DETAILS,
-	MOCK_GENRES,
-	MOCK_GAMES,
-	MOCK_PLATFORMS,
-	MOCK_SCREENSHOTS,
-} from './games.mock';
-
-// Set to false when the catalog-service is available.
-const USE_MOCK_DATA = true;
+import { Observable } from 'rxjs';
 
 /*******************************************************************************
  *   Models (subset of the RAWG /games payload)                                *
@@ -120,61 +110,38 @@ export class GamesApi {
 	private readonly http = inject(HttpClient);
 
 	getGames(query: GamesQuery = {}): Observable<GamesPage> {
-		if (USE_MOCK_DATA) {
-			return of(this.mockGames(query));
-		}
-
 		const params: Record<string, string | number> = {};
-		for (const [key, value] of Object.entries(query)) {
+		const { metacritic, ...backendQuery } = query;
+		for (const [key, value] of Object.entries(backendQuery)) {
 			if (value !== undefined && value !== '')
 					params[key] = value;
+		}
+		if (metacritic) {
+			const [min, max] = metacritic.split(',');
+			if (min) params['minMetacritic'] = Number(min);
+			if (max) params['maxMetacritic'] = Number(max);
 		}
 		return this.http.get<GamesPage>('/api/games', { params });
 	}
 
 	// Methods for retrieving curtain filter data
 	getGenres(): Observable<GenresPage> {
-		if (USE_MOCK_DATA) return of(MOCK_GENRES);
 		return this.http.get<GenresPage>('/api/genres');
 	}
 	getPlatforms(): Observable<PlatformsPage> {
-		if (USE_MOCK_DATA) return of(MOCK_PLATFORMS);
 		// page_size=40 is the maximum allowed by RAWG, so we can get all platforms in one call
 		const params = new HttpParams().set('page_size', '40');
 		return this.http.get<PlatformsPage>('/api/platforms', { params });
 	}
+	getParentPlatforms(): Observable<PlatformsPage> {
+		return this.http.get<PlatformsPage>('/api/parent-platforms');
+	}
 
 	// Methods for retrieving detail information and screenshots of the individual game
 	getGame(id: number): Observable<GameDetailData> {
-		if (USE_MOCK_DATA) {
-			const game = MOCK_DETAILS[id];
-			return of(game ?? MOCK_DETAILS[1]);
-		}
 		return this.http.get<GameDetailData>(`/api/games/${id}`);
 	}
 	getScreenshots(id: number): Observable<ScreenshotsResponse> {
-		if (USE_MOCK_DATA) return of(MOCK_SCREENSHOTS[id] ?? { count: 0, results: [] });
 		return this.http.get<ScreenshotsResponse>(`/api/games/${id}/screenshots`);
-	}
-
-	private mockGames(query: GamesQuery): GamesPage {
-		const normalizedSearch = query.search?.trim().toLowerCase();
-		const filtered = MOCK_GAMES.filter(game => {
-			const matchesSearch =
-				!normalizedSearch || game.name.toLowerCase().includes(normalizedSearch);
-			const matchesParentPlatform =
-				!query.parentPlatforms ||
-				game.parentPlatforms?.some(({ platform }) =>
-					query.parentPlatforms?.split(',').includes(String(platform.id)),
-				);
-			return matchesSearch && matchesParentPlatform;
-		});
-
-		return {
-			count: filtered.length,
-			next: null,
-			previous: null,
-			results: filtered,
-		};
 	}
 }

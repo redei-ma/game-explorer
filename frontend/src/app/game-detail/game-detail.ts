@@ -1,10 +1,20 @@
-import { ChangeDetectionStrategy, Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { Subject, forkJoin, of } from 'rxjs';
-import { catchError, takeUntil } from 'rxjs/operators';
+import { toSignal, toObservable } from '@angular/core/rxjs-interop';
+import { forkJoin, of, combineLatest } from 'rxjs';
+import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 import { GamesApi, GameDetailData, Screenshot, Game } from '../games/games.api';
 import { FavoritesService } from '../favorites/favorites.service';
+
+// Internal state interface for reactive HTTP calls
+interface DetailState {
+	gameId: number | null;
+	game: GameDetailData | null;
+	screenshots: Screenshot[];
+	isLoading: boolean;
+	hasError: boolean;
+}
 
 @Component({
 	selector: 'app-game-detail',
@@ -14,20 +24,56 @@ import { FavoritesService } from '../favorites/favorites.service';
 	templateUrl: './game-detail.html',
 	styleUrls: ['./game-detail.css']
 })
-export class GameDetail implements OnInit, OnDestroy {
+export class GameDetail {
 	private readonly gamesApi = inject(GamesApi);
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
 	readonly location = inject(Location);
-	private readonly destroy$ = new Subject<void>();
 	private readonly favoritesService = inject(FavoritesService);
 
-	// State converted to signals to fix zoneless change detection issues
-	readonly gameId = signal<number | null>(null);
-	readonly game = signal<GameDetailData | null>(null);
-	readonly screenshots = signal<Screenshot[]>([]);
-	readonly isLoading = signal<boolean>(true);
-	readonly hasError = signal<boolean>(false);
+	// Trigger to manually re-fetch data from the UI (error banner)
+	private readonly refreshTrigger = signal(0);
+
+	// Main declarative data pipeline replacing ngOnInit and manual subscriptions
+	private readonly detailState = toSignal(
+		combineLatest([
+			this.route.paramMap,
+			toObservable(this.refreshTrigger)
+		]).pipe(
+			switchMap(([params]) => {
+				const idParam = params.get('id');
+				if (!idParam) {
+					return of({ gameId: null, game: null, screenshots: [], isLoading: false, hasError: true });
+				}
+				const id = parseInt(idParam, 10);
+
+				// Run the request for basic information and screenshots in parallel
+				// Added catchError to screenshots to prevent the entire page from failing if images fail
+				return forkJoin({
+					detail: this.gamesApi.getGame(id),
+					screenshotsRes: this.gamesApi.getScreenshots(id).pipe(catchError(() => of(null)))
+				}).pipe(
+					map(({ detail, screenshotsRes }) => ({
+						gameId: id,
+						game: detail,
+						screenshots: screenshotsRes?.results || [],
+						isLoading: false,
+						hasError: false
+					})),
+					catchError(() => of({ gameId: id, game: null, screenshots: [], isLoading: false, hasError: true })),
+					startWith({ gameId: id, game: null, screenshots: [], isLoading: true, hasError: false })
+				);
+			})
+		),
+		{ initialValue: { gameId: null, game: null, screenshots: [], isLoading: true, hasError: false } }
+	);
+
+	// State exposed to the template as computed signals to keep HTML bindings working perfectly
+	readonly gameId = computed(() => this.detailState().gameId);
+	readonly game = computed(() => this.detailState().game);
+	readonly screenshots = computed(() => this.detailState().screenshots);
+	readonly isLoading = computed(() => this.detailState().isLoading);
+	readonly hasError = computed(() => this.detailState().hasError);
 
 	// Reactive signal to compute favorite status
 	readonly isFavorite = computed(() => {
@@ -35,45 +81,9 @@ export class GameDetail implements OnInit, OnDestroy {
 		return g ? this.favoritesService.isFavorite(g.id) : false;
 	});
 
-	ngOnInit(): void {
-		this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-			const idParam = params.get('id');
-			if (idParam) {
-				const id = parseInt(idParam, 10);
-				this.gameId.set(id);
-				this.fetchGameDetails(id);
-			} else {
-				this.isLoading.set(false);
-				this.hasError.set(true);
-			}
-		});
-	}
-
-	ngOnDestroy(): void {
-		this.destroy$.next();
-		this.destroy$.complete();
-	}
-
-	fetchGameDetails(id: number): void {
-		this.isLoading.set(true);
-		this.hasError.set(false);
-
-		// Run the request for basic information and screenshots in parallel
-		// Added catchError to screenshots to prevent the entire page from failing if images fail
-		forkJoin({
-			detail: this.gamesApi.getGame(id),
-			screenshotsRes: this.gamesApi.getScreenshots(id).pipe(catchError(() => of(null)))
-		}).subscribe({
-			next: ({ detail, screenshotsRes }) => {
-				this.game.set(detail);
-				this.screenshots.set(screenshotsRes?.results || []);
-				this.isLoading.set(false);
-			},
-			error: () => {
-				this.isLoading.set(false);
-				this.hasError.set(true);
-			}
-		});
+	// Triggered by the "Riprova" button in the template
+	fetchGameDetails(): void {
+		this.refreshTrigger.update(v => v + 1);
 	}
 
 	// Extracts base game data to store in favorites without unnecessary heavy details

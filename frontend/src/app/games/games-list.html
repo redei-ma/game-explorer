@@ -37,6 +37,14 @@
 		</div>
 
 		<div class="filter-group">
+			<label for="specific-platform-select">Console</label>
+			<select id="specific-platform-select" [(ngModel)]="currentQuery.platforms" (change)="onFilterChange()">
+				<option [ngValue]="undefined">Tutte le piattaforme</option>
+				<option *ngFor="let p of specificPlatforms()" [value]="p.id">{{ p.name }}</option>
+			</select>
+		</div>
+
+		<div class="filter-group">
 			<label for="year-select">Anno</label>
 			<select id="year-select" [(ngModel)]="selectedYear" (change)="onFilterChange()">
 				<option value="">Tutti gli anni</option>

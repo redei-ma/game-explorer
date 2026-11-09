@@ -8,6 +8,12 @@
   "/api/platforms": {
     "target": "http://localhost:5001"
   },
+  "/api/parent-platforms": {
+    "target": "http://localhost:5001"
+  },
+  "/api/library": {
+    "target": "http://localhost:5003"
+  },
   "/health/catalog": {
     "target": "http://localhost:5001",
     "pathRewrite": {
