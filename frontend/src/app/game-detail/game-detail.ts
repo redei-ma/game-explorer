@@ -6,6 +6,7 @@ import { forkJoin, of, combineLatest } from 'rxjs';
 import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 import { GamesApi, GameDetailData, Screenshot, Game } from '../games/games.api';
 import { FavoritesService } from '../favorites/favorites.service';
+import { GameReviews } from '../game-reviews/game-reviews';
 
 // Internal state interface for reactive HTTP calls
 interface DetailState {
@@ -19,7 +20,7 @@ interface DetailState {
 @Component({
 	selector: 'app-game-detail',
 	standalone: true,
-	imports: [CommonModule, RouterModule],
+	imports: [CommonModule, RouterModule, GameReviews],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './game-detail.html',
 	styleUrls: ['./game-detail.css']

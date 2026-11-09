@@ -99,6 +99,27 @@ export interface GamesQuery {
 	pageSize?: number;
 }
 
+// Data structures for user reviews
+export interface Review {
+	id: string;
+	gameId: number;
+	userId: string;
+	userName: string;
+	rating: number;
+	comment: string;
+	createdAt: string;
+}
+
+export interface ReviewPayload {
+	rating: number;
+	comment: string;
+}
+
+export interface ReviewsResponse {
+	count: number;
+	results: Review[];
+}
+
 /*******************************************************************************
  *   API layer                                                                 *
  ******************************************************************************/
@@ -143,5 +164,13 @@ export class GamesApi {
 	}
 	getScreenshots(id: number): Observable<ScreenshotsResponse> {
 		return this.http.get<ScreenshotsResponse>(`/api/games/${id}/screenshots`);
+	}
+
+	// Methods for user reviews endpoints
+	getGameReviews(gameId: number): Observable<ReviewsResponse> {
+		return this.http.get<ReviewsResponse>(`/api/games/${gameId}/reviews`);
+	}
+	createReview(gameId: number, payload: ReviewPayload): Observable<Review> {
+		return this.http.post<Review>(`/api/games/${gameId}/reviews`, payload);
 	}
 }

@@ -18,7 +18,6 @@ export class App {
 	protected readonly navLinks = [
 	{ label: 'Giochi', path: '/games' },
 	{ label: 'Preferiti', path: '/favorites' },
-	{ label: 'Recensioni', path: '/' },
 	{ label: 'Liste', path: '/' },
 	];
 	protected readonly footerLinks = ['Chi siamo', 'Aiuto', 'Termini', 'Privacy', 'Contatti'];

@@ -1,0 +1,84 @@
+<section class="reviews-section">
+	<div class="reviews-header">
+		<h2>Recensioni della community</h2>
+		<div class="reviews-summary" *ngIf="!isLoading() && !hasError()">
+			<span class="avg-score" *ngIf="reviews().length > 0">★ {{ averageRating() }} / 5</span>
+			<span class="count-badge">({{ reviews().length }} {{ reviews().length === 1 ? 'recensione' : 'recensioni' }})</span>
+		</div>
+	</div>
+
+	<!-- Form per Utenti Loggati -->
+	<div class="review-form-card" *ngIf="authService.isLoggedIn(); else loginBanner">
+		<h3>Lascia la tua recensione</h3>
+		
+		<form (ngSubmit)="submitReview()">
+			<div class="form-group">
+				<label>Valutazione:</label>
+				<div class="rating-picker">
+					<button 
+						type="button" 
+						*ngFor="let star of [1, 2, 3, 4, 5]" 
+						class="star-btn" 
+						[class.active]="star <= newRating"
+						(click)="newRating = star"
+					>★</button>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label for="review-comment">Commento:</label>
+				<textarea 
+					id="review-comment" 
+					class="form-control" 
+					rows="3" 
+					placeholder="Cosa ne pensi di questo gioco?"
+					[(ngModel)]="newComment"
+					name="comment"
+					required
+				></textarea>
+			</div>
+
+			<div class="form-actions">
+				<span class="error-msg" *ngIf="submitError()">{{ submitError() }}</span>
+				<button type="submit" class="btn-primary" [disabled]="isSubmitting() || !newComment.trim()">
+					{{ isSubmitting() ? 'Invio in corso...' : 'Invia recensione' }}
+				</button>
+			</div>
+		</form>
+	</div>
+
+	<!-- Banner per utenti Anonimi -->
+	<ng-template #loginBanner>
+		<div class="state-banner info-banner">
+			<p>Vuoi dire la tua? <strong>Accedi o Registrati</strong> per lasciare una recensione su questo gioco.</p>
+		</div>
+	</ng-template>
+
+	<!-- Skeleton / Loading State -->
+	<div class="loading-state" *ngIf="isLoading()">
+		<p>Caricamento recensioni in corso...</p>
+	</div>
+
+	<!-- Error State -->
+	<div class="state-banner error-banner" *ngIf="!isLoading() && hasError()">
+		<p>Impossibile caricare le recensioni.</p>
+	</div>
+
+	<!-- Lista Recensioni -->
+	<div class="reviews-list" *ngIf="!isLoading() && !hasError()">
+		<div class="no-reviews" *ngIf="reviews().length === 0">
+			<p>Non ci sono ancora recensioni per questo gioco. Sii il primo a scriverne una!</p>
+		</div>
+
+		<div class="review-card" *ngFor="let rev of reviews()">
+			<div class="review-meta">
+				<strong class="user-name">{{ rev.userName }}</strong>
+				<span class="review-date">{{ rev.createdAt | date:'dd/MM/yyyy' }}</span>
+			</div>
+			<div class="review-rating">
+				<span class="stars">★ {{ rev.rating }}/5</span>
+			</div>
+			<p class="review-body">{{ rev.comment }}</p>
+		</div>
+	</div>
+</section>
