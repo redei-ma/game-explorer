@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace AuthService.Data.Migrations
+namespace AuthService.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
     [Migration("20261029165545_InitialIdentity")]
