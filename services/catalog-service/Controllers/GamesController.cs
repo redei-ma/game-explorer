@@ -10,8 +10,8 @@ namespace CatalogService.Controllers;
 /// frontend (or the gateway), asks IGDB through <see cref="IgdbClient"/>, and returns the result.
 /// The URLs, parameters and JSON shapes are the same as in the RAWG version, so the frontend did not change.
 /// </summary>
-[ApiController]            // enables automatic 400 responses for invalid input
-[Route("api/games")]       // base URL for every action in this class
+[ApiController]
+[Route("api/games")]
 public class GamesController(IgdbClient igdb) : ControllerBase
 {
     /// <summary>
@@ -40,12 +40,11 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     [FromQuery, Range(1970, 2100)] int? year = null,
     [FromQuery] int pageSize = 20, CancellationToken ct = default)
     {
-        // Page size capped at 40.
         pageSize = Math.Clamp(pageSize, 1, 40);
         page = Math.Max(page, 1);
 
         if (minMetacritic is not null && maxMetacritic is not null && minMetacritic > maxMetacritic)
-            return BadRequest("minMetacritic cannot be greater than maxMetacritic.");
+            return Problem("minMetacritic cannot be greater than maxMetacritic.", statusCode: StatusCodes.Status400BadRequest);
 
         if (year is not null && string.IsNullOrWhiteSpace(dates))
             dates = $"{year}-01-01,{year}-12-31";
@@ -61,7 +60,7 @@ public class GamesController(IgdbClient igdb) : ControllerBase
         catch (ArgumentException ex)
         {
             // IgdbClient rejected a parameter (bad id list, bad date range, unknown ordering).
-            return BadRequest(ex.Message);
+            return Problem(ex.Message, statusCode: StatusCodes.Status400BadRequest);
         }
         catch (HttpRequestException ex)
         {
@@ -70,7 +69,7 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     }
 
     /// <summary>Returns the full details of one game. GET /api/games/1942
-    /// Throws "400 bad request" error with id &lt;= 0 </summary>
+    /// Answers 400 when id is less than 1.</summary>
     /// <param name="id">The IGDB game id; must be 1 or greater.</param>
     /// <param name="ct">Cancellation token.</param>
     [HttpGet("{id:int}")]

@@ -1,7 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
 
-// Namespace: same as RawgClient, so all "talk to an external API" classes live together.
 namespace CatalogService.Services;
 
 /// <summary>

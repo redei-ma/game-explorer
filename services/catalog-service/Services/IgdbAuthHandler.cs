@@ -4,10 +4,9 @@ using System.Net.Http.Headers;
 namespace CatalogService.Services;
 
 /// <summary>
-/// A "message handler": a piece of code that sits between <see cref="IgdbClient"/> and
-/// the network and sees every request on its way out. Its job is to attach the two
-/// headers IGDB requires (Client-ID and Authorization: Bearer ...) so that IgdbClient
-/// never has to think about authentication.
+/// Adds the two headers IGDB requires (Client-ID and Authorization: Bearer ...) to every
+/// request of <see cref="IgdbClient"/>, so that IgdbClient never has to think about
+/// authentication.
 /// </summary>
 /// <remarks>
 /// It also handles one failure automatically: if IGDB answers 401 Unauthorized, the
@@ -17,7 +16,7 @@ public sealed class IgdbAuthHandler(IgdbTokenProvider tokens) : DelegatingHandle
 {
     /// <summary>
     /// Called by HttpClient for every outgoing request. Adds the headers, forwards
-    /// the request ("base.SendAsync" passes it on toward the network) and retries once on 401.
+    /// the request and retries once on 401.
     /// </summary>
     /// <param name="request">The request IgdbClient built.</param>
     /// <param name="ct">Cancellation token.</param>

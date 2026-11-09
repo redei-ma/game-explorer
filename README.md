@@ -84,13 +84,15 @@ Run in Docker what you are not changing, and locally what you are working on:
   dotnet user-secrets set "ConnectionStrings:AuthDb" "Server=localhost,1433;Database=AuthDb;User Id=sa;Password=$SA_PASSWORD;TrustServerCertificate=True" --project services/auth-service
   dotnet user-secrets set "Jwt:Key" "$(grep '^JWT_KEY=' .env | cut -d= -f2-)" --project services/auth-service
   dotnet user-secrets set "ConnectionStrings:LibraryDb" "Server=localhost,1433;Database=LibraryDb;User Id=sa;Password=$SA_PASSWORD;TrustServerCertificate=True" --project services/library-service
-  dotnet user-secrets set "Jwt:Key" "$(grep '^JWT_KEY=' .env | cut -d= -f2-)" --project services/library-service, come la riga 85 per auth. Serve per dotnet run
+  dotnet user-secrets set "Jwt:Key" "$(grep '^JWT_KEY=' .env | cut -d= -f2-)" --project services/library-service
   ```
 
-- **Calling auth-service directly (curl, Postman):** POST requests need an `X-CSRF-Token`
-  header, with any value. Without it the service answers `403`.
+- **Calling auth-service or library-service directly (curl, Postman):** POST, PUT and
+  DELETE requests need an `X-CSRF-Token` header, with any value. Without it the service
+  answers `403`.
 - **Database migrations:** creating one needs the EF Core tool
-  (`dotnet tool install --global dotnet-ef`); see `services/auth-service/Data/Migrations`.
+  (`dotnet tool install --global dotnet-ef`); see the `Migrations` folder of
+  auth-service and library-service.
   Services apply pending migrations at startup.
 
 | Address                | What                                          |

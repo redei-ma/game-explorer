@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-// HTTP endpoints (controllers) of library-service
 namespace LibraryService.Controllers;
 
 /// <summary>
@@ -34,7 +33,7 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
     {
         var userId = UserId;
         return await db.Favorites
-            .AsNoTracking()   // read-only query: skips change tracking, which is faster
+            .AsNoTracking()
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.AddedAt)
             .Select(f => new FavoriteDto(f.GameId, f.Name, f.CoverUrl, f.Rating, f.ReleaseDate, f.AddedAt))
@@ -57,7 +56,8 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
     [HttpPut("{gameId:int}")]
     public async Task<IActionResult> Add(int gameId, CancellationToken ct)
     {
-        if (gameId <= 0) return BadRequest("gameId must be positive");
+        if (gameId <= 0)
+            return Problem("gameId must be positive.", statusCode: StatusCodes.Status400BadRequest);
 
         var userId = UserId;
 
@@ -73,11 +73,11 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
         catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
         {
             logger.LogWarning(ex, "catalog-service call failed for game {GameId}", gameId);
-            return Problem(statusCode: StatusCodes.Status502BadGateway, title: "Catalog service is unavailable");
+            return Problem("Catalog service is unavailable.", statusCode: StatusCodes.Status502BadGateway);
         }
 
         if (game is null)
-            return Problem(statusCode: StatusCodes.Status404NotFound, title: "Game not found in the catalog");
+            return Problem("Game not found in the catalog.", statusCode: StatusCodes.Status404NotFound);
 
         db.Favorites.Add(new Favorite
         {

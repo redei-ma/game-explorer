@@ -3,7 +3,8 @@ using System.ComponentModel.DataAnnotations;
 namespace LibraryService.Services;
 
 /// <summary>
-/// Settings for signing JWTs, bound from the "Jwt" configuration section.
+/// Settings for validating the JWTs issued by auth-service, bound from the "Jwt"
+/// configuration section.
 /// </summary>
 public class JwtOptions
 {
@@ -13,7 +14,7 @@ public class JwtOptions
     public const string SectionName = "Jwt";
 
     /// <summary>
-    /// HMAC key shared with library-service. RFC 7518 requires at least
+    /// HMAC key shared with auth-service. RFC 7518 requires at least
     /// 256 bits for HS256, which is 32 ASCII characters.
     /// </summary>
     [Required, MinLength(32)]

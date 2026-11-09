@@ -11,11 +11,12 @@ const string AccessTokenCookie = "access_token";
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+// Every error response uses the ProblemDetails format (RFC 9457), so the
+// frontend handles all errors the same way
+builder.Services.AddProblemDetails();
 
 // The connection string comes from configuration: ConnectionStrings__LibraryDb
 // is set by docker-compose from the .env file, so no password lives in the code
@@ -84,7 +85,10 @@ using (var scope = app.Services.CreateScope())
     db.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline.
+// Without these, unhandled exceptions and unknown routes return an empty body
+app.UseExceptionHandler();
+app.UseStatusCodePages();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

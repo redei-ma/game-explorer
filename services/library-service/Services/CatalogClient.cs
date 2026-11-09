@@ -1,6 +1,5 @@
 using System.Net;
 
-// Code that talks to other services
 namespace LibraryService.Services;
 
 /// <summary>The part of catalog-service's game-detail response that library-service needs.</summary>
@@ -22,7 +21,8 @@ public class CatalogClient(HttpClient http) : ICatalogClient
     /// </summary>
     public async Task<CatalogGame?> GetGameAsync(int gameId, CancellationToken ct)
     {
-        // the gateway forwards /api/games unchanged, so catalog's route starts with api/games
+        // Called directly, not through the gateway; the path still starts with api/
+        // because catalog's routes match the URLs the gateway forwards unchanged
         using var response = await http.GetAsync($"api/games/{gameId}", ct);
 
         if (response.StatusCode == HttpStatusCode.NotFound)
