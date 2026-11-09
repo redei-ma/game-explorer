@@ -3,6 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormField, FormRoot, email, form, required } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
 import { AuthService } from '../auth.service';
 
 @Component({
@@ -48,7 +49,7 @@ function loginErrorMessage(error: unknown): string {
     return 'Email o password errate.';
   }
   if (error instanceof HttpErrorResponse && error.status === 429) {
-    return 'Troppi tentativi: riprova tra un minuto.';
+    return TOO_MANY_ATTEMPTS_MESSAGE;
   }
   return 'Accesso non riuscito: riprova più tardi.';
 }
