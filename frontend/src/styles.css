@@ -8,8 +8,8 @@
 	--ge-border: #223039;
 	--ge-text: #f2f5f7;
 	--ge-muted: #8493a1;
-	--ge-accent: #00b06a;
-	--ge-accent-hover: #00c978;
+	--ge-accent: #007a4b;
+	--ge-accent-hover: #006f45;
 	--ge-primary: #005a9c;
 	--ge-primary-hover: #00457a;
 	--ge-info: #00a3e0;
@@ -78,6 +78,8 @@ h1, h2, h3, h4, h5 {
 	background: var(--ge-accent-hover);
 	color: #fff;
 }
+.btn-ge--disabled { cursor: default; opacity: .7; }
+.btn-ge--disabled:hover { background: var(--ge-accent); color: #fff; }
 
 .eyebrow {
 	color: var(--ge-accent);

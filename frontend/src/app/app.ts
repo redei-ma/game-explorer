@@ -14,12 +14,10 @@ export class App {
 	protected readonly menuOpen = signal(false);
 	protected readonly searchOpen = signal(false);
 
-	// Navigation links including the new Favorites route
+	// Navigation links with currently available routes
 	protected readonly navLinks = [
 	{ label: 'Giochi', path: '/games' },
 	{ label: 'Preferiti', path: '/favorites' },
-	{ label: 'Recensioni', path: '/' },
-	{ label: 'Liste', path: '/' },
 	];
 	protected readonly footerLinks = ['Chi siamo', 'Aiuto', 'Termini', 'Privacy', 'Contatti'];
 

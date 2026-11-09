@@ -7,7 +7,7 @@
 		Tieni traccia delle tue avventure, crea liste e scopri nuovi titoli insieme a una community di appassionati.
 	</p>
 	<div class="d-flex flex-wrap align-items-center gap-3">
-		<a class="btn btn-ge" routerLink="/">Crea il tuo account</a>
+		<span class="btn btn-ge btn-ge--disabled">Crea il tuo account</span>
 		<small class="hero__note">È gratuito. Nessuna pubblicità invadente.</small>
 	</div>
 	</div>
@@ -68,7 +68,7 @@
 	<div class="container-ge">
 	<div class="row gy-5">
 		<div class="col-lg-7">
-		<div class="section-head"><span>Recensioni popolari</span><a href="#">Altro</a></div>
+		<div class="section-head"><span>Recensioni popolari</span><span class="section-link--disabled">Altro</span></div>
 		@for (r of reviews; track r.n) {
 			<article class="review">
 			<span class="ph-poster review__poster" [class]="'c' + r.n"><span class="ph-poster__n">{{ pad(r.n) }}</span></span>
@@ -88,7 +88,7 @@
 			<li><span class="avatar">{{ a.initials }}</span><span><strong>{{ a.user }}</strong>{{ ' ' + a.verb }}<strong>{{ a.object }}</strong>{{ a.tail }}</span></li>
 			}
 		</ul>
-		<a class="activity__more" href="#">Esplora l’attività della community &gt;</a>
+		<span class="activity__more activity__more--disabled">Esplora l’attività della community &gt;</span>
 		</div>
 	</div>
 	</div>
@@ -97,7 +97,7 @@
 <!-- POPULAR LISTS -->
 <section class="band band--alt">
 	<div class="container-ge">
-	<div class="section-head"><span>Liste popolari</span><a href="#">Tutte le liste &gt;</a></div>
+	<div class="section-head"><span>Liste popolari</span><span class="section-link--disabled">Tutte le liste &gt;</span></div>
 	<div class="row gy-4">
 		@for (l of lists; track l.title) {
 		<div class="col-md-4">
@@ -121,6 +121,6 @@
 		<p class="eyebrow mb-2">Inizia il tuo diario</p>
 		<h2 class="cta__title">Ogni gioco racconta anche qualcosa di te.</h2>
 	</div>
-	<a class="btn btn-ge" routerLink="/">Unisciti alla community</a>
+	<span class="btn btn-ge btn-ge--disabled">Unisciti alla community</span>
 	</div>
 </section>
