@@ -1,0 +1,90 @@
+<section class="container-ge py-5" data-bs-theme="dark">
+  @if (recoveryCode(); as code) {
+    <h1 class="mb-4">Account creato</h1>
+    <p>
+      Questo è il tuo codice di recupero: ti serve per scegliere una nuova password se dimentichi
+      quella attuale.
+    </p>
+    <p class="fs-4 font-monospace text-break user-select-all">{{ code }}</p>
+    <p>Salvalo adesso in un posto sicuro: non verrà più mostrato.</p>
+    <button type="button" class="btn btn-ge" (click)="continue()">
+      Ho salvato il codice, continua
+    </button>
+  } @else {
+    <h1 class="mb-4">Crea il tuo account</h1>
+
+    <form [formRoot]="registerForm">
+      <div class="mb-3">
+        <label for="register-email" class="form-label">Email</label>
+        <input
+          id="register-email"
+          type="email"
+          class="form-control"
+          autocomplete="email"
+          [formField]="registerForm.email"
+        />
+        @if (registerForm.email().touched()) {
+          @for (error of registerForm.email().errors(); track error.kind) {
+            <div class="form-text text-danger">{{ error.message }}</div>
+          }
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="register-username" class="form-label">Username</label>
+        <input
+          id="register-username"
+          type="text"
+          class="form-control"
+          autocomplete="username"
+          [formField]="registerForm.username"
+        />
+        @if (registerForm.username().touched()) {
+          @for (error of registerForm.username().errors(); track error.kind) {
+            <div class="form-text text-danger">{{ error.message }}</div>
+          }
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="register-password" class="form-label">Password</label>
+        <input
+          id="register-password"
+          type="password"
+          class="form-control"
+          autocomplete="new-password"
+          [formField]="registerForm.password"
+        />
+        @if (registerForm.password().touched()) {
+          @for (error of registerForm.password().errors(); track error.kind) {
+            <div class="form-text text-danger">{{ error.message }}</div>
+          }
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="register-confirm-password" class="form-label">Conferma la password</label>
+        <input
+          id="register-confirm-password"
+          type="password"
+          class="form-control"
+          autocomplete="new-password"
+          [formField]="registerForm.confirmPassword"
+        />
+        @if (registerForm.confirmPassword().touched()) {
+          @for (error of registerForm.confirmPassword().errors(); track error.kind) {
+            <div class="form-text text-danger">{{ error.message }}</div>
+          }
+        }
+      </div>
+
+      @for (error of registerForm().errors(); track error.kind) {
+        <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
+      }
+
+      <button type="submit" class="btn btn-ge" [disabled]="registerForm().submitting()">
+        {{ registerForm().submitting() ? 'Registrazione in corso…' : "Crea l'account" }}
+      </button>
+    </form>
+  }
+</section>

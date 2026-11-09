@@ -17,6 +17,11 @@ export const routes: Routes = [
 		loadComponent: () => import('./auth/login/login').then((m) => m.Login),
 		title: 'Accedi',
 	},
+	{
+		path: 'register',
+		loadComponent: () => import('./auth/register/register').then((m) => m.Register),
+		title: 'Crea il tuo account',
+	},
 	
 	// NB: /games & /games/:id routes are now active. Unhandled routes land on Home without errors
 	{ path: '**', redirectTo: '' },
