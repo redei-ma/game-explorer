@@ -431,15 +431,13 @@ FodyWeavers.xsd
 .env.*
 !.env.example
 
+# Personal Compose settings for development: only the example is committed
+docker-compose.override.yml
+
 # Private keys and certificates
 secrets/
 *.pem
 *.key
-
-# Angular / Node
-.angular/
-dist/
-coverage/
 
 # OS files
 .DS_Store
@@ -452,3 +450,6 @@ Thumbs.db
 CLAUDE.md
 CLAUDE.local.md
 .claude/
+
+# Temporary scripts for development phase
+*addMigration.sh
