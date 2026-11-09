@@ -45,7 +45,7 @@ public class GamesController(IgdbClient igdb) : ControllerBase
         page = Math.Max(page, 1);
 
         if (minMetacritic is not null && maxMetacritic is not null && minMetacritic > maxMetacritic)
-            return BadRequest("minMetacritic cannot be greater than maxMetacritic.");
+            return Problem("minMetacritic cannot be greater than maxMetacritic.", statusCode: StatusCodes.Status400BadRequest);
 
         if (year is not null && string.IsNullOrWhiteSpace(dates))
             dates = $"{year}-01-01,{year}-12-31";
@@ -61,7 +61,7 @@ public class GamesController(IgdbClient igdb) : ControllerBase
         catch (ArgumentException ex)
         {
             // IgdbClient rejected a parameter (bad id list, bad date range, unknown ordering).
-            return BadRequest(ex.Message);
+            return Problem(ex.Message, statusCode: StatusCodes.Status400BadRequest);
         }
         catch (HttpRequestException ex)
         {

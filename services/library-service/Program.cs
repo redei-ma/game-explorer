@@ -17,6 +17,10 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+// Every error response uses the ProblemDetails format (RFC 9457), so the
+// frontend handles all errors the same way
+builder.Services.AddProblemDetails();
+
 // The connection string comes from configuration: ConnectionStrings__LibraryDb
 // is set by docker-compose from the .env file, so no password lives in the code
 // (docker-compose starts this service only once SQL Server is healthy)
@@ -83,6 +87,10 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();
     db.Database.Migrate();
 }
+
+// Without these, unhandled exceptions and unknown routes return an empty body
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

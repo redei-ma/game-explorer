@@ -15,6 +15,10 @@ builder.Services.AddOpenApi();
 // Used by Docker and the gateway to know whether the service is up
 builder.Services.AddHealthChecks();
 
+// Every error response uses the ProblemDetails format (RFC 9457), so the
+// frontend handles all errors the same way.
+builder.Services.AddProblemDetails();
+
 builder.Services.AddMemoryCache();
 
 // --- IGDB -------------------------------------------------------------------
@@ -39,6 +43,10 @@ builder.Services.AddHttpClient<IgdbClient>(client =>
 .AddHttpMessageHandler<IgdbAuthHandler>();
 
 var app = builder.Build();
+
+// Without these, unhandled exceptions and unknown routes return an empty body.
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
