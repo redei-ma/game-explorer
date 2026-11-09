@@ -3,14 +3,11 @@ using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
     });
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 // Used by Docker and the gateway to know whether the service is up
 builder.Services.AddHealthChecks();
@@ -28,11 +25,11 @@ builder.Services.AddHttpClient(IgdbTokenProvider.HttpClientName, client =>
     client.BaseAddress = new Uri("https://id.twitch.tv/");
 });
 
-// 2. The token cache. Singleton = one shared instance, so the token is shared by all requests.
+// 2. The token cache. Singleton, so every request shares the same cached token.
 builder.Services.AddSingleton<IgdbTokenProvider>();
 
 // 3. The handler that stamps Client-ID + Bearer token onto every IGDB request.
-//    Transient = a new one each time the HttpClient pipeline is built (required for handlers).
+//    Transient, as HttpClient message handlers must be.
 builder.Services.AddTransient<IgdbAuthHandler>();
 
 // 4. The IGDB typed client itself, with the auth handler plugged into its pipeline.
@@ -48,7 +45,6 @@ var app = builder.Build();
 app.UseExceptionHandler();
 app.UseStatusCodePages();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

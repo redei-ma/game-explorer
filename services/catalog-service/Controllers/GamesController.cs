@@ -10,8 +10,8 @@ namespace CatalogService.Controllers;
 /// frontend (or the gateway), asks IGDB through <see cref="IgdbClient"/>, and returns the result.
 /// The URLs, parameters and JSON shapes are the same as in the RAWG version, so the frontend did not change.
 /// </summary>
-[ApiController]            // enables automatic 400 responses for invalid input
-[Route("api/games")]       // base URL for every action in this class
+[ApiController]
+[Route("api/games")]
 public class GamesController(IgdbClient igdb) : ControllerBase
 {
     /// <summary>
@@ -40,7 +40,6 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     [FromQuery, Range(1970, 2100)] int? year = null,
     [FromQuery] int pageSize = 20, CancellationToken ct = default)
     {
-        // Page size capped at 40.
         pageSize = Math.Clamp(pageSize, 1, 40);
         page = Math.Max(page, 1);
 

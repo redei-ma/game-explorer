@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-// HTTP endpoints (controllers) of library-service
 namespace LibraryService.Controllers;
 
 /// <summary>
@@ -34,7 +33,7 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
     {
         var userId = UserId;
         return await db.Favorites
-            .AsNoTracking()   // read-only query: skips change tracking, which is faster
+            .AsNoTracking()
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.AddedAt)
             .Select(f => new FavoriteDto(f.GameId, f.Name, f.CoverUrl, f.Rating, f.ReleaseDate, f.AddedAt))

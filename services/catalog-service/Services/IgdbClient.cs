@@ -9,8 +9,8 @@ using Microsoft.Extensions.Caching.Memory;
 namespace CatalogService.Services;
 
 /// <summary>
-/// The typed client that replaces RawgClient. It is the ONLY class that knows IGDB's
-/// URLs and query language. It translates the frontend's RAWG-style parameters into
+/// The typed client for IGDB, and the only class that writes IGDB queries (the base
+/// URL is set in Program.cs). It translates the frontend's RAWG-style parameters into
 /// IGDB queries and translates IGDB's answers back into the existing models,
 /// so the controller and the frontend do not change.
 /// </summary>
