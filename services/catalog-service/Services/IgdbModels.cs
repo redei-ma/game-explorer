@@ -56,7 +56,7 @@ public sealed record IgdbNamed(int Id, string Name, string? Slug);
 /// <param name="Id">IGDB platform id (e.g. 167 = PlayStation 5).</param>
 /// <param name="Name">Display name.</param>
 /// <param name="Slug">URL-friendly name.</param>
-/// <param name="PlatformFamily">The family it belongs to, or null (PC, Mac, mobile have none).</param>
+/// <param name="PlatformFamily">The family it belongs to, or null (PC, Mac and iOS have none).</param>
 public sealed record IgdbPlatform(int Id, string Name, string? Slug, IgdbNamed? PlatformFamily);
 
 /// <summary>

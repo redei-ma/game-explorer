@@ -69,7 +69,7 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     }
 
     /// <summary>Returns the full details of one game. GET /api/games/1942
-    /// Throws "400 bad request" error with id &lt;= 0 </summary>
+    /// Answers 400 when id is less than 1.</summary>
     /// <param name="id">The IGDB game id; must be 1 or greater.</param>
     /// <param name="ct">Cancellation token.</param>
     [HttpGet("{id:int}")]
