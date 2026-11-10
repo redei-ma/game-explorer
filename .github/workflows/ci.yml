@@ -62,7 +62,8 @@ jobs:
       # Test values, not secrets: Compose refuses to start without them, and
       # this stack exists only inside the job.
       MSSQL_SA_PASSWORD: Ci-Placeholder-1
-      RAWG_API_KEY: placeholder
+      IGDB_CLIENT_ID: placeholder
+      IGDB_CLIENT_SECRET: placeholder
       JWT_KEY: ci-placeholder-key-at-least-32-characters
     steps:
       - uses: actions/checkout@v7

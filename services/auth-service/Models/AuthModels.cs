@@ -7,12 +7,12 @@ namespace AuthService.Models;
 /// so the error lists exactly the rules that failed.
 /// </summary>
 /// <param name="Email">Login email, unique among users.</param>
-/// <param name="Username">Name shown in the app, unique among users.</param>
+/// <param name="Username">Name shown in the app, 3 to 30 characters, unique among users.</param>
 /// <param name="Password">Plain-text password, hashed by Identity before saving.</param>
 public record RegisterRequest(
-    // 256 is the size of the Email and UserName columns in AspNetUsers.
+    // 256 is the size of the Email column in AspNetUsers.
     [Required, EmailAddress, MaxLength(256)] string Email,
-    [Required, MaxLength(256)] string Username,
+    [Required, Length(3, 30)] string Username,
     [Required] string Password);
 
 /// <summary>

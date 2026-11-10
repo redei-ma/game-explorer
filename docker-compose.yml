@@ -28,7 +28,8 @@ services:
     init: true
     restart: unless-stopped
     environment:
-      Rawg__ApiKey: ${RAWG_API_KEY:?RAWG_API_KEY is not set in .env}
+      Igdb__ClientId: ${IGDB_CLIENT_ID:?IGDB_CLIENT_ID is not set in .env}
+      Igdb__ClientSecret: ${IGDB_CLIENT_SECRET:?IGDB_CLIENT_SECRET is not set in .env}
 
   auth-service:
     build: ./services/auth-service
@@ -51,6 +52,8 @@ services:
       # "sa" is the SQL Server administrator: fine for local development; a production
       # setup would use a dedicated login with access to this database only
       ConnectionStrings__LibraryDb: "Server=sqlserver;Database=LibraryDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
+      Catalog__BaseUrl: http://catalog-service:8080
+      Jwt__Key: ${JWT_KEY:?Set JWT_KEY in .env (see .env.example)}
     depends_on:
       sqlserver:
         condition: service_healthy

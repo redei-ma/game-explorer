@@ -40,9 +40,9 @@ export class Home {
 	];
 
 	protected readonly reviews = [
-	{ n: 1, initials: 'AM', user: 'membro_1', title: 'Titolo del gioco', rating: 4.5, likes: 12, text: 'Una riflessione breve sul film, sui suoi personaggi e sulle immagini che restano.' },
-	{ n: 2, initials: 'LC', user: 'membro_2', title: 'Titolo del gioco', rating: 4, likes: 29, text: 'Una recensione della community occupa questo spazio con poche righe essenziali.' },
-	{ n: 3, initials: 'RS', user: 'membro_3', title: 'Titolo del gioco', rating: 3.5, likes: 46, text: 'Impressioni, dettagli e punti di vista condivisi dopo la visione.' },
+	{ n: 1, initials: 'AM', user: 'membro_1', title: 'Titolo del gioco', rating: 4.5, likes: 12, text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed pulvinar at sem et semper.' },
+	{ n: 2, initials: 'LC', user: 'membro_2', title: 'Titolo del gioco', rating: 4, likes: 29, text: 'Maecenas vestibulum, nulla non consectetur ultrices.' },
+	{ n: 3, initials: 'RS', user: 'membro_3', title: 'Titolo del gioco', rating: 3.5, likes: 46, text: 'Nam eget diam ac est rutrum pulvinar.' },
 	];
 
   protected readonly activity = [
