@@ -78,7 +78,11 @@ export class FavoritesService {
 			withCredentials: true
 		}).subscribe({
 			next: favorites => {
-				const games = favorites.map(favorite => this.toGame(favorite));
+				const cachedFavorites = this.favorites();
+				const games = favorites.map(favorite => {
+					const cachedGame = cachedFavorites.find(game => game.id === favorite.gameId);
+					return this.toGame(favorite, cachedGame);
+				});
 				this.favorites.set(games);
 				this.saveFavorites(games);
 			},
@@ -102,15 +106,17 @@ export class FavoritesService {
 
 	private readonly csrfHeaders = new HttpHeaders({ 'X-CSRF-Token': 'frontend' });
 
-	private toGame(favorite: FavoriteDto): Game {
+	private toGame(favorite: FavoriteDto, cachedGame?: Game): Game {
 		return {
 			id: favorite.gameId,
-			name: favorite.name,
-			slug: '',
-			released: favorite.releaseDate,
-			backgroundImage: favorite.coverUrl,
-			rating: favorite.rating ?? 0,
-			metacritic: null
+			name: favorite.name || cachedGame?.name || 'Gioco senza nome',
+			slug: cachedGame?.slug ?? '',
+			released: favorite.releaseDate ?? cachedGame?.released ?? null,
+			backgroundImage: favorite.coverUrl ?? cachedGame?.backgroundImage ?? null,
+			rating: favorite.rating ?? cachedGame?.rating ?? 0,
+			metacritic: cachedGame?.metacritic ?? null,
+			parentPlatforms: cachedGame?.parentPlatforms,
+			platforms: cachedGame?.platforms
 		};
 	}
 
