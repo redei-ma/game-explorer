@@ -3,6 +3,7 @@ import { Home } from './home/home';
 import { GamesList } from './games/games-list';
 import { GameDetail } from './game-detail/game-detail';
 import { FavoritesList } from './favorites/favorites-list';
+import { NotFound } from './not-found/not-found';
 
 export const routes: Routes = [
 	{ path: '', component: Home, title: 'Gaming Explorer' },
@@ -13,6 +14,5 @@ export const routes: Routes = [
 	// Route to the user's favorite games section
 	{ path: 'favorites', component: FavoritesList, title: 'I miei Preferiti' },
 	
-	// NB: /games & /games/:id routes are now active. Unhandled routes land on Home without errors
-	{ path: '**', redirectTo: '' },
+	{ path: '**', component: NotFound, title: 'Pagina non trovata' },
 ];
