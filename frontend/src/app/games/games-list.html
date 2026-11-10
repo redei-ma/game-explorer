@@ -99,10 +99,10 @@
 	</section>
 
 	<!-- Games Grid -->
-	<main class="games-grid" *ngIf="!isLoading() && !hasError() && games().length > 0">
+	<div class="games-grid" *ngIf="!isLoading() && !hasError() && games().length > 0">
 		<!-- Selector of GameCard  -->
 		<app-game-card *ngFor="let game of games()" [game]="game"></app-game-card>
-	</main>
+	</div>
 
 	<!-- Pagination Controls -->
 	<nav class="pagination-container" *ngIf="!isLoading() && !hasError() && totalPages() > 1">

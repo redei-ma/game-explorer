@@ -19,6 +19,8 @@ main { flex: 1; }
 
 .btn-user { padding: .45rem .9rem; background: #2a3a45; border: 0; border-radius: 3px; color: var(--ge-text); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
 .btn-user:hover { background: #34495a; color: #fff; }
+.btn-user--disabled { cursor: default; opacity: .7; }
+.btn-user--disabled:hover { background: #2a3a45; color: var(--ge-text); }
 
 .search-bar { display: flex; gap: .5rem; padding-block: .6rem .85rem; }
 .search-bar .form-control { background: var(--ge-surface); border-color: var(--ge-border); color: var(--ge-text); font-size: .85rem; }
@@ -28,6 +30,7 @@ main { flex: 1; }
 .footer-links { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 0; padding: 0; list-style: none; }
 .footer-links a { color: var(--ge-muted); font-size: .62rem; text-decoration: none; }
 .footer-links a:hover { color: var(--ge-text); }
+.footer-link--disabled { color: var(--ge-muted); font-size: .62rem; }
 .footer-note { color: #5b6a77; font-size: .6rem; }
 
 @media (max-width: 767.98px) {

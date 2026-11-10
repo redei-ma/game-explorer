@@ -3,6 +3,7 @@ import { Home } from './home/home';
 import { GamesList } from './games/games-list';
 import { GameDetail } from './game-detail/game-detail';
 import { FavoritesList } from './favorites/favorites-list';
+import { NotFound } from './not-found/not-found';
 import { guestGuard, loggedInGuard } from './auth/auth.guards';
 
 export const routes: Routes = [
@@ -38,6 +39,5 @@ export const routes: Routes = [
 		title: 'Il tuo account',
 	},
 	
-	// NB: /games & /games/:id routes are now active. Unhandled routes land on Home without errors
-	{ path: '**', redirectTo: '' },
+	{ path: '**', component: NotFound, title: 'Pagina non trovata' },
 ];

@@ -1,8 +1,9 @@
 import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
-import { forkJoin, of, combineLatest } from 'rxjs';
+import { forkJoin, of, combineLatest, Observable } from 'rxjs';
 import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 import { GamesApi, GameDetailData, Screenshot, Game } from '../games/games.api';
 import { FavoritesService } from '../favorites/favorites.service';
@@ -13,7 +14,7 @@ interface DetailState {
 	game: GameDetailData | null;
 	screenshots: Screenshot[];
 	isLoading: boolean;
-	hasError: boolean;
+	error: 'not-found' | 'load' | null;
 }
 
 @Component({
@@ -40,10 +41,10 @@ export class GameDetail {
 			this.route.paramMap,
 			toObservable(this.refreshTrigger)
 		]).pipe(
-			switchMap(([params]) => {
+			switchMap(([params]): Observable<DetailState> => {
 				const idParam = params.get('id');
 				if (!idParam) {
-					return of({ gameId: null, game: null, screenshots: [], isLoading: false, hasError: true });
+					return of({ gameId: null, game: null, screenshots: [], isLoading: false, error: 'not-found' as const });
 				}
 				const id = parseInt(idParam, 10);
 
@@ -58,14 +59,20 @@ export class GameDetail {
 						game: detail,
 						screenshots: screenshotsRes?.results || [],
 						isLoading: false,
-						hasError: false
+						error: null
 					})),
-					catchError(() => of({ gameId: id, game: null, screenshots: [], isLoading: false, hasError: true })),
-					startWith({ gameId: id, game: null, screenshots: [], isLoading: true, hasError: false })
+					catchError((error: HttpErrorResponse) => of({
+						gameId: id,
+						game: null,
+						screenshots: [],
+						isLoading: false,
+						error: error.status === 404 ? 'not-found' as const : 'load' as const
+					})),
+					startWith({ gameId: id, game: null, screenshots: [], isLoading: true, error: null })
 				);
 			})
 		),
-		{ initialValue: { gameId: null, game: null, screenshots: [], isLoading: true, hasError: false } }
+		{ initialValue: { gameId: null, game: null, screenshots: [], isLoading: true, error: null } satisfies DetailState }
 	);
 
 	// State exposed to the template as computed signals to keep HTML bindings working perfectly
@@ -73,7 +80,8 @@ export class GameDetail {
 	readonly game = computed(() => this.detailState().game);
 	readonly screenshots = computed(() => this.detailState().screenshots);
 	readonly isLoading = computed(() => this.detailState().isLoading);
-	readonly hasError = computed(() => this.detailState().hasError);
+	readonly error = computed(() => this.detailState().error);
+	readonly hasError = computed(() => this.error() !== null);
 
 	// Reactive signal to compute favorite status
 	readonly isFavorite = computed(() => {

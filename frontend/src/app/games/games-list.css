@@ -90,20 +90,18 @@
 
 .games-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
 	gap: 1rem;
 }
 
 @media (min-width: 768px) {
 	.games-grid {
-		grid-template-columns: repeat(4, 1fr);
 		gap: 1.25rem;
 	}
 }
 
 @media (min-width: 1200px) {
 	.games-grid {
-		grid-template-columns: repeat(6, 1fr);
 		gap: 1.5rem;
 	}
 }

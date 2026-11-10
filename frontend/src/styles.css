@@ -8,8 +8,8 @@
 	--ge-border: #223039;
 	--ge-text: #f2f5f7;
 	--ge-muted: #8493a1;
-	--ge-accent: #00b06a;
-	--ge-accent-hover: #00c978;
+	--ge-accent: #007a4b;
+	--ge-accent-hover: #006f45;
 	--ge-primary: #005a9c;
 	--ge-primary-hover: #00457a;
 	--ge-info: #00a3e0;
@@ -61,6 +61,39 @@ h1, h2, h3, h4, h5 {
 	color: var(--ge-text);
 }
 
+/* Shared layout for centered feedback and error states. */
+.feedback-panel {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	width: min(100%, 48rem);
+	margin-inline: auto;
+	padding: clamp(2rem, 6vw, 3rem) clamp(1.25rem, 5vw, 3rem);
+	text-align: center;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+}
+
+.feedback-panel h1,
+.feedback-panel h2,
+.feedback-panel p {
+	margin: 0;
+}
+
+.feedback-panel .banner-content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1rem;
+	width: 100%;
+}
+
+.feedback-panel p:not(.eyebrow) {
+	color: var(--ge-muted);
+}
+
 /* Pulsante verde cta (si usa insieme a .btn di Bootstrap). */
 .btn-ge {
 	--bs-btn-padding-x: 1.1rem;
@@ -78,6 +111,8 @@ h1, h2, h3, h4, h5 {
 	background: var(--ge-accent-hover);
 	color: #fff;
 }
+.btn-ge--disabled { cursor: default; opacity: .7; }
+.btn-ge--disabled:hover { background: var(--ge-accent); color: #fff; }
 
 .eyebrow {
 	color: var(--ge-accent);

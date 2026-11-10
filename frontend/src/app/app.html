@@ -40,7 +40,7 @@
 	<a class="brand" routerLink="/"><span class="brand__dots" aria-hidden="true"><i></i><i></i><i></i></span>Gaming Explorer</a>
 	<ul class="footer-links">
 		@for (l of footerLinks; track l) {
-		<li><a href="#">{{ l }}</a></li>
+		<li><span class="footer-link footer-link--disabled">{{ l }}</span></li>
 		}
 	</ul>
 	<small class="footer-note">Interfaccia dimostrativa &bull; Nessun asset fotografico utilizzato</small>
