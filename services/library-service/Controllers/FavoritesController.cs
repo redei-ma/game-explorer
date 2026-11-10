@@ -121,4 +121,23 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
 
         return NoContent();
     }
+
+    /// <summary>
+    /// DELETE /api/library/favorites: removes ALL of the caller's favorites.
+    /// The frontend calls it right after the account is deleted in auth-service,
+    /// so no data of a deleted user is left behind.
+    /// </summary>
+    [HttpDelete]
+    public async Task<IActionResult> RemoveAll(CancellationToken ct)
+    {
+        var userId = UserId;
+
+        // One DELETE statement for every row of this user; returns how many rows it removed
+        var removed = await db.Favorites
+            .Where(f => f.UserId == userId)
+            .ExecuteDeleteAsync(ct);
+
+        logger.LogInformation("Removed {Count} favorites of user {UserId}", removed, userId);
+        return NoContent();
+    }
 }

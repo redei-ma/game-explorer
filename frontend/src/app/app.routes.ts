@@ -13,6 +13,11 @@ export const routes: Routes = [
 	{ path: 'games/:id', component: GameDetail, title: 'Dettagli Gioco' },
 	// Route to the user's favorite games section
 	{ path: 'favorites', component: FavoritesList, title: 'I miei Preferiti' },
+	{
+		path: 'login',
+		loadComponent: () => import('./auth/login/login').then((m) => m.Login),
+		title: 'Accedi',
+	},
 	
 	{ path: '**', component: NotFound, title: 'Pagina non trovata' },
 ];

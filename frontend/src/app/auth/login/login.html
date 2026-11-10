@@ -1,0 +1,45 @@
+<section class="container-ge py-5" data-bs-theme="dark">
+  <h1 class="mb-4">Accedi</h1>
+
+  <form [formRoot]="loginForm">
+    <div class="mb-3">
+      <label for="login-email" class="form-label">Email</label>
+      <input
+        id="login-email"
+        type="email"
+        class="form-control"
+        autocomplete="email"
+        [formField]="loginForm.email"
+      />
+      @if (loginForm.email().touched()) {
+        @for (error of loginForm.email().errors(); track error.kind) {
+          <div class="form-text text-danger">{{ error.message }}</div>
+        }
+      }
+    </div>
+
+    <div class="mb-3">
+      <label for="login-password" class="form-label">Password</label>
+      <input
+        id="login-password"
+        type="password"
+        class="form-control"
+        autocomplete="current-password"
+        [formField]="loginForm.password"
+      />
+      @if (loginForm.password().touched()) {
+        @for (error of loginForm.password().errors(); track error.kind) {
+          <div class="form-text text-danger">{{ error.message }}</div>
+        }
+      }
+    </div>
+
+    @for (error of loginForm().errors(); track error.kind) {
+      <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
+    }
+
+    <button type="submit" class="btn btn-ge" [disabled]="loginForm().submitting()">
+      {{ loginForm().submitting() ? 'Accesso in corso…' : 'Accedi' }}
+    </button>
+  </form>
+</section>
