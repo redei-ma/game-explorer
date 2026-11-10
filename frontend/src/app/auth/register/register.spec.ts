@@ -120,22 +120,45 @@ describe('Register', () => {
     expect(navigate).toHaveBeenCalledWith('/', { replaceUrl: true });
   });
 
-  it('shows the password rules that failed under the password', async () => {
+  it('joins the failed password rules into one sentence under the password', async () => {
+    const { fixture, page } = await submitValidForm();
+
+    // auth-service's answer for the password "abc".
+    http.expectOne('/api/auth/register').flush(
+      validationProblem({
+        PasswordTooShort: ['Passwords must be at least 6 characters.'],
+        PasswordRequiresDigit: ["Passwords must have at least one digit ('0'-'9')."],
+        PasswordRequiresUpper: ["Passwords must have at least one uppercase ('A'-'Z')."],
+        PasswordRequiresNonAlphanumeric: [
+          'Passwords must have at least one non alphanumeric character.',
+        ],
+      }),
+      { status: 400, statusText: 'Bad Request' },
+    );
+    await settle(fixture);
+
+    const errors = page
+      .querySelector('#register-password')!
+      .closest('.mb-3')!
+      .querySelectorAll('.text-danger');
+    expect(errors.length).toBe(1);
+    expect(errors[0].textContent).toBe(
+      'La password deve avere almeno 6 caratteri, un numero, una lettera maiuscola e un simbolo.',
+    );
+  });
+
+  it('names only the missing rule when one password rule fails', async () => {
     const { fixture, page } = await submitValidForm();
 
     http.expectOne('/api/auth/register').flush(
       validationProblem({
-        PasswordTooShort: ['Passwords must be at least 6 characters.'],
         PasswordRequiresDigit: ["Passwords must have at least one digit ('0'-'9')."],
       }),
       { status: 400, statusText: 'Bad Request' },
     );
     await settle(fixture);
 
-    expect(fieldText(page, 'register-password')).toContain(
-      'La password deve avere almeno 6 caratteri.',
-    );
-    expect(fieldText(page, 'register-password')).toContain('Serve almeno un numero.');
+    expect(fieldText(page, 'register-password')).toContain('La password deve avere un numero.');
   });
 
   it('shows the username length error once under the username', async () => {

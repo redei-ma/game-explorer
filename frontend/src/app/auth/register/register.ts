@@ -5,6 +5,7 @@ import {
   FormField,
   FormRoot,
   TreeValidationResult,
+  ValidationError,
   email,
   form,
   required,
@@ -85,33 +86,30 @@ export class Register {
 // Keys of auth-service's 400: field names from DataAnnotations, rule codes from Identity.
 // The numbers repeat auth-service's settings only in the text, the server still decides:
 // Identity's default options (Program.cs) and [Length(3, 30)] on the username (AuthModels.cs).
-const serverErrors: Record<string, { field: 'email' | 'username' | 'password'; message: string }> =
-  {
-    Email: { field: 'email', message: "L'email non è valida." },
-    Username: { field: 'username', message: 'Lo username deve avere da 3 a 30 caratteri.' },
-    InvalidUserName: {
-      field: 'username',
-      message: 'Lo username può contenere solo lettere, numeri e i simboli - . _ @ +',
-    },
-    PasswordTooShort: { field: 'password', message: 'La password deve avere almeno 6 caratteri.' },
-    PasswordRequiresDigit: { field: 'password', message: 'Serve almeno un numero.' },
-    PasswordRequiresLower: { field: 'password', message: 'Serve almeno una lettera minuscola.' },
-    PasswordRequiresUpper: { field: 'password', message: 'Serve almeno una lettera maiuscola.' },
-    PasswordRequiresNonAlphanumeric: {
-      field: 'password',
-      message: 'Serve almeno un simbolo, per esempio ! o ?',
-    },
-  };
+const fieldErrors: Record<string, { field: 'email' | 'username'; message: string }> = {
+  Email: { field: 'email', message: "L'email non è valida." },
+  Username: { field: 'username', message: 'Lo username deve avere da 3 a 30 caratteri.' },
+  InvalidUserName: {
+    field: 'username',
+    message: 'Lo username può contenere solo lettere, numeri e i simboli - . _ @ +',
+  },
+};
+
+// Identity sends one code per failed password rule; the page joins them into one sentence, in
+// this order.
+const passwordRules: Record<string, string> = {
+  PasswordTooShort: 'almeno 6 caratteri',
+  PasswordRequiresDigit: 'un numero',
+  PasswordRequiresLower: 'una lettera minuscola',
+  PasswordRequiresUpper: 'una lettera maiuscola',
+  PasswordRequiresNonAlphanumeric: 'un simbolo',
+};
+
+const italianList = new Intl.ListFormat('it');
 
 function registerErrors(error: unknown, form: FieldTree<RegisterModel>): TreeValidationResult {
   if (error instanceof HttpErrorResponse && error.status === 400) {
-    // One message per key: a key can carry more than one text for the same rule.
-    return Object.keys(error.error?.errors ?? {}).map((code) => {
-      const known = serverErrors[code];
-      return known
-        ? { kind: code, message: known.message, fieldTree: form[known.field] }
-        : { kind: code, message: 'Dati non validi: controlla i campi e riprova.' };
-    });
+    return validationErrors(Object.keys(error.error?.errors ?? {}), form);
   }
   if (error instanceof HttpErrorResponse && error.status === 409) {
     // Only the server's English text says which one is taken. A shared message does not hide
@@ -122,4 +120,31 @@ function registerErrors(error: unknown, form: FieldTree<RegisterModel>): TreeVal
     return { kind: 'server', message: TOO_MANY_ATTEMPTS_MESSAGE };
   }
   return { kind: 'server', message: 'Registrazione non riuscita: riprova più tardi.' };
+}
+
+// One message per key: a key can carry more than one text for the same rule.
+function validationErrors(
+  codes: string[],
+  form: FieldTree<RegisterModel>,
+): ValidationError.WithOptionalFieldTree[] {
+  const errors: ValidationError.WithOptionalFieldTree[] = codes
+    .filter((code) => !(code in passwordRules))
+    .map((code) => {
+      const known = fieldErrors[code];
+      return known
+        ? { kind: code, message: known.message, fieldTree: form[known.field] }
+        : { kind: code, message: 'Dati non validi: controlla i campi e riprova.' };
+    });
+
+  const missing = Object.keys(passwordRules)
+    .filter((code) => codes.includes(code))
+    .map((code) => passwordRules[code]);
+  if (missing.length > 0) {
+    errors.push({
+      kind: 'password',
+      message: `La password deve avere ${italianList.format(missing)}.`,
+      fieldTree: form.password,
+    });
+  }
+  return errors;
 }
