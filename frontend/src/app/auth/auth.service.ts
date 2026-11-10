@@ -48,6 +48,11 @@ export class AuthService {
       .pipe(map((response) => response.recoveryCode));
   }
 
+  // The session stays: the caller still needs it to delete the user's favorites, then logs out.
+  deleteAccount(password: string): Observable<void> {
+    return this.http.delete<void>('/api/auth/me', { body: { password } });
+  }
+
   // Only the server can delete the HttpOnly cookie: until it answers, the session still exists.
   logout(): Observable<void> {
     return this.http

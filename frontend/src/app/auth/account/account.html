@@ -19,4 +19,33 @@
   <button type="button" class="btn btn-outline-light" [disabled]="loggingOut()" (click)="logout()">
     {{ loggingOut() ? 'Uscita in corso…' : 'Esci' }}
   </button>
+
+  <h2 class="h4 mt-5 mb-3">Elimina l'account</h2>
+  <p>L'account e i preferiti salvati vengono cancellati per sempre.</p>
+
+  <form class="auth-form" novalidate (submit)="onSubmit($event)">
+    <div class="mb-3">
+      <label for="delete-password" class="form-label">Password</label>
+      <input
+        id="delete-password"
+        type="password"
+        class="form-control"
+        autocomplete="current-password"
+        [formField]="deleteForm.password"
+      />
+      @if (submitted()) {
+        @for (error of deleteForm.password().errors(); track error.kind) {
+          <div class="form-text text-danger">{{ error.message }}</div>
+        }
+      }
+    </div>
+
+    @for (error of deleteForm().errors(); track error.kind) {
+      <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
+    }
+
+    <button type="submit" class="btn btn-danger" [disabled]="deleteForm().submitting()">
+      {{ deleteForm().submitting() ? 'Eliminazione in corso…' : "Elimina l'account" }}
+    </button>
+  </form>
 </section>

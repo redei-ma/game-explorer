@@ -2,6 +2,7 @@
 
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 import { Game } from '../games/games.api';
 
 // Key used to store favorites in the browser's Local Storage
@@ -92,6 +93,16 @@ export class FavoritesService {
 				}
 			}
 		});
+	}
+
+	// Used when the account is deleted: removes every favorite on the server, then the local copy
+	deleteAll(): Observable<void> {
+		return this.http.delete<void>('/api/library/favorites').pipe(
+			tap(() => {
+				this.favorites.set([]);
+				this.saveFavorites([]);
+			})
+		);
 	}
 
 	// Retrieves the saved favorites from Local Storage on application startup

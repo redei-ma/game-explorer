@@ -30,6 +30,8 @@ describe('Account', () => {
       .expectOne('/api/auth/me')
       .flush({ id: '1', email: 'mario@example.com', username: 'mario' });
     const fixture = TestBed.createComponent(Account);
+    // FavoritesService loads the account's favorites as soon as it is created.
+    http.expectOne({ method: 'GET', url: '/api/library/favorites' }).flush([]);
     await fixture.whenStable();
     const page = fixture.nativeElement as HTMLElement;
     return { fixture, page, button: page.querySelector<HTMLButtonElement>('button')! };
@@ -78,5 +80,97 @@ describe('Account', () => {
     );
     expect(button.disabled).toBe(false);
     expect(navigate).not.toHaveBeenCalled();
+  });
+
+  async function submitDeletion(password = 'Secret1!') {
+    const rendered = await renderLoggedIn();
+    const input = rendered.page.querySelector<HTMLInputElement>('#delete-password')!;
+    input.value = password;
+    input.dispatchEvent(new Event('input'));
+    deleteButton(rendered.page).click();
+    await rendered.fixture.whenStable();
+    return rendered;
+  }
+
+  function deleteButton(page: HTMLElement) {
+    return page.querySelector<HTMLButtonElement>('form button[type="submit"]')!;
+  }
+
+  function expectAccountDeletion() {
+    const request = http.expectOne({ method: 'DELETE', url: '/api/auth/me' });
+    expect(request.request.body).toEqual({ password: 'Secret1!' });
+    return request;
+  }
+
+  it('asks for the password before deleting the account', async () => {
+    const { fixture, page } = await renderLoggedIn();
+
+    deleteButton(page).click();
+    await fixture.whenStable();
+
+    http.expectNone({ method: 'DELETE', url: '/api/auth/me' });
+    expect(page.textContent).toContain('Inserisci la password per confermare.');
+  });
+
+  it('deletes the account, then the favorites, then logs out and goes home', async () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
+    const { fixture } = await submitDeletion();
+
+    expectAccountDeletion().flush(null, { status: 204, statusText: 'No Content' });
+    await settle(fixture);
+    http
+      .expectOne({ method: 'DELETE', url: '/api/library/favorites' })
+      .flush(null, { status: 204, statusText: 'No Content' });
+    await settle(fixture);
+    http.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
+    await settle(fixture);
+
+    expect(TestBed.inject(AuthService).currentUser()).toBeNull();
+    expect(navigate).toHaveBeenCalledWith('/', { replaceUrl: true });
+  });
+
+  it('shows a wrong password under the field and deletes nothing', async () => {
+    const { fixture, page } = await submitDeletion();
+
+    expectAccountDeletion().flush(null, { status: 403, statusText: 'Forbidden' });
+    await settle(fixture);
+
+    http.expectNone({ method: 'DELETE', url: '/api/library/favorites' });
+    const field = page.querySelector('#delete-password')!.closest('.mb-3')!;
+    expect(field.textContent).toContain('Password errata.');
+  });
+
+  it('retries only the favorites when they fail after the account is deleted', async () => {
+    const { fixture, page } = await submitDeletion();
+    expectAccountDeletion().flush(null, { status: 204, statusText: 'No Content' });
+    await settle(fixture);
+    http
+      .expectOne({ method: 'DELETE', url: '/api/library/favorites' })
+      .error(new ProgressEvent('error'));
+    await settle(fixture);
+
+    expect(page.querySelector('form .alert-danger')?.textContent).toContain(
+      "L'account è stato eliminato, ma i preferiti no",
+    );
+
+    deleteButton(page).click();
+    await fixture.whenStable();
+    http.expectNone({ method: 'DELETE', url: '/api/auth/me' });
+    http
+      .expectOne({ method: 'DELETE', url: '/api/library/favorites' })
+      .flush(null, { status: 204, statusText: 'No Content' });
+    await settle(fixture);
+    http.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
+  });
+
+  it('shows a generic message when the account cannot be deleted', async () => {
+    const { fixture, page } = await submitDeletion();
+
+    expectAccountDeletion().error(new ProgressEvent('error'));
+    await settle(fixture);
+
+    expect(page.querySelector('form .alert-danger')?.textContent).toContain(
+      'Eliminazione non riuscita: riprova più tardi.',
+    );
   });
 });

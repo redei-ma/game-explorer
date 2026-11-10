@@ -109,6 +109,21 @@ describe('AuthService', () => {
     expect(auth.currentUser()).toBeNull();
   });
 
+  it('deletes the account with the password and keeps the session for the next calls', async () => {
+    const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
+    http.expectOne('/api/auth/login').flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });
+    await result;
+
+    const deletion = firstValueFrom(auth.deleteAccount('Secret1!'));
+    const request = http.expectOne('/api/auth/me');
+    expect(request.request.method).toBe('DELETE');
+    expect(request.request.body).toEqual({ password: 'Secret1!' });
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    await deletion;
+    expect(auth.currentUser()).toEqual(mario);
+  });
+
   it('logs out and becomes a guest once the server answers', async () => {
     const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
     http.expectOne('/api/auth/login').flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });
