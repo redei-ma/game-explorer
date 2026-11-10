@@ -19,7 +19,7 @@
 				<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
 			</button>
 			</li>
-			<li class="nav-item"><a class="btn btn-user" href="#">Area utente</a></li>
+			<li class="nav-item"><span class="btn btn-user btn-user--disabled">Area utente</span></li>
 		</ul>
 		</div>
 	</div>
@@ -40,7 +40,7 @@
 	<a class="brand" routerLink="/"><span class="brand__dots" aria-hidden="true"><i></i><i></i><i></i></span>Gaming Explorer</a>
 	<ul class="footer-links">
 		@for (l of footerLinks; track l) {
-		<li><a href="#">{{ l }}</a></li>
+		<li><span class="footer-link footer-link--disabled">{{ l }}</span></li>
 		}
 	</ul>
 	<small class="footer-note">Interfaccia dimostrativa &bull; Nessun asset fotografico utilizzato</small>

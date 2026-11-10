@@ -55,7 +55,9 @@
 .activity li { display: flex; align-items: center; gap: .6rem; padding-block: .75rem; border-bottom: 1px solid var(--ge-border); color: #b6c0c9; font-size: .66rem; }
 .activity li:first-child { padding-top: 0; }
 .activity strong { color: var(--ge-text); font-weight: 600; }
+.section-link--disabled { color: var(--ge-muted); }
 .activity__more { display: inline-block; margin-top: 1rem; color: var(--ge-accent); font-size: .62rem; font-weight: 600; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+.activity__more--disabled { cursor: default; opacity: .7; }
 
 /* Popular lists: three overlapping posters */
 .stack { display: flex; margin-bottom: 1rem; }
