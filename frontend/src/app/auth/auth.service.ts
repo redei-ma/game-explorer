@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Service, inject, signal } from '@angular/core';
 import { Observable, catchError, map, of, tap } from 'rxjs';
-import { AuthResponse, RegisterResponse, User } from './auth.models';
+import { AuthResponse, RecoverResponse, RegisterResponse, User } from './auth.models';
 
 @Service()
 export class AuthService {
@@ -38,6 +38,14 @@ export class AuthService {
     return this.http
       .post<RegisterResponse>('/api/auth/register', { email, username, password })
       .pipe(tap((response) => this._currentUser.set(response.user)));
+  }
+
+  // Sets a new password with the recovery code and returns the new code, since the old one stops
+  // working. No login: the user then logs in as usual (OWASP Forgot Password Cheat Sheet).
+  recover(email: string, code: string, newPassword: string): Observable<string> {
+    return this.http
+      .post<RecoverResponse>('/api/auth/recover', { email, code, newPassword })
+      .pipe(map((response) => response.recoveryCode));
   }
 
   // Only the server can delete the HttpOnly cookie: until it answers, the session still exists.

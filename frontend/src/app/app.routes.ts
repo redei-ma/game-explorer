@@ -26,6 +26,12 @@ export const routes: Routes = [
 		title: 'Crea il tuo account',
 	},
 	{
+		path: 'recover',
+		loadComponent: () => import('./auth/recover/recover').then((m) => m.Recover),
+		canActivate: [guestGuard],
+		title: 'Password dimenticata',
+	},
+	{
 		path: 'account',
 		loadComponent: () => import('./auth/account/account').then((m) => m.Account),
 		canActivate: [loggedInGuard],

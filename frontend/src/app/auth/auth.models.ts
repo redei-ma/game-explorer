@@ -12,3 +12,7 @@ export interface AuthResponse {
 export interface RegisterResponse extends AuthResponse {
   recoveryCode: string;
 }
+
+export interface RecoverResponse {
+  recoveryCode: string;
+}

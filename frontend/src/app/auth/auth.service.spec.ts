@@ -92,6 +92,23 @@ describe('AuthService', () => {
     expect(auth.currentUser()).toEqual(mario);
   });
 
+  it('recovers the password and returns only the new code, staying a guest', async () => {
+    auth.loadCurrentUser().subscribe();
+    http.expectOne('/api/auth/me').flush(null, { status: 401, statusText: 'Unauthorized' });
+
+    const result = firstValueFrom(auth.recover('mario@example.com', 'old-code', 'NewSecret1!'));
+    const request = http.expectOne('/api/auth/recover');
+    expect(request.request.body).toEqual({
+      email: 'mario@example.com',
+      code: 'old-code',
+      newPassword: 'NewSecret1!',
+    });
+    request.flush({ recoveryCode: 'new-code' });
+
+    expect(await result).toBe('new-code');
+    expect(auth.currentUser()).toBeNull();
+  });
+
   it('logs out and becomes a guest once the server answers', async () => {
     const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
     http.expectOne('/api/auth/login').flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });

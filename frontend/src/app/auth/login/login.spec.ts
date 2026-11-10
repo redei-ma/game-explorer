@@ -50,6 +50,14 @@ describe('Login', () => {
     expect(page.querySelector('a[href="/register"]')?.textContent).toContain('Crea il tuo account');
   });
 
+  it('links to the password recovery page', async () => {
+    const { page } = await render();
+
+    expect(page.querySelector('a[href="/recover"]')?.textContent).toContain(
+      'Password dimenticata?',
+    );
+  });
+
   it('shows no error before the user touches a field', async () => {
     const { page } = await render();
 
