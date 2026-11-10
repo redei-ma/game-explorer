@@ -1,3 +1,7 @@
+/* Footer at the bottom of the window even when the page is short or still loading (lazy routes) */
+:host { display: flex; flex-direction: column; min-height: 100vh; }
+main { flex: 1; }
+
 .site-header { position: sticky; top: 0; z-index: 10; background: rgba(11, 18, 24, .92); backdrop-filter: blur(6px); border-bottom: 1px solid #16232d; }
 .navbar { --bs-navbar-padding-y: .55rem; min-height: 3.6rem; }
 
