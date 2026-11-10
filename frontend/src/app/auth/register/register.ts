@@ -13,8 +13,9 @@ import {
 } from '@angular/forms/signals';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
+import { TOO_MANY_ATTEMPTS_MESSAGE, isPasswordRule, passwordRulesMessage } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { RecoveryCode } from '../recovery-code/recovery-code';
 
 interface RegisterModel {
   email: string;
@@ -25,7 +26,7 @@ interface RegisterModel {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, FormRoot],
+  imports: [FormField, FormRoot, RecoveryCode],
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
@@ -83,9 +84,9 @@ export class Register {
   }
 }
 
-// Keys of auth-service's 400: field names from DataAnnotations, rule codes from Identity.
-// The numbers repeat auth-service's settings only in the text, the server still decides:
-// Identity's default options (Program.cs) and [Length(3, 30)] on the username (AuthModels.cs).
+// Keys of auth-service's 400 besides the password rules: field names from DataAnnotations,
+// InvalidUserName from Identity. The numbers repeat [Length(3, 30)] on the username
+// (AuthModels.cs) only in the text: the server still decides.
 const fieldErrors: Record<string, { field: 'email' | 'username'; message: string }> = {
   Email: { field: 'email', message: "L'email non è valida." },
   Username: { field: 'username', message: 'Lo username deve avere da 3 a 30 caratteri.' },
@@ -94,18 +95,6 @@ const fieldErrors: Record<string, { field: 'email' | 'username'; message: string
     message: 'Lo username può contenere solo lettere, numeri e i simboli - . _ @ +',
   },
 };
-
-// Identity sends one code per failed password rule; the page joins them into one sentence, in
-// this order.
-const passwordRules: Record<string, string> = {
-  PasswordTooShort: 'almeno 6 caratteri',
-  PasswordRequiresDigit: 'un numero',
-  PasswordRequiresLower: 'una lettera minuscola',
-  PasswordRequiresUpper: 'una lettera maiuscola',
-  PasswordRequiresNonAlphanumeric: 'un simbolo',
-};
-
-const italianList = new Intl.ListFormat('it');
 
 function registerErrors(error: unknown, form: FieldTree<RegisterModel>): TreeValidationResult {
   if (error instanceof HttpErrorResponse && error.status === 400) {
@@ -128,7 +117,7 @@ function validationErrors(
   form: FieldTree<RegisterModel>,
 ): ValidationError.WithOptionalFieldTree[] {
   const errors: ValidationError.WithOptionalFieldTree[] = codes
-    .filter((code) => !(code in passwordRules))
+    .filter((code) => !isPasswordRule(code))
     .map((code) => {
       const known = fieldErrors[code];
       return known
@@ -136,15 +125,9 @@ function validationErrors(
         : { kind: code, message: 'Dati non validi: controlla i campi e riprova.' };
     });
 
-  const missing = Object.keys(passwordRules)
-    .filter((code) => codes.includes(code))
-    .map((code) => passwordRules[code]);
-  if (missing.length > 0) {
-    errors.push({
-      kind: 'password',
-      message: `La password deve avere ${italianList.format(missing)}.`,
-      fieldTree: form.password,
-    });
+  const passwordMessage = passwordRulesMessage(codes);
+  if (passwordMessage) {
+    errors.push({ kind: 'password', message: passwordMessage, fieldTree: form.password });
   }
   return errors;
 }
