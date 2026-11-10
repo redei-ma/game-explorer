@@ -1,4 +1,4 @@
-<section class="container-ge py-5" data-bs-theme="dark">
+<section class="container-ge py-5">
   @if (recoveryCode(); as code) {
     <h1 class="mb-4">Password cambiata</h1>
     <p>Il codice che hai usato non vale più.</p>
@@ -10,7 +10,7 @@
     <h1 class="mb-4">Password dimenticata</h1>
     <p>Usa il codice di recupero che hai salvato quando hai creato l'account.</p>
 
-    <form [formRoot]="recoverForm" (submit)="submitted.set(true)">
+    <form class="auth-form" [formRoot]="recoverForm" (submit)="submitted.set(true)">
       <div class="mb-3">
         <label for="recover-email" class="form-label">Email</label>
         <input

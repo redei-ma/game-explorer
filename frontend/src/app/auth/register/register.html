@@ -1,4 +1,4 @@
-<section class="container-ge py-5" data-bs-theme="dark">
+<section class="container-ge py-5">
   @if (recoveryCode(); as code) {
     <h1 class="mb-4">Account creato</h1>
     <app-recovery-code [code]="code" />
@@ -8,7 +8,7 @@
   } @else {
     <h1 class="mb-4">Crea il tuo account</h1>
 
-    <form [formRoot]="registerForm" (submit)="submitted.set(true)">
+    <form class="auth-form" [formRoot]="registerForm" (submit)="submitted.set(true)">
       <div class="mb-3">
         <label for="register-email" class="form-label">Email</label>
         <input

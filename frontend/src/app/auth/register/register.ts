@@ -28,7 +28,6 @@ interface RegisterModel {
   selector: 'app-register',
   imports: [FormField, FormRoot, RecoveryCode],
   templateUrl: './register.html',
-  styleUrl: './register.css',
 })
 export class Register {
   private readonly auth = inject(AuthService);

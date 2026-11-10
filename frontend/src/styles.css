@@ -151,6 +151,12 @@ h1, h2, h3, h4, h5 {
 	border-radius: 50%;
 }
 
+/* Login, registration and recovery forms: fields styled like the header search bar (app.css) */
+.auth-form { max-width: 24rem; }
+.auth-form .form-control { background: var(--ge-surface); border-color: var(--ge-border); color: var(--ge-text); }
+.auth-form .form-control:focus { background: var(--ge-surface); border-color: var(--ge-accent); box-shadow: none; color: var(--ge-text); }
+.auth-form .alert-danger { background: color-mix(in srgb, var(--ge-danger) 12%, transparent); border-color: var(--ge-danger); color: var(--ge-text); }
+
 a:focus-visible, button:focus-visible, input:focus-visible {
 	outline: 2px solid var(--ge-accent);
 	outline-offset: 2px;

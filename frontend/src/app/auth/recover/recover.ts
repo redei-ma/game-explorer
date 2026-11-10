@@ -27,7 +27,6 @@ interface RecoverModel {
   selector: 'app-recover',
   imports: [FormField, FormRoot, RecoveryCode],
   templateUrl: './recover.html',
-  styleUrl: './recover.css',
 })
 export class Recover {
   private readonly auth = inject(AuthService);
