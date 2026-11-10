@@ -13,7 +13,7 @@
   } @else {
     <h1 class="mb-4">Crea il tuo account</h1>
 
-    <form [formRoot]="registerForm">
+    <form [formRoot]="registerForm" (submit)="submitted.set(true)">
       <div class="mb-3">
         <label for="register-email" class="form-label">Email</label>
         <input
@@ -23,7 +23,7 @@
           autocomplete="email"
           [formField]="registerForm.email"
         />
-        @if (registerForm.email().touched()) {
+        @if (submitted()) {
           @for (error of registerForm.email().errors(); track error.kind) {
             <div class="form-text text-danger">{{ error.message }}</div>
           }
@@ -39,7 +39,7 @@
           autocomplete="username"
           [formField]="registerForm.username"
         />
-        @if (registerForm.username().touched()) {
+        @if (submitted()) {
           @for (error of registerForm.username().errors(); track error.kind) {
             <div class="form-text text-danger">{{ error.message }}</div>
           }
@@ -55,7 +55,7 @@
           autocomplete="new-password"
           [formField]="registerForm.password"
         />
-        @if (registerForm.password().touched()) {
+        @if (submitted()) {
           @for (error of registerForm.password().errors(); track error.kind) {
             <div class="form-text text-danger">{{ error.message }}</div>
           }
@@ -71,7 +71,7 @@
           autocomplete="new-password"
           [formField]="registerForm.confirmPassword"
         />
-        @if (registerForm.confirmPassword().touched()) {
+        @if (submitted()) {
           @for (error of registerForm.confirmPassword().errors(); track error.kind) {
             <div class="form-text text-danger">{{ error.message }}</div>
           }

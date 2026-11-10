@@ -17,6 +17,10 @@ export class Login {
   private readonly router = inject(Router);
   private readonly model = signal({ email: '', password: '' });
 
+  // Field errors appear from the first submit, not when a field loses focus: a message added
+  // on blur pushes down the link below the form, and the click that caused the blur misses it.
+  protected readonly submitted = signal(false);
+
   // Only "is it filled in": the password rules are checked at registration, and a wrong
   // password gets the same answer from the server as an unknown email.
   protected readonly loginForm = form(

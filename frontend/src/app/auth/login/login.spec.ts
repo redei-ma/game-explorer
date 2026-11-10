@@ -56,22 +56,35 @@ describe('Login', () => {
     expect(page.querySelectorAll('.text-danger').length).toBe(0);
   });
 
-  it('asks for an email after the field is left empty', async () => {
-    const { fixture, page } = await render();
-
-    type(page.querySelector('#login-email')!, '');
-    await fixture.whenStable();
-
-    expect(page.textContent).toContain("Inserisci l'email.");
-  });
-
-  it('rejects an email without @', async () => {
+  it('shows no error when a field is left before the first submit', async () => {
     const { fixture, page } = await render();
 
     type(page.querySelector('#login-email')!, 'mario');
     await fixture.whenStable();
 
+    expect(page.querySelectorAll('.text-danger').length).toBe(0);
+  });
+
+  it('rejects an email without @ on submit', async () => {
+    const { fixture, page } = await render();
+
+    type(page.querySelector('#login-email')!, 'mario');
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await fixture.whenStable();
+
+    http.expectNone('/api/auth/login');
     expect(page.textContent).toContain("L'email non è valida.");
+  });
+
+  it('updates the errors while typing after the first submit', async () => {
+    const { fixture, page } = await render();
+
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    type(page.querySelector('#login-email')!, 'mario@example.com');
+    await fixture.whenStable();
+
+    expect(page.textContent).not.toContain("Inserisci l'email.");
+    expect(page.textContent).toContain('Inserisci la password.');
   });
 
   it('sends nothing and shows every error when submitted empty', async () => {

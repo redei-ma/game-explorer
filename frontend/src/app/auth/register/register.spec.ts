@@ -34,6 +34,10 @@ describe('Register', () => {
     input.dispatchEvent(new Event('blur'));
   }
 
+  function submit(page: HTMLElement) {
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+  }
+
   // The submit action awaits a Promise: let it settle before checking the page.
   async function settle(fixture: { whenStable(): Promise<unknown> }) {
     await new Promise((resolve) => setTimeout(resolve));
@@ -46,7 +50,7 @@ describe('Register', () => {
     type(page.querySelector('#register-username')!, 'mario');
     type(page.querySelector('#register-password')!, 'Secret1!');
     type(page.querySelector('#register-confirm-password')!, 'Secret1!');
-    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    submit(page);
     await fixture.whenStable();
     return { fixture, page };
   }
@@ -69,7 +73,7 @@ describe('Register', () => {
   it('sends nothing and shows every error when submitted empty', async () => {
     const { fixture, page } = await render();
 
-    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    submit(page);
     await fixture.whenStable();
 
     http.expectNone('/api/auth/register');
@@ -208,30 +212,44 @@ describe('Register', () => {
     );
   });
 
-  it('rejects an email without @', async () => {
+  it('rejects an email without @ on submit', async () => {
     const { fixture, page } = await render();
 
     type(page.querySelector('#register-email')!, 'mario');
+    submit(page);
     await fixture.whenStable();
 
+    http.expectNone('/api/auth/register');
     expect(page.textContent).toContain("L'email non è valida.");
   });
 
-  it('shows an error when the two passwords differ', async () => {
+  it('shows no error when a field is left before the first submit', async () => {
     const { fixture, page } = await render();
 
     type(page.querySelector('#register-password')!, 'Secret1!');
     type(page.querySelector('#register-confirm-password')!, 'Secret2!');
+    await fixture.whenStable();
+
+    expect(page.querySelectorAll('.text-danger').length).toBe(0);
+  });
+
+  it('shows an error on submit when the two passwords differ', async () => {
+    const { fixture, page } = await render();
+
+    type(page.querySelector('#register-password')!, 'Secret1!');
+    type(page.querySelector('#register-confirm-password')!, 'Secret2!');
+    submit(page);
     await fixture.whenStable();
 
     expect(page.textContent).toContain('Le password non coincidono.');
   });
 
-  it('clears the error when the passwords match again', async () => {
+  it('clears the error while typing when the passwords match again', async () => {
     const { fixture, page } = await render();
 
     type(page.querySelector('#register-password')!, 'Secret1!');
     type(page.querySelector('#register-confirm-password')!, 'Secret2!');
+    submit(page);
     type(page.querySelector('#register-password')!, 'Secret2!');
     await fixture.whenStable();
 

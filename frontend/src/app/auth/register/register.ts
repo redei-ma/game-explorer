@@ -38,6 +38,9 @@ export class Register {
     confirmPassword: '',
   });
 
+  // Field errors appear from the first submit, as in Login.
+  protected readonly submitted = signal(false);
+
   // Only in this page: the server keeps just a hash, so the code cannot be shown again.
   protected readonly recoveryCode = signal<string | null>(null);
 
