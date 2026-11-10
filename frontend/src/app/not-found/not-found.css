@@ -3,17 +3,5 @@
 }
 
 .not-found {
-	max-width: 48rem;
-	margin: 0 auto;
-	padding: 6rem 1rem;
-	text-align: center;
-}
-
-.not-found h1 {
-	margin-bottom: 1rem;
-}
-
-.not-found p:not(.eyebrow) {
-	margin-bottom: 1.5rem;
-	color: var(--ge-muted);
+	margin-block: 2rem;
 }

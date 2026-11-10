@@ -15,11 +15,17 @@
 	</div>
 
 	<!-- Error Banner -->
-	<div class="state-banner error-banner" *ngIf="!isLoading() && hasError()">
+	<div class="feedback-panel state-banner error-banner" *ngIf="!isLoading() && hasError()">
 		<div class="banner-content">
-			<h2>Impossibile caricare le informazioni del gioco</h2>
-			<p>Si è verificato un errore di connessione con il server.</p>
-			<button class="btn-primary" (click)="fetchGameDetails()">Riprova</button>
+			@if (error() === 'not-found') {
+				<h2>Gioco non trovato</h2>
+				<p>Il gioco richiesto non esiste o non è più disponibile.</p>
+				<a class="btn-primary" routerLink="/games">Torna alla ricerca</a>
+			} @else {
+				<h2>Impossibile caricare le informazioni del gioco</h2>
+				<p>Si è verificato un errore di connessione con il server.</p>
+				<button class="btn-primary" (click)="fetchGameDetails()">Riprova</button>
+			}
 		</div>
 	</div>
 
