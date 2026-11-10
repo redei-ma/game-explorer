@@ -3,6 +3,7 @@ import { Home } from './home/home';
 import { GamesList } from './games/games-list';
 import { GameDetail } from './game-detail/game-detail';
 import { FavoritesList } from './favorites/favorites-list';
+import { loggedInGuard } from './auth/auth.guards';
 
 export const routes: Routes = [
 	{ path: '', component: Home, title: 'Gaming Explorer' },
@@ -21,6 +22,12 @@ export const routes: Routes = [
 		path: 'register',
 		loadComponent: () => import('./auth/register/register').then((m) => m.Register),
 		title: 'Crea il tuo account',
+	},
+	{
+		path: 'account',
+		loadComponent: () => import('./auth/account/account').then((m) => m.Account),
+		canActivate: [loggedInGuard],
+		title: 'Il tuo account',
 	},
 	
 	// NB: /games & /games/:id routes are now active. Unhandled routes land on Home without errors
