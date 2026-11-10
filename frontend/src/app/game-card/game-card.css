@@ -1,5 +1,59 @@
-/* Favorite button styling and positioning */
-.game-card-container { position: relative; display: block; }
+/* Shared layout for cards rendered by home, search and favorites. */
+.game-card-container { position: relative; display: block; min-width: 0; width: 100%; }
+
+.game-card {
+	display: block;
+	min-width: 0;
+	color: inherit;
+	text-decoration: none;
+}
+
+.game-card .ph-poster {
+	width: 100%;
+}
+
+.game-card .ph-poster--cover img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.game-card__body {
+	display: block;
+	min-width: 0;
+	padding-top: .55rem;
+}
+
+.game-card__title,
+.game-card__meta,
+.game-card__platforms {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.game-card__title {
+	color: var(--ge-text);
+	font-size: .78rem;
+	line-height: 1.3;
+}
+
+.game-card__meta,
+.game-card__platforms {
+	color: var(--ge-muted);
+	font-size: .64rem;
+	line-height: 1.4;
+}
+
+.game-card__rating {
+	color: var(--ge-accent);
+}
+
+.game-card__platforms {
+	margin-top: .15rem;
+}
 
 .fav-btn {
 	position: absolute;

@@ -22,7 +22,7 @@
 	</div>
 
 	@if (popular.isLoading()) {
-		<div class="row row-cols-3 row-cols-md-6 games-grid" aria-busy="true" aria-label="Caricamento dei giochi">
+		<div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 games-grid" aria-busy="true" aria-label="Caricamento dei giochi">
 		@for (s of skeletons; track s) {
 			<div class="col"><span class="ph-poster skeleton"></span></div>
 		}
@@ -37,7 +37,7 @@
 	@else {
 		@let games = popular.value()?.results ?? [];
 		@if (games.length) {
-		<div class="row row-cols-3 row-cols-md-6 games-grid">
+		<div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 games-grid">
 			@for (game of games; track game.id; let i = $index) {
 			<div class="col"><app-game-card [game]="game" [index]="i + 1" /></div>
 			}
@@ -48,7 +48,7 @@
 		}
 	}
 
-	<h2 class="about__title">GameLog ti aiuta a ricordare, scoprire e condividere i videogiochi.</h2>
+	<h2 class="about__title">Gaming Explorer ti aiuta a ricordare, scoprire e condividere i videogiochi.</h2>
 	<div class="features">
 		<div class="row row-cols-1 row-cols-md-3 gy-4">
 		@for (f of features; track f.n) {
