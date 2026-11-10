@@ -22,6 +22,7 @@ public class LibraryApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             InitialCatalog = "LibraryDb",
         }.ConnectionString;
         builder.UseSetting("ConnectionStrings:LibraryDb", connectionString);
+        builder.UseSetting("Jwt:Key", "integration-tests-signing-key-not-a-secret");
     }
 
     public new Task DisposeAsync() => _database.DisposeAsync().AsTask();

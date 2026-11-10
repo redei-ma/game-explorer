@@ -24,6 +24,7 @@ export class GamesList implements OnInit, OnDestroy {
 	readonly games = signal<Game[]>([]);
 	readonly genres = signal<Genre[]>([]);
 	readonly platforms = signal<PlatformItem[]>([]);
+	readonly specificPlatforms = signal<PlatformItem[]>([]);
 
 	readonly totalResults = signal(0);
 	readonly totalPages = signal(1);
@@ -95,8 +96,13 @@ export class GamesList implements OnInit, OnDestroy {
 			error: () => console.error('Errore nel caricamento dei generi')
 		});
 
-		this.gamesApi.getPlatforms().subscribe({
+		this.gamesApi.getParentPlatforms().subscribe({
 			next: res => this.platforms.set(res.results || []),
+			error: () => console.error('Errore nel caricamento delle famiglie di piattaforme')
+		});
+
+		this.gamesApi.getPlatforms().subscribe({
+			next: res => this.specificPlatforms.set(res.results || []),
 			error: () => console.error('Errore nel caricamento delle piattaforme')
 		});
 	}
@@ -138,6 +144,7 @@ export class GamesList implements OnInit, OnDestroy {
 		this.currentQuery.search = undefined;
 		this.currentQuery.genres = undefined;
 		this.currentQuery.parentPlatforms = undefined;
+		this.currentQuery.platforms = undefined;
 		this.selectedYear = '';
 		this.currentQuery.metacritic = undefined;
 		this.currentQuery.ordering = '-rating';
@@ -153,6 +160,7 @@ export class GamesList implements OnInit, OnDestroy {
 			search: this.currentQuery.search || null,
 			genres: this.currentQuery.genres || null,
 			parentPlatforms: this.currentQuery.parentPlatforms || null,
+			platforms: this.currentQuery.platforms || null,
 			year: this.selectedYear || null,
 			metacritic: this.currentQuery.metacritic || null,
 			ordering: this.currentQuery.ordering !== '-rating' ? this.currentQuery.ordering : null,
@@ -171,7 +179,8 @@ export class GamesList implements OnInit, OnDestroy {
 		return {
 			search: params['search'] || undefined,
 			genres: params['genres'] || undefined,
-			parentPlatforms: params['parentPlatforms'] || params['platforms'] || undefined,
+			parentPlatforms: params['parentPlatforms'] || undefined,
+			platforms: params['platforms'] || undefined,
 			metacritic: params['metacritic'] || undefined,
 			ordering: params['ordering'] || '-rating',
 			page: params['page'] ? parseInt(params['page'], 10) : 1,

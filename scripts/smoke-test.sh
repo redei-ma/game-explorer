@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Smoke test of the running stack, through the gateway: run it after
 # `docker compose up -d`. Checks what docker-compose.yml and nginx.conf
-# configure; nothing reaches RAWG. Run it at most once a minute: nginx
+# configure; nothing reaches IGDB. Run it at most once a minute: nginx
 # remembers the login attempts.
 set -euo pipefail
 
@@ -29,6 +29,7 @@ check 200 "$base/"
 check 200 "$base/games/42"
 check 404 "$base/api/nonexistent"
 check 401 "$base/api/auth/me"
+check 401 "$base/api/library/favorites"
 check 400 "$base/api/games/0"
 
 # burst=5 lets 6 logins through at once, then nginx answers 429.

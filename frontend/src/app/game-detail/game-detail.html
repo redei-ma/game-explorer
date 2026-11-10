@@ -19,7 +19,7 @@
 		<div class="banner-content">
 			<h2>Impossibile caricare le informazioni del gioco</h2>
 			<p>Si è verificato un errore di connessione con il server.</p>
-			<button class="btn-primary" (click)="gameId() && fetchGameDetails(gameId()!)">Riprova</button>
+			<button class="btn-primary" (click)="fetchGameDetails()">Riprova</button>
 		</div>
 	</div>
 
@@ -96,13 +96,15 @@
 		</section>
 
 		<!-- Screenshots Gallery -->
-		<section class="gallery-section" *ngIf="screenshots() && screenshots().length > 0">
-			<h2>Galleria Screenshot</h2>
-			<div class="screenshots-grid">
-				<div class="screenshot-item" *ngFor="let shot of screenshots()">
-					<img [src]="shot.image" [alt]="'Screenshot ' + g.name" loading="lazy" />
+		<section class="gallery-section" *ngIf="screenshots() as shots">
+			<ng-container *ngIf="shots.length > 0">
+				<h2>Galleria Screenshot</h2>
+				<div class="screenshots-grid">
+					<div class="screenshot-item" *ngFor="let shot of shots">
+						<img [src]="shot.image" [alt]="'Screenshot ' + g.name" loading="lazy" />
+					</div>
 				</div>
-			</div>
+			</ng-container>
 		</section>
 
 	</div>
