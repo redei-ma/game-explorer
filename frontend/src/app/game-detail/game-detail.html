@@ -67,7 +67,7 @@
 			</div>
 			<div class="meta-card">
 				<span class="meta-label">Data di Uscita</span>
-				<span class="meta-value">{{ g.released || 'N/D' }}</span>
+				<span class="meta-value">{{ g.released ? (g.released | date: 'd MMM y') : 'N/D' }}</span>
 			</div>
 			<div class="meta-card" *ngIf="g.genres && g.genres.length > 0">
 				<span class="meta-label">Generi</span>
