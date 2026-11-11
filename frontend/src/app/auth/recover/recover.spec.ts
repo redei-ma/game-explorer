@@ -59,7 +59,7 @@ describe('Recover', () => {
   it('links back to the login page', async () => {
     const { page } = await render();
 
-    expect(page.querySelector('a[href="/login"]')?.textContent).toContain('Accedi');
+    expect(page.querySelector('a[href="/login"]')?.textContent).toContain("Torna all'accesso");
   });
 
   it('sends nothing and shows every error when submitted empty', async () => {
