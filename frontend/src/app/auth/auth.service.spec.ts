@@ -92,6 +92,38 @@ describe('AuthService', () => {
     expect(auth.currentUser()).toEqual(mario);
   });
 
+  it('recovers the password and returns only the new code, staying a guest', async () => {
+    auth.loadCurrentUser().subscribe();
+    http.expectOne('/api/auth/me').flush(null, { status: 401, statusText: 'Unauthorized' });
+
+    const result = firstValueFrom(auth.recover('mario@example.com', 'old-code', 'NewSecret1!'));
+    const request = http.expectOne('/api/auth/recover');
+    expect(request.request.body).toEqual({
+      email: 'mario@example.com',
+      code: 'old-code',
+      newPassword: 'NewSecret1!',
+    });
+    request.flush({ recoveryCode: 'new-code' });
+
+    expect(await result).toBe('new-code');
+    expect(auth.currentUser()).toBeNull();
+  });
+
+  it('deletes the account with the password and keeps the session for the next calls', async () => {
+    const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
+    http.expectOne('/api/auth/login').flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });
+    await result;
+
+    const deletion = firstValueFrom(auth.deleteAccount('Secret1!'));
+    const request = http.expectOne('/api/auth/me');
+    expect(request.request.method).toBe('DELETE');
+    expect(request.request.body).toEqual({ password: 'Secret1!' });
+    request.flush(null, { status: 204, statusText: 'No Content' });
+
+    await deletion;
+    expect(auth.currentUser()).toEqual(mario);
+  });
+
   it('logs out and becomes a guest once the server answers', async () => {
     const result = firstValueFrom(auth.login('mario@example.com', 'Secret1!'));
     http.expectOne('/api/auth/login').flush({ expiresAt: '2026-11-07T18:00:00Z', user: mario });
