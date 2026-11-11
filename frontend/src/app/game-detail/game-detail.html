@@ -108,8 +108,10 @@
 			<ng-container *ngIf="shots.length > 0">
 				<h2>Galleria Screenshot</h2>
 				<div class="screenshots-grid">
-					<div class="screenshot-item" *ngFor="let shot of shots">
-						<img [src]="shot.image" [alt]="'Screenshot ' + g.name" loading="lazy" />
+					<div class="screenshot-item" *ngFor="let shot of shots; let i = index">
+						<button type="button" class="screenshot-trigger" (click)="openScreenshot(i, $event)">
+							<img [src]="shot.image" [alt]="'Apri screenshot ' + (i + 1) + ' di ' + g.name" loading="lazy" />
+						</button>
 					</div>
 				</div>
 			</ng-container>
@@ -117,3 +119,23 @@
 
 	</div>
 </div>
+
+@if (selectedScreenshot(); as shot) {
+	<div class="lightbox-backdrop" role="presentation" (click)="closeScreenshot()">
+		<div class="lightbox" role="dialog" aria-modal="true" [attr.aria-label]="'Screenshot ingrandito di ' + (game()?.name ?? 'gioco')" (click)="$event.stopPropagation()">
+			<figure class="lightbox-figure">
+				<button #closeLightboxButton type="button" class="lightbox-close" aria-label="Chiudi screenshot" (click)="closeScreenshot()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+				</button>
+				<button type="button" class="lightbox-navigation lightbox-navigation--previous" aria-label="Screenshot precedente" (click)="showPreviousScreenshot()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+				</button>
+				<img [src]="shot.image" [alt]="'Screenshot ingrandito ' + (selectedScreenshotIndex()! + 1) + ' di ' + (game()?.name ?? 'gioco')" />
+				<button type="button" class="lightbox-navigation lightbox-navigation--next" aria-label="Screenshot successivo" (click)="showNextScreenshot()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+				</button>
+				<figcaption>{{ selectedScreenshotIndex()! + 1 }} / {{ screenshots().length }}</figcaption>
+			</figure>
+		</div>
+	</div>
+}

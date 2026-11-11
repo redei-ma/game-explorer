@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject, signal, computed } from '@angular/core';
-import { CommonModule, Location } from '@angular/common';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, signal, computed, viewChild } from '@angular/core';
+import { CommonModule, DOCUMENT, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { toSignal, toObservable } from '@angular/core/rxjs-interop';
@@ -31,6 +31,10 @@ export class GameDetail {
 	private readonly router = inject(Router);
 	readonly location = inject(Location);
 	private readonly favoritesService = inject(FavoritesService);
+	private readonly document = inject(DOCUMENT);
+	private readonly closeLightboxButton = viewChild<ElementRef<HTMLButtonElement>>('closeLightboxButton');
+	private lightboxTrigger: HTMLElement | null = null;
+	private previousBodyOverflow = '';
 
 	// Trigger to manually re-fetch data from the UI (error banner)
 	private readonly refreshTrigger = signal(0);
@@ -82,6 +86,11 @@ export class GameDetail {
 	readonly isLoading = computed(() => this.detailState().isLoading);
 	readonly error = computed(() => this.detailState().error);
 	readonly hasError = computed(() => this.error() !== null);
+	readonly selectedScreenshotIndex = signal<number | null>(null);
+	readonly selectedScreenshot = computed(() => {
+		const index = this.selectedScreenshotIndex();
+		return index === null ? null : this.screenshots()[index] ?? null;
+	});
 
 	// Reactive signal to compute favorite status
 	readonly isFavorite = computed(() => {
@@ -92,6 +101,48 @@ export class GameDetail {
 	// Triggered by the "Riprova" button in the template
 	fetchGameDetails(): void {
 		this.refreshTrigger.update(v => v + 1);
+	}
+
+	openScreenshot(index: number, event: Event): void {
+		this.selectedScreenshotIndex.set(index);
+		this.lightboxTrigger = event.currentTarget as HTMLElement;
+		this.previousBodyOverflow = this.document.body.style.overflow;
+		this.document.body.style.overflow = 'hidden';
+		setTimeout(() => this.closeLightboxButton()?.nativeElement.focus());
+	}
+
+	closeScreenshot(): void {
+		this.selectedScreenshotIndex.set(null);
+		this.document.body.style.overflow = this.previousBodyOverflow;
+		this.lightboxTrigger?.focus();
+		this.lightboxTrigger = null;
+	}
+
+	showPreviousScreenshot(): void {
+		const index = this.selectedScreenshotIndex();
+		if (index === null || this.screenshots().length === 0) return;
+		this.selectedScreenshotIndex.set((index - 1 + this.screenshots().length) % this.screenshots().length);
+	}
+
+	showNextScreenshot(): void {
+		const index = this.selectedScreenshotIndex();
+		if (index === null || this.screenshots().length === 0) return;
+		this.selectedScreenshotIndex.set((index + 1) % this.screenshots().length);
+	}
+
+	@HostListener('document:keydown', ['$event'])
+	handleLightboxKeydown(event: KeyboardEvent): void {
+		if (this.selectedScreenshotIndex() === null) return;
+		if (event.key === 'Escape') {
+			event.preventDefault();
+			this.closeScreenshot();
+		} else if (event.key === 'ArrowLeft') {
+			event.preventDefault();
+			this.showPreviousScreenshot();
+		} else if (event.key === 'ArrowRight') {
+			event.preventDefault();
+			this.showNextScreenshot();
+		}
 	}
 
 	// Extracts base game data to store in favorites without unnecessary heavy details
