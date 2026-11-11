@@ -27,7 +27,7 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     /// Example for the home page: GET /api/games?ordering=-rating&amp;pageSize=12
     /// </summary>
     /// <param name="search">Optional words to look for in game names.</param>
-    /// <param name="ordering">Optional sort: name, released, rating, metacritic, added, created, updated; "-" prefix = descending.</param>
+    /// <param name="ordering">Optional sort: name, released, rating, metacritic, added, created, updated, hypes; "-" prefix = descending.</param>
     /// <param name="dates">Optional release range, "yyyy-MM-dd,yyyy-MM-dd".</param>
     /// <param name="genres">Optional comma-separated genre ids (from /api/genres).</param>
     /// <param name="parentPlatforms">Optional comma-separated platform group ids (from /api/parent-platforms).</param>
