@@ -116,8 +116,6 @@ h1, h2, h3, h4, h5 {
 /* Red variant for irreversible actions, such as deleting the account */
 .btn-ge--danger { background: var(--ge-danger); }
 .btn-ge--danger:hover, .btn-ge--danger:focus-visible { background: color-mix(in srgb, var(--ge-danger) 85%, #fff); }
-.btn-ge--disabled { cursor: default; }
-.btn-ge--disabled:hover { background: var(--ge-accent); color: #111827; }
 
 .auth-page {
 	position: relative;
