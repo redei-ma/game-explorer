@@ -199,36 +199,6 @@ export class GameDetail implements OnDestroy {
 		this.wishlistService.toggleWishlist(card);
 	}
 
-/* 	MI SERVIVA PER TESTARE, DA TOGLIERE POI
-	fetchGameDetails(id: number): void {
-	this.isLoading = false;
-	this.hasError = false;
-	this.game = {
-		id: id,
-		name: 'The Legend of Zelda: Tears of the Kingdom',		slug: 'zelda-totk',
-		released: '2023-05-12',
-		backgroundImage: 'https://media.rawg.io/media/games/f99/f997966e3f22d05779ec364bc9a5f22e.jpg',
-		rating: 4.8,
-		metacritic: 96,
-		descriptionRaw: 'An epic adventure across the land and skies of Hyrule awaits in The Legend of Zelda: Tears of the Kingdom for Nintendo Switch. In this sequel to Breath of the Wild, you’ll decide your own path through the sprawling landscapes of Hyrule and the mysterious islands floating in the vast skies above.',
-		developers: [{ id: 1, name: 'Nintendo EPD', slug: 'nintendo-epd' }],
-		publishers: [{ id: 1, name: 'Nintendo', slug: 'nintendo' }],
-		genres: [
-		{ id: 1, name: 'Action', slug: 'action' },
-		{ id: 2, name: 'Adventure', slug: 'adventure' }
-		],
-		parentPlatforms: [
-		{ platform: { id: 1, name: 'Nintendo Switch', slug: 'switch' } }
-		]
-	};
-	this.screenshots = [
-		{ id: 1, image: 'https://media.rawg.io/media/screenshots/a7e/a7e289f6479f8263884d5df656c9a3eb.jpg' },
-		{ id: 2, image: 'https://media.rawg.io/media/screenshots/030/03080b0e50f5550a256f642a8b9e6040.jpg' },
-		{ id: 3, image: 'https://media.rawg.io/media/screenshots/81d/81d2f785a21e64627d72111867dd1f68.jpg' },
-		{ id: 4, image: 'https://media.rawg.io/media/screenshots/39a/39a66420e6e76d9bf84594689dd8880d.jpg' }
-	];
-	} */
-
 	goBack(): void {
 		// Navigation id 1 means the detail page was opened directly
 		if (history.state?.navigationId > 1) {
