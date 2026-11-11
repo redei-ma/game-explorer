@@ -1,7 +1,7 @@
 <header class="site-header">
   <nav class="navbar navbar-expand-md" data-bs-theme="dark" aria-label="Navigazione principale">
 	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between">
-		<a class="brand" routerLink="/" aria-label="Novaquest, home">
+		<a class="brand" routerLink="/" aria-label="Novaquest, home" (click)="menuOpen.set(false)">
 		<span class="brand__dots" aria-hidden="true"><i></i><i></i><i></i></span>Novaquest
 		</a>
 
@@ -12,7 +12,7 @@
 		<div class="collapse navbar-collapse justify-content-end" [class.show]="menuOpen()">
 		<ul class="navbar-nav align-items-md-center gap-md-4">
 			@for (link of navLinks; track link.label) {
-			<li class="nav-item"><a class="nav-link" [routerLink]="link.path">{{ link.label }}</a></li>
+			<li class="nav-item"><a class="nav-link" [routerLink]="link.path" (click)="menuOpen.set(false)">{{ link.label }}</a></li>
 			}
 			<li class="nav-item">
 			<button type="button" class="search-toggle" aria-label="Cerca un gioco" [attr.aria-expanded]="searchOpen()" (click)="toggleSearch()">
@@ -21,9 +21,9 @@
 			</li>
 			<li class="nav-item">
 			@if (currentUser(); as user) {
-				<a class="btn btn-user" routerLink="/account" [attr.aria-label]="'Area utente di ' + user.username">{{ user.username }}</a>
+				<a class="btn btn-user" routerLink="/account" [attr.aria-label]="'Area utente di ' + user.username" (click)="menuOpen.set(false)">{{ user.username }}</a>
 			} @else {
-				<a class="btn btn-user" routerLink="/login">Accedi</a>
+				<a class="btn btn-user" routerLink="/login" (click)="menuOpen.set(false)">Accedi</a>
 			}
 			</li>
 		</ul>
