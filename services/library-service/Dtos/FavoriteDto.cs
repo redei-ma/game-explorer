@@ -2,7 +2,13 @@
 namespace LibraryService.Dtos;
 
 /// <summary>
-/// What the API returns for a favorite. Deliberately leaves out ClientId and the
-/// internal Id: the browser doesn't need them, and the client ID is a secret.
+/// What the API returns for a favorite.
 /// </summary>
-public record FavoriteDto(int GameId, string Name, string? CoverUrl, double? Rating, DateOnly? ReleaseDate, DateTimeOffset AddedAt);
+public record FavoriteDto(
+    int GameId,
+    string Name,
+    string? CoverUrl,
+    double? Rating,
+    DateOnly? ReleaseDate,
+    List<PlatformEntryDto> ParentPlatforms,
+    DateTimeOffset AddedAt);
