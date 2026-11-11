@@ -1,4 +1,4 @@
-<section class="container-ge py-5">
+<section class="container-ge py-5 auth-page">
   <h1 class="mb-4">Il tuo account</h1>
 
   @if (user(); as user) {
@@ -16,11 +16,11 @@
     <div class="alert alert-danger py-2" role="alert">{{ message }}</div>
   }
 
-  <button type="button" class="btn btn-outline-light" [disabled]="loggingOut()" (click)="logout()">
+  <button type="button" class="btn btn-ge" [disabled]="loggingOut()" (click)="logout()">
     {{ loggingOut() ? 'Uscita in corso…' : 'Esci' }}
   </button>
 
-  <h2 class="h4 mt-5 mb-3">Elimina l'account</h2>
+  <h2 class="mt-5 mb-3">Elimina l'account</h2>
   <p>L'account e i preferiti salvati vengono cancellati per sempre.</p>
 
   <form class="auth-form" novalidate (submit)="onSubmit($event)">
@@ -44,7 +44,7 @@
       <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
     }
 
-    <button type="submit" class="btn btn-danger" [disabled]="deleteForm().submitting()">
+    <button type="submit" class="btn btn-ge btn-ge--danger" [disabled]="deleteForm().submitting()">
       {{ deleteForm().submitting() ? 'Eliminazione in corso…' : "Elimina l'account" }}
     </button>
   </form>
