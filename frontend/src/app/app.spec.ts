@@ -19,6 +19,6 @@ describe('App', () => {
 	const fixture = TestBed.createComponent(App);
 	await fixture.whenStable();
 	const header = (fixture.nativeElement as HTMLElement).querySelector('.site-header');
-	expect(header?.textContent).toContain('Gaming Explorer');
+	expect(header?.textContent).toContain('Novaquest');
 	});
 });
