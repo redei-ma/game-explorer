@@ -1,13 +1,27 @@
 <div class="favorites-container">
 	<header class="favorites-header">
 		<h1>I tuoi Preferiti</h1>
-		<p class="favorites-count">
-			<!-- Simple pluralization logic -->
-			{{ favorites().length }} {{ favorites().length === 1 ? 'gioco salvato' : 'giochi salvati' }}
-		</p>
+		@if (favoritesService.status() === 'ready') {
+			<p class="favorites-count">
+				<!-- Simple pluralization logic -->
+				{{ favorites().length }} {{ favorites().length === 1 ? 'gioco salvato' : 'giochi salvati' }}
+			</p>
+		}
 	</header>
 
-	@if (favorites().length === 0) {
+	<!-- A logged-in user's list comes from the server: without these states, an error or a slow
+	     answer would look like an empty list -->
+	@if (favoritesService.status() === 'loading') {
+		<p class="d-flex align-items-center gap-2" role="status">
+			<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+			Caricamento dei preferiti…
+		</p>
+	} @else if (favoritesService.status() === 'error') {
+		<div class="feedback-panel" role="alert">
+			<p>Impossibile caricare i preferiti. Controlla la connessione e riprova.</p>
+			<button type="button" class="btn-primary" (click)="favoritesService.refresh()">Riprova</button>
+		</div>
+	} @else if (favorites().length === 0) {
 		<!-- State to show when there are no favorites -->
 		<div class="empty-state">
 			<div class="empty-icon">♥</div>
