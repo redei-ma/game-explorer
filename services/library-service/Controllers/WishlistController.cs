@@ -153,7 +153,7 @@ public class WishlistController(LibraryDbContext db, ICatalogClient catalog, ILo
             UserId = userId,
             GameId = game.Id,
             Name = game.Name,
-            CoverUrl = game.BackgroundImage,
+            CoverUrl = game.CoverImage,
             Rating = game.Rating,
             ReleaseDate = game.Released,
             AddedAt = DateTimeOffset.UtcNow
