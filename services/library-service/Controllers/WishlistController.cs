@@ -11,6 +11,8 @@ using Microsoft.IdentityModel.JsonWebTokens;
 // The HTTP controllers: classes that answer the requests forwarded by the gateway
 namespace LibraryService.Controllers;
 
+
+
 /// <summary>
 /// Manages the logged-in user's wishlist (games to buy or try), separate from favorites.
 /// [Authorize] answers 401 to any request without a valid login cookie.
@@ -26,17 +28,23 @@ public class WishlistController(LibraryDbContext db, ICatalogClient catalog, ILo
     /// <summary>The caller's user ID, from the verified token (never from the URL or body).</summary>
     private string UserId => User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
 
+    /// <summary>Converts a database row into what the API returns; the platforms are read back from their JSON text.</summary>
+    private static FavoriteDto ToDto(Favorite w) => new(
+        w.GameId, w.Name, w.CoverUrl, w.Rating, w.ReleaseDate,
+        PlatformJson.FromJson(w.ParentPlatformsJson), w.AddedAt);
+
     /// <summary>GET /api/library/wishlist: the whole list, newest first.</summary>
     [HttpGet]
     public async Task<ActionResult<List<WishlistItemDto>>> List(CancellationToken ct)
     {
         var userId = UserId;
-        return await db.WishlistItems
+        var rows = await db.WishlistItems
             .AsNoTracking()
             .Where(w => w.UserId == userId)
             .OrderByDescending(w => w.AddedAt)
-            .Select(w => new WishlistItemDto(w.GameId, w.Name, w.CoverUrl, w.Rating, w.ReleaseDate, w.AddedAt))
             .ToListAsync(ct);
+
+        return rows.Select(ToDto).ToList();
     }
 
     /// <summary>GET /api/library/wishlist/{gameId}: 204 if present, 404 if not.</summary>
@@ -156,6 +164,7 @@ public class WishlistController(LibraryDbContext db, ICatalogClient catalog, ILo
             CoverUrl = game.CoverImage,
             Rating = game.Rating,
             ReleaseDate = game.Released,
+            ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
             AddedAt = DateTimeOffset.UtcNow
         };
     }

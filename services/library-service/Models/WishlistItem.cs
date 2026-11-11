@@ -22,6 +22,9 @@ public class WishlistItem
     public double? Rating { get; set; }
     public DateOnly? ReleaseDate { get; set; }
 
+    /// <summary>Platform groups (PC, PlayStation...) as JSON text, saved with the snapshot. See PlatformJson.</summary>
+    public string? ParentPlatformsJson { get; set; }
+
     /// <summary>When the game was added (UTC). Used to sort the list, newest first.</summary>
     public DateTimeOffset AddedAt { get; set; }
 }
