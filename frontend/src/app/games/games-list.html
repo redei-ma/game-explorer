@@ -7,7 +7,7 @@
 				{{ totalResults() }} risultati trovati
 			</span>
 		</div>
-		<button class="btn-toggle-filters d-md-none" (click)="toggleMobileFilters()">
+		<button type="button" class="btn-toggle-filters d-md-none" [attr.aria-expanded]="showMobileFilters" (click)="toggleMobileFilters()">
 			{{ showMobileFilters ? 'Chiudi Filtri' : 'Filtri' }}
 		</button>
 	</header>
@@ -105,7 +105,7 @@
 	</div>
 
 	<!-- Pagination Controls -->
-	<nav class="pagination-container" *ngIf="!isLoading() && !hasError() && totalPages() > 1">
+	<nav class="pagination-container" aria-label="Paginazione risultati" *ngIf="!isLoading() && !hasError() && totalPages() > 1">
 		<button class="pagination-btn" [disabled]="currentQuery.page === 1" 
 			(click)="onPageChange((currentQuery.page || 1) - 1)">
 			Precedente

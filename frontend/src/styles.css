@@ -1,25 +1,27 @@
 /* Bootstrap CSS e' caricato da angular.json: sotto solo token e override */
-/* Colori e font del tema scuro*/
 :root {
-	--ge-bg: #0b1218;
-	--ge-bg-alt: #0f1820;
-	--ge-band: #16232d;
-	--ge-surface: #101a22;
-	--ge-border: #223039;
-	--ge-text: #f2f5f7;
-	--ge-muted: #8493a1;
-	--ge-accent: #007a4b;
-	--ge-accent-hover: #006f45;
-	--ge-primary: #005a9c;
-	--ge-primary-hover: #00457a;
-	--ge-info: #00a3e0;
+	--ge-bg: #0A0F1D;
+	--ge-bg-alt: #0d1426;
+	--ge-band: #1b2740;
+	--ge-surface: #141C2F;
+	--ge-border: #2A344A;
+	--ge-text: #F8FAFC;
+	--ge-muted: #94a3b8;
+	--ge-accent: #FCD34D;
+	--ge-accent-hover: #FBBF24;
+	--ge-primary: #00F5D4;
+	--ge-primary-hover: #00c9ae;
+	--ge-blue-soft: #9FB3C8;
+	--ge-blue-soft-hover: #B8C9D9;
+	--ge-blue-panel: #172554;
 	--ge-danger: #ef4444;
 	--bs-body-bg: var(--ge-bg);
 	--bs-body-color: var(--ge-text);
-	--bs-body-font-family: 'DM Sans', system-ui, sans-serif;
-	--bs-link-color-rgb: 0, 176, 106;
+	--bs-body-font-family: 'Roboto', system-ui, sans-serif;
+	--bs-link-color-rgb: 103, 232, 249;
 }
 
+html { background: var(--ge-bg); }
 body {
 	background: var(--ge-bg);
 	color: var(--ge-text);
@@ -27,7 +29,7 @@ body {
 }
 
 h1, h2, h3, h4, h5 {
-	font-family: "Inter", system-ui, sans-serif;
+	font-family: "Oxanium", system-ui, sans-serif;
 	letter-spacing: -0.02em;
 }
 
@@ -73,7 +75,7 @@ h1, h2, h3, h4, h5 {
 	text-align: center;
 	background: rgba(255, 255, 255, 0.03);
 	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 8px;
+	border-radius: 16px;
 }
 
 .feedback-panel h1,
@@ -100,8 +102,8 @@ h1, h2, h3, h4, h5 {
 	--bs-btn-padding-y: .55rem;
 	background: var(--ge-accent);
 	border: 0;
-	border-radius: 3px;
-	color: #fff;
+	border-radius: 999px;
+	color: #111827;
 	font-size: 0.68rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
@@ -109,10 +111,10 @@ h1, h2, h3, h4, h5 {
 }
 .btn-ge:hover, .btn-ge:focus-visible {
 	background: var(--ge-accent-hover);
-	color: #fff;
+	color: #111827;
 }
 .btn-ge--disabled { cursor: default; opacity: .7; }
-.btn-ge--disabled:hover { background: var(--ge-accent); color: #fff; }
+.btn-ge--disabled:hover { background: var(--ge-accent); color: #111827; }
 
 .eyebrow {
 	color: var(--ge-accent);
@@ -128,7 +130,7 @@ h1, h2, h3, h4, h5 {
 	position: relative;
 	display: block;
 	aspect-ratio: 2/3;
-	border-radius: 3px;
+	border-radius: 12px;
 	overflow: hidden;
 	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.14);
 }

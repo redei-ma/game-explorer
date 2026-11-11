@@ -1,7 +1,7 @@
 <div class="detail-container">
 
 	<!-- BACK button -->
-	<button class="btn-back" (click)="goBack()">
+	<button type="button" class="btn-back" (click)="goBack()">
 		&larr; Torna indietro
 	</button>
 
@@ -41,6 +41,8 @@
 						type="button" 
 						class="btn-fav-detail" 
 						[class.btn-fav-detail--active]="isFavorite()" 
+						[attr.aria-pressed]="isFavorite()"
+						[attr.aria-label]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
 						(click)="toggleFavorite()"
 					>
 						<span class="fav-icon">♥</span>

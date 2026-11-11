@@ -8,6 +8,11 @@
 	text-decoration: none;
 }
 
+.game-card:hover .game-card__title,
+.game-card:focus-visible .game-card__title {
+	color: var(--ge-blue-soft);
+}
+
 .game-card .ph-poster {
 	width: 100%;
 }
@@ -69,7 +74,7 @@
 	background: rgba(0, 0, 0, 0.65);
 	backdrop-filter: blur(4px);
 	border: 1px solid rgba(255, 255, 255, 0.2);
-	border-radius: 50%;
+	border-radius: 999px;
 	width: 2.2rem;
 	height: 2.2rem;
 	display: flex;
@@ -87,7 +92,7 @@
 }
 
 .fav-btn--active {
-	color: #ff4757;
-	border-color: #ff4757;
-	background: rgba(255, 71, 87, 0.25);
+	color: var(--ge-accent);
+	border-color: var(--ge-accent);
+	background: rgba(252, 211, 77, .16);
 }
