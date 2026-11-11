@@ -140,27 +140,21 @@ describe('Account', () => {
     expect(field.textContent).toContain('Password errata.');
   });
 
-  it('retries only the favorites when they fail after the account is deleted', async () => {
+  it('logs out and goes home even when the favorites cannot be deleted', async () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
     const { fixture, page } = await submitDeletion();
+
     expectAccountDeletion().flush(null, { status: 204, statusText: 'No Content' });
     await settle(fixture);
     http
       .expectOne({ method: 'DELETE', url: '/api/library/favorites' })
       .error(new ProgressEvent('error'));
     await settle(fixture);
-
-    expect(page.querySelector('form .alert-danger')?.textContent).toContain(
-      "L'account è stato eliminato, ma i preferiti no",
-    );
-
-    deleteButton(page).click();
-    await fixture.whenStable();
-    http.expectNone({ method: 'DELETE', url: '/api/auth/me' });
-    http
-      .expectOne({ method: 'DELETE', url: '/api/library/favorites' })
-      .flush(null, { status: 204, statusText: 'No Content' });
-    await settle(fixture);
     http.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
+    await settle(fixture);
+
+    expect(page.querySelector('form .alert-danger')).toBeNull();
+    expect(navigate).toHaveBeenCalledWith('/', { replaceUrl: true });
   });
 
   it('shows a generic message when the account cannot be deleted', async () => {

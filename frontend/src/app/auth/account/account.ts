@@ -1,12 +1,6 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import {
-  FieldTree,
-  FormField,
-  TreeValidationResult,
-  form,
-  required,
-} from '@angular/forms/signals';
+import { FieldTree, FormField, TreeValidationResult, form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { FavoritesService } from '../../favorites/favorites.service';
@@ -32,10 +26,6 @@ export class Account {
   // Field errors appear from the first submit, as in Login.
   protected readonly submitted = signal(false);
 
-  // Set once auth-service has deleted the account: a retry must skip that step, since the
-  // account no longer exists.
-  private accountDeleted = false;
-
   protected readonly deleteForm = form(
     this.deleteModel,
     (field) => {
@@ -44,23 +34,14 @@ export class Account {
     {
       submission: {
         action: async (field) => {
-          if (!this.accountDeleted) {
-            try {
-              await firstValueFrom(this.auth.deleteAccount(this.deleteModel().password));
-            } catch (error) {
-              return deleteAccountError(error, field);
-            }
-            this.accountDeleted = true;
-          }
           try {
-            await firstValueFrom(this.favorites.deleteAll());
-          } catch {
-            return {
-              kind: 'server',
-              message:
-                "L'account è stato eliminato, ma i preferiti no: premi di nuovo per riprovare.",
-            };
+            await firstValueFrom(this.auth.deleteAccount(this.deleteModel().password));
+          } catch (error) {
+            return deleteAccountError(error, field);
           }
+          // The account is gone either way: if library fails, its favorites stay orphaned (a known
+          // limit in decisions.md) instead of asking the user to retry.
+          await firstValueFrom(this.favorites.deleteAll()).catch(() => undefined);
           await this.logout();
           return undefined;
         },
