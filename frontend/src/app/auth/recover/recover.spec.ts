@@ -56,6 +56,12 @@ describe('Recover', () => {
     return page.querySelector(`#${id}`)!.closest('.mb-3')!.textContent;
   }
 
+  it('links back to the login page', async () => {
+    const { page } = await render();
+
+    expect(page.querySelector('a[href="/login"]')?.textContent).toContain('Accedi');
+  });
+
   it('sends nothing and shows every error when submitted empty', async () => {
     const { fixture, page } = await render();
 

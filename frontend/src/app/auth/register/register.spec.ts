@@ -64,6 +64,12 @@ describe('Register', () => {
     return { title: 'One or more validation errors occurred.', status: 400, errors };
   }
 
+  it('links back to the login page', async () => {
+    const { page } = await render();
+
+    expect(page.querySelector('a[href="/login"]')?.textContent).toContain('Accedi');
+  });
+
   it('shows no error before the user touches a field', async () => {
     const { page } = await render();
 

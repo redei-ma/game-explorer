@@ -11,7 +11,7 @@ import {
   required,
   validate,
 } from '@angular/forms/signals';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TOO_MANY_ATTEMPTS_MESSAGE, isPasswordRule, passwordRulesMessage } from '../auth-errors';
 import { AuthService } from '../auth.service';
@@ -26,7 +26,7 @@ interface RegisterModel {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, FormRoot, RecoveryCode],
+  imports: [FormField, FormRoot, RecoveryCode, RouterLink],
   templateUrl: './register.html',
 })
 export class Register {
