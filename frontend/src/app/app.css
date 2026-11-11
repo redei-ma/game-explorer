@@ -18,7 +18,7 @@ main { flex: 1; }
 .search-toggle:hover { color: var(--ge-text); }
 
 .btn-user { padding: .45rem .9rem; background: var(--ge-surface); border: 1px solid var(--ge-border); border-radius: 999px; color: var(--ge-text); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-.btn-user:hover { background: #34495a; color: #fff; }
+.btn-user:hover, .btn-user:focus-visible { background: var(--ge-blue-soft); color: #0A0F1D; }
 .btn-user--disabled { cursor: default; opacity: .7; }
 .btn-user--disabled:hover { background: var(--ge-surface); color: var(--ge-text); }
 
