@@ -3,7 +3,6 @@ import { Component, inject, signal } from '@angular/core';
 import {
   FieldTree,
   FormField,
-  FormRoot,
   TreeValidationResult,
   ValidationError,
   email,
@@ -15,6 +14,7 @@ import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TOO_MANY_ATTEMPTS_MESSAGE, isPasswordRule, passwordRulesMessage } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { submitAgain } from '../submit-again';
 import { RecoveryCode } from '../recovery-code/recovery-code';
 
 interface RegisterModel {
@@ -26,7 +26,7 @@ interface RegisterModel {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, FormRoot, RecoveryCode, RouterLink],
+  imports: [FormField, RecoveryCode, RouterLink],
   templateUrl: './register.html',
 })
 export class Register {
@@ -75,6 +75,12 @@ export class Register {
       },
     },
   );
+
+  protected async onSubmit(event: Event): Promise<void> {
+    event.preventDefault();
+    this.submitted.set(true);
+    await submitAgain(this.model, this.registerForm);
+  }
 
   // No automatic redirect after registering: the user leaves only after saving the code.
   // Replaces /register in the history, so Back goes to the page before it.

@@ -143,6 +143,22 @@ describe('Login', () => {
     );
   });
 
+  it('sends again with the same data after the server did not answer', async () => {
+    const { fixture, page } = await submitValidForm();
+    http.expectOne('/api/auth/login').error(new ProgressEvent('error'));
+    await settle(fixture);
+
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await fixture.whenStable();
+
+    http.expectOne('/api/auth/login').flush({
+      expiresAt: '2026-11-07T18:00:00Z',
+      user: { id: '1', email: 'mario@example.com', username: 'mario' },
+    });
+    await settle(fixture);
+    expect(TestBed.inject(AuthService).currentUser()?.username).toBe('mario');
+  });
+
   it('goes to the home page after logging in', async () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
     const { fixture } = await submitValidForm();

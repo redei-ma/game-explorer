@@ -1,14 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
-import { FormField, FormRoot, email, form, required } from '@angular/forms/signals';
+import { FormField, email, form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { submitAgain } from '../submit-again';
 
 @Component({
   selector: 'app-login',
-  imports: [FormField, FormRoot, RouterLink],
+  imports: [FormField, RouterLink],
   templateUrl: './login.html',
 })
 export class Login {
@@ -45,6 +46,12 @@ export class Login {
       },
     },
   );
+
+  protected async onSubmit(event: Event): Promise<void> {
+    event.preventDefault();
+    this.submitted.set(true);
+    await submitAgain(this.model, this.loginForm);
+  }
 }
 
 function loginErrorMessage(error: unknown): string {

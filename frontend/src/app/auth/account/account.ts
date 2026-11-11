@@ -6,12 +6,12 @@ import {
   TreeValidationResult,
   form,
   required,
-  submit,
 } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { FavoritesService } from '../../favorites/favorites.service';
 import { AuthService } from '../auth.service';
+import { submitAgain } from '../submit-again';
 
 @Component({
   selector: 'app-account',
@@ -68,13 +68,10 @@ export class Account {
     },
   );
 
-  // Errors returned by the last submit keep the form invalid until a value changes, and Angular
-  // skips the action of an invalid form: a retry with the same data must still run.
   protected async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     this.submitted.set(true);
-    this.deleteModel.update((value) => ({ ...value }));
-    await submit(this.deleteForm);
+    await submitAgain(this.deleteModel, this.deleteForm);
   }
 
   protected async logout(): Promise<void> {

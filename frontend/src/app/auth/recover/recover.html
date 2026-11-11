@@ -10,7 +10,7 @@
     <h1 class="mb-4">Password dimenticata</h1>
     <p>Usa il codice di recupero che hai salvato quando hai creato l'account.</p>
 
-    <form class="auth-form" [formRoot]="recoverForm" (submit)="submitted.set(true)">
+    <form class="auth-form" novalidate (submit)="onSubmit($event)">
       <div class="mb-3">
         <label for="recover-email" class="form-label">Email</label>
         <input

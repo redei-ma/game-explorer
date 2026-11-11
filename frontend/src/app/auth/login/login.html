@@ -1,7 +1,7 @@
 <section class="container-ge py-5 auth-page">
   <h1 class="mb-4">Accedi</h1>
 
-  <form class="auth-form" [formRoot]="loginForm" (submit)="submitted.set(true)">
+  <form class="auth-form" novalidate (submit)="onSubmit($event)">
     <div class="mb-3">
       <label for="login-email" class="form-label">Email</label>
       <input

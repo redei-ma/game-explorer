@@ -3,7 +3,6 @@ import { Component, inject, signal } from '@angular/core';
 import {
   FieldTree,
   FormField,
-  FormRoot,
   TreeValidationResult,
   email,
   form,
@@ -14,6 +13,7 @@ import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TOO_MANY_ATTEMPTS_MESSAGE, passwordRulesMessage } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { submitAgain } from '../submit-again';
 import { RecoveryCode } from '../recovery-code/recovery-code';
 
 interface RecoverModel {
@@ -25,7 +25,7 @@ interface RecoverModel {
 
 @Component({
   selector: 'app-recover',
-  imports: [FormField, FormRoot, RecoveryCode, RouterLink],
+  imports: [FormField, RecoveryCode, RouterLink],
   templateUrl: './recover.html',
 })
 export class Recover {
@@ -74,6 +74,12 @@ export class Recover {
       },
     },
   );
+
+  protected async onSubmit(event: Event): Promise<void> {
+    event.preventDefault();
+    this.submitted.set(true);
+    await submitAgain(this.model, this.recoverForm);
+  }
 
   protected continue(): void {
     this.router.navigateByUrl('/login', { replaceUrl: true });
