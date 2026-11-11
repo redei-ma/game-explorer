@@ -171,7 +171,8 @@ public class IgdbClient(HttpClient http, IMemoryCache cache)
                                       .Select(c => ToNamedItem(c.Company!)).ToList(),
             Publishers:      companies.Where(c => c.Publisher && c.Company is not null)
                                       .Select(c => ToNamedItem(c.Company!)).ToList(),
-            Platforms:       (g.Platforms ?? []).Select(p => new PlatformEntry(ToNamedItem(p))).ToList());
+            Platforms:       (g.Platforms ?? []).Select(p => new PlatformEntry(ToNamedItem(p))).ToList(),
+            CoverImage:      ImageUrl(g.Artworks?.FirstOrDefault(), "1080p") ?? ImageUrl(g.Cover, "cover_big"));
     }
 
     /// <summary>Fetches the screenshots of one game.</summary>
