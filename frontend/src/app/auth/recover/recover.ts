@@ -41,7 +41,6 @@ export class Recover {
   // Field errors appear from the first submit, as in Login.
   protected readonly submitted = signal(false);
 
-  // The new code: the one just used stops working.
   protected readonly recoveryCode = signal<string | null>(null);
 
   // As in Register: password rules are checked only by auth-service.
@@ -76,7 +75,6 @@ export class Recover {
     },
   );
 
-  // No login after a recovery: the user signs in with the new password.
   protected continue(): void {
     this.router.navigateByUrl('/login', { replaceUrl: true });
   }

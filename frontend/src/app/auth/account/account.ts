@@ -36,8 +36,6 @@ export class Account {
   // account no longer exists.
   private accountDeleted = false;
 
-  // Order from library-service's PR #20: auth checks the password and deletes the account,
-  // library deletes the favorites, then logout. The password is the confirmation.
   protected readonly deleteForm = form(
     this.deleteModel,
     (field) => {
