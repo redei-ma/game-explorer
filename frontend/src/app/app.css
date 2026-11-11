@@ -17,10 +17,9 @@ main { flex: 1; }
 .search-toggle { display: inline-grid; place-items: center; padding: .25rem; background: none; border: 0; color: #c3ccd4; }
 .search-toggle:hover { color: var(--ge-text); }
 
-.btn-user { padding: .45rem .9rem; background: var(--ge-surface); border: 1px solid var(--ge-border); border-radius: 999px; color: var(--ge-text); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+/* max-width and ellipsis: a long username is cut instead of breaking the header line */
+.btn-user { padding: .45rem .9rem; background: var(--ge-surface); border: 1px solid var(--ge-border); border-radius: 999px; color: var(--ge-text); font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; max-width: 12rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .btn-user:hover, .btn-user:focus-visible { background: var(--ge-blue-soft); color: #0A0F1D; }
-.btn-user--disabled { cursor: default; opacity: .7; }
-.btn-user--disabled:hover { background: var(--ge-surface); color: var(--ge-text); }
 
 .search-bar { display: flex; gap: .5rem; padding-block: .6rem .85rem; }
 .search-bar .form-control { background: var(--ge-surface); border-color: var(--ge-border); color: var(--ge-text); font-size: .85rem; }
