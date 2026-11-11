@@ -113,6 +113,9 @@ h1, h2, h3, h4, h5 {
 	background: var(--ge-accent-hover);
 	color: #111827;
 }
+/* Red variant for irreversible actions, such as deleting the account */
+.btn-ge--danger { background: var(--ge-danger); }
+.btn-ge--danger:hover, .btn-ge--danger:focus-visible { background: color-mix(in srgb, var(--ge-danger) 85%, #fff); }
 .btn-ge--disabled { cursor: default; opacity: .7; }
 .btn-ge--disabled:hover { background: var(--ge-accent); color: #111827; }
 
@@ -152,6 +155,15 @@ h1, h2, h3, h4, h5 {
 	border: 1px solid rgba(255, 255, 255, 0.35);
 	border-radius: 50%;
 }
+
+/* Auth pages: titles sized like the favorites page title (favorites-list.css) */
+.auth-page h1 { font-size: 1.8rem; font-weight: 700; }
+.auth-page h2 { font-size: 1.4rem; font-weight: 700; }
+/* Login, registration and recovery forms: fields styled like the header search bar (app.css) */
+.auth-form { max-width: 24rem; }
+.auth-form .form-control { background: var(--ge-surface); border-color: var(--ge-border); color: var(--ge-text); }
+.auth-form .form-control:focus { background: var(--ge-surface); border-color: var(--ge-accent); box-shadow: none; color: var(--ge-text); }
+.auth-form .alert-danger { background: color-mix(in srgb, var(--ge-danger) 12%, transparent); border-color: var(--ge-danger); color: var(--ge-text); }
 
 a:focus-visible, button:focus-visible, input:focus-visible {
 	outline: 2px solid var(--ge-accent);
