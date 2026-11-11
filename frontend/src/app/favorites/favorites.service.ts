@@ -1,8 +1,10 @@
-// Manages localStorage reactively using Angular Signals
+// Manages the favorites reactively using Angular Signals: a guest's in Local Storage,
+// a logged-in user's in library-service
 
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Injectable, effect, inject, signal, untracked } from '@angular/core';
+import { Observable, Subscription, tap } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
 import { Game } from '../games/games.api';
 
 // Key used to store favorites in the browser's Local Storage
@@ -22,12 +24,26 @@ interface FavoriteDto {
 })
 export class FavoritesService {
 	private readonly http = inject(HttpClient);
+	private readonly auth = inject(AuthService);
 
-	// Reactive signal holding the current list of favorite games
-	readonly favorites = signal<Game[]>(this.loadFavorites());
+	// Reactive signal holding the current list of favorite games. Local Storage keeps only the
+	// guest's list, so a logged-in user starts empty until the server answers.
+	readonly favorites = signal<Game[]>(this.auth.currentUser() ? [] : this.loadFavorites());
 
 	constructor() {
-		this.refresh();
+		// Runs again at every login and logout. onCleanup drops a list still on its way when the
+		// session changes again, so it cannot land in the wrong session.
+		effect((onCleanup) => {
+			const user = this.auth.currentUser();
+			untracked(() => {
+				if (user) {
+					const request = this.refresh();
+					onCleanup(() => request.unsubscribe());
+				} else {
+					this.favorites.set(this.loadFavorites());
+				}
+			});
+		});
 	}
 
 	// Checks if a specific game is already in the favorites list
@@ -44,40 +60,32 @@ export class FavoritesService {
 			: [...current, game];
 		const wasFavorite = index >= 0;
 
-		// Update the reactive signal and persist to Local Storage
+		// Update the reactive signal; only a guest's list is persisted to Local Storage
 		this.favorites.set(updated);
-		this.saveFavorites(updated);
+		if (!this.auth.currentUser()) {
+			this.saveFavorites(updated);
+			return;
+		}
 
+		// The X-CSRF-Token header is added by csrfInterceptor (app.config.ts)
 		const request = wasFavorite
-			? this.http.delete<void>(`/api/library/favorites/${game.id}`, {
-				headers: this.csrfHeaders,
-				withCredentials: true
-			})
-			: this.http.put<void>(`/api/library/favorites/${game.id}`, null, {
-				headers: this.csrfHeaders,
-				withCredentials: true
-			});
+			? this.http.delete<void>(`/api/library/favorites/${game.id}`)
+			: this.http.put<void>(`/api/library/favorites/${game.id}`, null);
 
 		request.subscribe({
 			error: (error: HttpErrorResponse) => {
-				// A 401 means the visitor is a guest: localStorage is the intended store.
-				if (error.status === 401) return;
-
-				console.error('Impossibile aggiornare i preferiti sul server', error);
+				console.error('Could not update the favorites on the server', error);
 				this.favorites.set(current);
-				this.saveFavorites(current);
 			}
 		});
 	}
 
 	/**
-	 * Loads the account favorites. Guests keep using their local favorites when
-	 * the library service answers 401.
+	 * Loads the account favorites. Called only for a logged-in user; the list is not
+	 * saved to Local Storage, so it does not stay in the browser after logout.
 	 */
-	refresh(): void {
-		this.http.get<FavoriteDto[]>('/api/library/favorites', {
-			withCredentials: true
-		}).subscribe({
+	refresh(): Subscription {
+		return this.http.get<FavoriteDto[]>('/api/library/favorites').subscribe({
 			next: favorites => {
 				const cachedFavorites = this.favorites();
 				const games = favorites.map(favorite => {
@@ -85,11 +93,10 @@ export class FavoritesService {
 					return this.toGame(favorite, cachedGame);
 				});
 				this.favorites.set(games);
-				this.saveFavorites(games);
 			},
 			error: (error: HttpErrorResponse) => {
 				if (error.status !== 401) {
-					console.error('Impossibile caricare i preferiti dal server', error);
+					console.error('Could not load the favorites from the server', error);
 				}
 			}
 		});
@@ -114,8 +121,6 @@ export class FavoritesService {
 			return [];
 		}
 	}
-
-	private readonly csrfHeaders = new HttpHeaders({ 'X-CSRF-Token': 'frontend' });
 
 	private toGame(favorite: FavoriteDto, cachedGame?: Game): Game {
 		return {
