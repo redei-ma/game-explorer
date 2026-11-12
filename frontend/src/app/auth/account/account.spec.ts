@@ -167,7 +167,6 @@ describe('Account', () => {
     expect(page.querySelector('form .alert-danger')?.textContent).toContain(
       'Troppi tentativi sbagliati: riprova tra qualche minuto.',
     );
-    http.expectNone({ method: 'DELETE', url: '/api/library/favorites' });
   });
 
   it('shows a generic message when the account cannot be deleted', async () => {

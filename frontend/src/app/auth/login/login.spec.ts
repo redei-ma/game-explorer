@@ -143,6 +143,17 @@ describe('Login', () => {
     );
   });
 
+  it('shows the message for too many attempts', async () => {
+    const { fixture, page } = await submitValidForm();
+
+    http.expectOne('/api/auth/login').flush(null, { status: 429, statusText: 'Too Many Requests' });
+    await settle(fixture);
+
+    expect(page.querySelector('.alert-danger')?.textContent).toContain(
+      'Troppi tentativi: riprova tra un minuto.',
+    );
+  });
+
   it('sends again with the same data after the server did not answer', async () => {
     const { fixture, page } = await submitValidForm();
     http.expectOne('/api/auth/login').error(new ProgressEvent('error'));
