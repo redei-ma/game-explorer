@@ -156,6 +156,8 @@ public class IgdbClient(HttpClient http, IMemoryCache cache)
         if (g is null)
             return null;
 
+        var catalog = await GetPlatformCatalogAsync(ct);
+
         var companies = g.InvolvedCompanies ?? [];
         return new GameDetail(
             Id:              g.Id,
@@ -171,7 +173,9 @@ public class IgdbClient(HttpClient http, IMemoryCache cache)
                                       .Select(c => ToNamedItem(c.Company!)).ToList(),
             Publishers:      companies.Where(c => c.Publisher && c.Company is not null)
                                       .Select(c => ToNamedItem(c.Company!)).ToList(),
-            Platforms:       (g.Platforms ?? []).Select(p => new PlatformEntry(ToNamedItem(p))).ToList());
+            Platforms:       (g.Platforms ?? []).Select(p => new PlatformEntry(ToNamedItem(p))).ToList(),
+            ParentPlatforms: ToParentPlatforms(g, catalog),
+            CoverImage:      CardImage(g));
     }
 
     /// <summary>Fetches the screenshots of one game.</summary>
@@ -358,6 +362,27 @@ public class IgdbClient(HttpClient http, IMemoryCache cache)
         return (Unix(from), Unix(to.AddDays(1)));
     }
 
+    /// <summary>
+    /// The image a game card shows: the portrait box art. The list AND the details call this,
+    /// so a game's card looks the same in the list, in favorites and in the wishlist.
+    /// </summary>
+    /// <param name="g">Raw IGDB game (needs cover.image_id).</param>
+    private static string? CardImage(IgdbGame g) => ImageUrl(g.Cover, "cover_big");  // 264x374
+
+    /// <summary>
+    /// Turns the game's specific platforms (PS4, PS5...) into its groups (PlayStation), one per group.
+    /// The list AND the details call this, so the icons on a card never depend on where the card came from.
+    /// </summary>
+    /// <param name="g">Raw IGDB game (needs platforms.id).</param>
+    /// <param name="catalog">Used to find the group of each platform.</param>
+    private static List<PlatformEntry> ToParentPlatforms(IgdbGame g, PlatformCatalog catalog)
+        => (g.Platforms ?? [])
+            .Select(p => catalog.GroupOf(p.Id))
+            .OfType<NamedItem>()            // drops nulls (platforms with no group)
+            .DistinctBy(group => group.Id)
+            .Select(group => new PlatformEntry(group))
+            .ToList();
+
     /// <summary>Converts one IGDB game into the card model the frontend expects.</summary>
     /// <param name="g">Raw IGDB game.</param>
     /// <param name="catalog">Used to turn platform ids into group icons.</param>
@@ -367,13 +392,8 @@ public class IgdbClient(HttpClient http, IMemoryCache cache)
             Name:            g.Name,
             Released:        ToDateString(g.FirstReleaseDate),
             Rating:          ToFiveStars(g.Rating),
-            BackgroundImage: ImageUrl(g.Cover, "cover_big"),  // portrait box art (264x374)
-            ParentPlatforms: (g.Platforms ?? [])
-                                 .Select(p => catalog.GroupOf(p.Id))
-                                 .OfType<NamedItem>()            // drops nulls (platforms with no group)
-                                 .DistinctBy(group => group.Id)
-                                 .Select(group => new PlatformEntry(group))
-                                 .ToList(),
+            BackgroundImage: CardImage(g),  // portrait box art (264x374)
+            ParentPlatforms: ToParentPlatforms(g, catalog),
             Metacritic:      ToScore(g.AggregatedRating));
 
     /// <summary>Unix timestamp -> "yyyy-MM-dd" (RAWG's format), or null if unknown.</summary>

@@ -29,7 +29,6 @@ export interface Game {
 	rating: number;// 0-5, 0 when nobody rated it yet
 	metacritic: number | null;
 	parentPlatforms?: GamePlatform[];
-	platforms?: GamePlatform[];
 }
 
 export interface GamesPage {
@@ -80,6 +79,10 @@ export interface GameDetailData extends Game {
 	developers?: Developer[];
 	publishers?: Publisher[];
 	genres?: Genre[];
+	/** The cover, the same image the list shows on the card. backgroundImage (inherited) is the banner. */
+	coverImage?: string | null;
+	/** Specific platforms (PS4, PS5...), shown only on the detail page. */
+	platforms?: GamePlatform[];
 }
 export interface ScreenshotsResponse {
 	count?: number;

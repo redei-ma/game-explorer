@@ -15,7 +15,7 @@ import {
 	toArray,
 } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
-import { Game } from '../games/games.api';
+import { Game, GamePlatform } from '../games/games.api';
 
 // Key used to store favorites in the browser's Local Storage
 const STORAGE_KEY = 'ge_favorites';
@@ -26,6 +26,7 @@ interface FavoriteDto {
 	coverUrl: string | null;
 	rating: number | null;
 	releaseDate: string | null;
+	parentPlatforms: GamePlatform[];
 	addedAt: string;
 }
 
@@ -170,8 +171,7 @@ export class FavoritesService {
 			backgroundImage: favorite.coverUrl ?? cachedGame?.backgroundImage ?? null,
 			rating: favorite.rating ?? cachedGame?.rating ?? 0,
 			metacritic: cachedGame?.metacritic ?? null,
-			parentPlatforms: cachedGame?.parentPlatforms,
-			platforms: cachedGame?.platforms
+			parentPlatforms: favorite.parentPlatforms,
 		};
 	}
 

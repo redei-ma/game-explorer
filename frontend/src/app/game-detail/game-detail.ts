@@ -153,23 +153,24 @@ export class GameDetail implements OnDestroy {
 	}
 
 	// Extracts base game data to store in favorites without unnecessary heavy details
+	// Builds the same shape as a list item (cover + platform groups), so the favorite's
+	// card looks exactly like the card in the game list
 	toggleFavorite(): void {
 		const g = this.game();
 		if (!g) return;
 
-		const gameSummary: Game = {
+		const card: Game = {
 			id: g.id,
 			name: g.name,
 			slug: g.slug,
 			released: g.released,
-			backgroundImage: g.backgroundImage,
+			backgroundImage: g.coverImage ?? null,
 			rating: g.rating,
 			metacritic: g.metacritic,
-			platforms: g.platforms,
 			parentPlatforms: g.parentPlatforms
 		};
 
-		this.favoritesService.toggleFavorite(gameSummary);
+		this.favoritesService.toggleFavorite(card);
 	}
 
 /* 	MI SERVIVA PER TESTARE, DA TOGLIERE POI

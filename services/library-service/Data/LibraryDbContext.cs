@@ -24,6 +24,7 @@ public class LibraryDbContext(DbContextOptions<LibraryDbContext> options) : DbCo
 
             // 450 is the length of the user ID column in Identity (AuthDb)
             entity.Property(f => f.UserId).IsRequired().HasMaxLength(450);
+            entity.Property(f => f.ParentPlatformsJson).HasMaxLength(2000);
 
             // A user can favorite a game only once. The database enforces it,
             // so even two simultaneous requests can't create a duplicate row.

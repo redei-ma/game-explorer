@@ -27,17 +27,23 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
     /// </summary>
     private string UserId => User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
 
+    /// <summary>Converts a database row into what the API returns; the platforms are read back from their JSON text.</summary>
+    private static FavoriteDto ToDto(Favorite f) => new(
+        f.GameId, f.Name, f.CoverUrl, f.Rating, f.ReleaseDate,
+        PlatformJson.FromJson(f.ParentPlatformsJson), f.AddedAt);
+
     /// <summary>GET /api/library/favorites: the whole list, newest first.</summary>
     [HttpGet]
     public async Task<ActionResult<List<FavoriteDto>>> List(CancellationToken ct)
     {
         var userId = UserId;
-        return await db.Favorites
+        var rows = await db.Favorites
             .AsNoTracking()
             .Where(f => f.UserId == userId)
             .OrderByDescending(f => f.AddedAt)
-            .Select(f => new FavoriteDto(f.GameId, f.Name, f.CoverUrl, f.Rating, f.ReleaseDate, f.AddedAt))
             .ToListAsync(ct);
+
+        return rows.Select(ToDto).ToList();
     }
 
     /// <summary>GET /api/library/favorites/{gameId}: 204 if the game is a favorite, 404 if not.</summary>
@@ -84,9 +90,10 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
             UserId = userId,
             GameId = game.Id,
             Name = game.Name,
-            CoverUrl = game.BackgroundImage,
+            CoverUrl = game.CoverImage,
             Rating = game.Rating,
             ReleaseDate = game.Released,
+            ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
             AddedAt = DateTimeOffset.UtcNow
         });
 
