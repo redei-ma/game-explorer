@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ElementRef, HostListener, inject, signal, computed, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener, OnDestroy, inject, signal, computed, viewChild } from '@angular/core';
 import { CommonModule, DOCUMENT, Location } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -25,7 +25,7 @@ interface DetailState {
 	templateUrl: './game-detail.html',
 	styleUrls: ['./game-detail.css']
 })
-export class GameDetail {
+export class GameDetail implements OnDestroy {
 	private readonly gamesApi = inject(GamesApi);
 	private readonly route = inject(ActivatedRoute);
 	private readonly router = inject(Router);
@@ -116,6 +116,13 @@ export class GameDetail {
 		this.document.body.style.overflow = this.previousBodyOverflow;
 		this.lightboxTrigger?.focus();
 		this.lightboxTrigger = null;
+	}
+
+	// Leaving the page with the lightbox open (e.g. the browser's Back) skips closeScreenshot
+	ngOnDestroy(): void {
+		if (this.selectedScreenshotIndex() !== null) {
+			this.document.body.style.overflow = this.previousBodyOverflow;
+		}
 	}
 
 	showPreviousScreenshot(): void {

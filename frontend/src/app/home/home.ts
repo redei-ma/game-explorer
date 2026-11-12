@@ -3,6 +3,7 @@ import { rxResource } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { GameCard } from '../game-card/game-card';
 import { GamesApi, GamesQuery } from '../games/games.api';
+import { AuthService } from '../auth/auth.service';
 
 // Popular this week = most added games released in the last N days
 const POPULAR_WINDOW_DAYS = 7;
@@ -26,6 +27,7 @@ function popularQuery(): GamesQuery {
 })
 export class Home {
 	private readonly api = inject(GamesApi);
+	protected readonly currentUser = inject(AuthService).currentUser;
 
 	// Data layer: loaded from RAWG through the catalog-service
 	protected readonly popular = rxResource({ stream: () => this.api.getGames(popularQuery()) });

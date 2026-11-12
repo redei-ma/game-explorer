@@ -1,7 +1,7 @@
 <header class="site-header">
   <nav class="navbar navbar-expand-md" data-bs-theme="dark" aria-label="Navigazione principale">
 	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between">
-		<a class="brand" routerLink="/" aria-label="Novaquest, home">
+		<a class="brand" routerLink="/" aria-label="Novaquest, home" (click)="menuOpen.set(false)">
 		<span class="brand__dots" aria-hidden="true"><i></i><i></i><i></i></span>Novaquest
 		</a>
 
@@ -12,14 +12,20 @@
 		<div class="collapse navbar-collapse justify-content-end" [class.show]="menuOpen()">
 		<ul class="navbar-nav align-items-md-center gap-md-4">
 			@for (link of navLinks; track link.label) {
-			<li class="nav-item"><a class="nav-link" [routerLink]="link.path">{{ link.label }}</a></li>
+			<li class="nav-item"><a class="nav-link" [routerLink]="link.path" (click)="menuOpen.set(false)">{{ link.label }}</a></li>
 			}
 			<li class="nav-item">
 			<button type="button" class="search-toggle" aria-label="Cerca un gioco" [attr.aria-expanded]="searchOpen()" (click)="toggleSearch()">
 				<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg>
 			</button>
 			</li>
-			<li class="nav-item"><a class="btn btn-user" routerLink="/account">Area utente</a></li>
+			<li class="nav-item">
+			@if (currentUser(); as user) {
+				<a class="btn btn-user btn-user--name" routerLink="/account" [attr.aria-label]="'Area utente di ' + user.username" (click)="menuOpen.set(false)">{{ user.username }}</a>
+			} @else {
+				<a class="btn btn-user" routerLink="/login" (click)="menuOpen.set(false)">Accedi</a>
+			}
+			</li>
 		</ul>
 		</div>
 	</div>
