@@ -29,7 +29,7 @@ public class WishlistController(LibraryDbContext db, ICatalogClient catalog, ILo
     private string UserId => User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
 
     /// <summary>Converts a database row into what the API returns; the platforms are read back from their JSON text.</summary>
-    private static FavoriteDto ToDto(Favorite w) => new(
+    private static WishlistItemDto ToDto(WishlistItem w) => new(
         w.GameId, w.Name, w.CoverUrl, w.Rating, w.ReleaseDate,
         PlatformJson.FromJson(w.ParentPlatformsJson), w.AddedAt);
 
