@@ -21,7 +21,7 @@
 			</li>
 			<li class="nav-item">
 			@if (currentUser(); as user) {
-				<a class="btn btn-user" routerLink="/account" [attr.aria-label]="'Area utente di ' + user.username" (click)="menuOpen.set(false)">{{ user.username }}</a>
+				<a class="btn btn-user btn-user--name" routerLink="/account" [attr.aria-label]="'Area utente di ' + user.username" (click)="menuOpen.set(false)">{{ user.username }}</a>
 			} @else {
 				<a class="btn btn-user" routerLink="/login" (click)="menuOpen.set(false)">Accedi</a>
 			}
