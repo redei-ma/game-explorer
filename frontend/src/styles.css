@@ -1,25 +1,27 @@
 /* Bootstrap CSS e' caricato da angular.json: sotto solo token e override */
-/* Colori e font del tema scuro*/
 :root {
-	--ge-bg: #0b1218;
-	--ge-bg-alt: #0f1820;
-	--ge-band: #16232d;
-	--ge-surface: #101a22;
-	--ge-border: #223039;
-	--ge-text: #f2f5f7;
-	--ge-muted: #8493a1;
-	--ge-accent: #007a4b;
-	--ge-accent-hover: #006f45;
-	--ge-primary: #005a9c;
-	--ge-primary-hover: #00457a;
-	--ge-info: #00a3e0;
+	--ge-bg: #0A0F1D;
+	--ge-bg-alt: #0d1426;
+	--ge-band: #1b2740;
+	--ge-surface: #141C2F;
+	--ge-border: #2A344A;
+	--ge-text: #F8FAFC;
+	--ge-muted: #94a3b8;
+	--ge-accent: #FCD34D;
+	--ge-accent-hover: #FBBF24;
+	--ge-primary: #00F5D4;
+	--ge-primary-hover: #00c9ae;
+	--ge-blue-soft: #9FB3C8;
+	--ge-blue-soft-hover: #B8C9D9;
+	--ge-blue-panel: #172554;
 	--ge-danger: #ef4444;
 	--bs-body-bg: var(--ge-bg);
 	--bs-body-color: var(--ge-text);
-	--bs-body-font-family: 'DM Sans', system-ui, sans-serif;
-	--bs-link-color-rgb: 0, 176, 106;
+	--bs-body-font-family: 'Roboto', system-ui, sans-serif;
+	--bs-link-color-rgb: 103, 232, 249;
 }
 
+html { background: var(--ge-bg); }
 body {
 	background: var(--ge-bg);
 	color: var(--ge-text);
@@ -27,7 +29,7 @@ body {
 }
 
 h1, h2, h3, h4, h5 {
-	font-family: "Inter", system-ui, sans-serif;
+	font-family: "Oxanium", system-ui, sans-serif;
 	letter-spacing: -0.02em;
 }
 
@@ -73,7 +75,7 @@ h1, h2, h3, h4, h5 {
 	text-align: center;
 	background: rgba(255, 255, 255, 0.03);
 	border: 1px solid rgba(255, 255, 255, 0.1);
-	border-radius: 8px;
+	border-radius: 16px;
 }
 
 .feedback-panel h1,
@@ -100,8 +102,8 @@ h1, h2, h3, h4, h5 {
 	--bs-btn-padding-y: .55rem;
 	background: var(--ge-accent);
 	border: 0;
-	border-radius: 3px;
-	color: #fff;
+	border-radius: 999px;
+	color: #111827;
 	font-size: 0.68rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
@@ -109,10 +111,178 @@ h1, h2, h3, h4, h5 {
 }
 .btn-ge:hover, .btn-ge:focus-visible {
 	background: var(--ge-accent-hover);
+	color: #111827;
+}
+/* Red variant for irreversible actions, such as deleting the account */
+.btn-ge--danger { background: var(--ge-danger); }
+.btn-ge--danger:hover, .btn-ge--danger:focus-visible { background: color-mix(in srgb, var(--ge-danger) 85%, #fff); }
+
+.auth-page {
+	position: relative;
+	max-width: 40rem;
+	margin-block: clamp(1rem, 5vw, 3rem);
+	padding: clamp(1.5rem, 5vw, 2.5rem) !important;
+	background: linear-gradient(145deg, var(--ge-surface), rgba(23, 37, 84, .72));
+	border: 1px solid var(--ge-border);
+	border-radius: 16px;
+	box-shadow: 0 16px 40px rgba(0, 0, 0, .22);
+}
+
+.auth-page::before {
+	content: "";
+	position: absolute;
+	top: -5rem;
+	right: -3rem;
+	width: 12rem;
+	height: 12rem;
+	background: #9D4EDD;
+	border-radius: 50%;
+	filter: blur(120px);
+	opacity: .12;
+	pointer-events: none;
+}
+
+.auth-page > * {
+	position: relative;
+	z-index: 1;
+}
+
+.auth-page h1,
+.auth-page h2 {
+	color: var(--ge-text);
+}
+
+.auth-page h1 {
+	margin-bottom: 1.5rem !important;
+	font-size: clamp(1.7rem, 4vw, 2.25rem);
+}
+
+.auth-page h2 {
+	font-size: 1.25rem;
+}
+
+.auth-page p {
+	color: var(--ge-muted);
+	line-height: 1.6;
+}
+
+.auth-page a {
+	color: var(--ge-blue-soft);
+	font-weight: 500;
+}
+
+.auth-page a:hover,
+.auth-page a:focus-visible {
+	color: var(--ge-blue-soft-hover);
+}
+
+.auth-form {
+	position: relative;
+	z-index: 1;
+}
+
+.auth-form .form-label {
+	color: #dbe7f2;
+	font-size: .78rem;
+	font-weight: 700;
+	letter-spacing: .04em;
+}
+
+.auth-form .form-control {
+	min-height: 2.7rem;
+	padding: .65rem .75rem;
+	background: var(--ge-bg);
+	border: 1px solid var(--ge-border);
+	border-radius: 10px;
+	color: var(--ge-text);
+}
+
+.auth-form .form-control::placeholder {
+	color: var(--ge-muted);
+}
+
+.auth-form .form-control:focus {
+	background: var(--ge-bg);
+	border-color: var(--ge-blue-soft);
+	box-shadow: 0 0 0 .2rem rgba(159, 179, 200, .15);
+	color: var(--ge-text);
+}
+
+.auth-form .form-text.text-danger,
+.auth-page .alert-danger {
+	color: #fca5a5 !important;
+}
+
+.auth-page .alert-danger {
+	background: rgba(239, 68, 68, .1);
+	border: 1px solid rgba(239, 68, 68, .35);
+	border-radius: 10px;
+}
+
+.auth-page .btn-ge {
+	position: relative;
+	z-index: 1;
+}
+
+.auth-page .btn-ge--danger {
+	background: #ef4444;
 	color: #fff;
 }
-.btn-ge--disabled { cursor: default; opacity: .7; }
-.btn-ge--disabled:hover { background: var(--ge-accent); color: #fff; }
+
+.auth-page .btn-ge--danger:hover,
+.auth-page .btn-ge--danger:focus-visible {
+	background: #dc2626;
+	color: #fff;
+}
+
+.recovery-code-panel {
+	margin-block: 1.5rem;
+	padding: 1rem;
+	background: rgba(159, 179, 200, .08);
+	border: 1px solid rgba(159, 179, 200, .35);
+	border-radius: 12px;
+}
+
+.recovery-code-panel .recovery-code-value {
+	display: block;
+	margin-block: .75rem;
+	padding: .75rem;
+	background: var(--ge-bg);
+	border-radius: 8px;
+	color: var(--ge-blue-soft-hover);
+	font-size: clamp(1.1rem, 4vw, 1.5rem);
+	letter-spacing: .08em;
+}
+
+.account-details {
+	display: grid;
+	grid-template-columns: minmax(7rem, .5fr) 1fr;
+	gap: .75rem 1rem;
+	margin: 0 0 1.5rem;
+	padding: 1rem;
+	background: rgba(159, 179, 200, .06);
+	border: 1px solid var(--ge-border);
+	border-radius: 12px;
+}
+
+.account-details dt {
+	color: var(--ge-muted);
+	font-size: .75rem;
+	font-weight: 700;
+	text-transform: uppercase;
+}
+
+.account-details dd {
+	margin: 0;
+	overflow-wrap: anywhere;
+	color: var(--ge-text);
+}
+
+.account-danger {
+	margin-top: 2rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid rgba(239, 68, 68, .3);
+}
 
 .eyebrow {
 	color: var(--ge-accent);
@@ -128,7 +298,7 @@ h1, h2, h3, h4, h5 {
 	position: relative;
 	display: block;
 	aspect-ratio: 2/3;
-	border-radius: 3px;
+	border-radius: 12px;
 	overflow: hidden;
 	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(255, 255, 255, 0.14);
 }
@@ -150,6 +320,15 @@ h1, h2, h3, h4, h5 {
 	border: 1px solid rgba(255, 255, 255, 0.35);
 	border-radius: 50%;
 }
+
+/* Auth pages: titles sized like the favorites page title (favorites-list.css) */
+.auth-page h1 { font-size: 1.8rem; font-weight: 700; }
+.auth-page h2 { font-size: 1.4rem; font-weight: 700; }
+/* Login, registration and recovery forms: fields styled like the header search bar (app.css) */
+.auth-form { max-width: 24rem; }
+.auth-form .form-control { background: var(--ge-surface); border-color: var(--ge-border); color: var(--ge-text); }
+.auth-form .form-control:focus { background: var(--ge-surface); border-color: var(--ge-accent); box-shadow: none; color: var(--ge-text); }
+.auth-form .alert-danger { background: color-mix(in srgb, var(--ge-danger) 12%, transparent); border-color: var(--ge-danger); color: var(--ge-text); }
 
 a:focus-visible, button:focus-visible, input:focus-visible {
 	outline: 2px solid var(--ge-accent);

@@ -7,8 +7,12 @@
 		Tieni traccia delle tue avventure, crea liste e scopri nuovi titoli insieme a una community di appassionati.
 	</p>
 	<div class="d-flex flex-wrap align-items-center gap-3">
-		<span class="btn btn-ge btn-ge--disabled">Crea il tuo account</span>
+		@if (currentUser()) {
+		<a class="btn btn-ge" routerLink="/games">Esplora i giochi</a>
+		} @else {
+		<a class="btn btn-ge" routerLink="/register">Crea il tuo account</a>
 		<small class="hero__note">È gratuito. Nessuna pubblicità invadente.</small>
+		}
 	</div>
 	</div>
 </section>
@@ -48,7 +52,7 @@
 		}
 	}
 
-	<h2 class="about__title">Gaming Explorer ti aiuta a ricordare, scoprire e condividere i videogiochi.</h2>
+	<h2 class="about__title">Novaquest ti aiuta a ricordare, scoprire e condividere i videogiochi.</h2>
 	<div class="features">
 		<div class="row row-cols-1 row-cols-md-3 gy-4">
 		@for (f of features; track f.n) {
@@ -114,13 +118,15 @@
 	</div>
 </section>
 
-<!-- CTA -->
+<!-- CTA: only for guests, it invites them to sign up -->
+@if (!currentUser()) {
 <section class="cta">
 	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between gap-4">
 	<div>
 		<p class="eyebrow mb-2">Inizia il tuo diario</p>
 		<h2 class="cta__title">Ogni gioco racconta anche qualcosa di te.</h2>
 	</div>
-	<span class="btn btn-ge btn-ge--disabled">Unisciti alla community</span>
+	<a class="btn btn-ge" routerLink="/register">Unisciti alla community</a>
 	</div>
 </section>
+}

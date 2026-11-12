@@ -1,5 +1,6 @@
 import { Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
+import { AuthService } from './auth/auth.service';
 
 @Component({
 	imports: [RouterOutlet, RouterLink],
@@ -10,6 +11,8 @@ import { Router, RouterLink, RouterOutlet } from '@angular/router';
 export class App {
 	private readonly router = inject(Router);
 	private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
+
+	protected readonly currentUser = inject(AuthService).currentUser;
 
 	protected readonly menuOpen = signal(false);
 	protected readonly searchOpen = signal(false);

@@ -44,28 +44,55 @@ describe('Login', () => {
     return { fixture, page };
   }
 
+  it('links to the registration page', async () => {
+    const { page } = await render();
+
+    expect(page.querySelector('a[href="/register"]')?.textContent).toContain('Crea il tuo account');
+  });
+
+  it('links to the password recovery page', async () => {
+    const { page } = await render();
+
+    expect(page.querySelector('a[href="/recover"]')?.textContent).toContain(
+      'Password dimenticata?',
+    );
+  });
+
   it('shows no error before the user touches a field', async () => {
     const { page } = await render();
 
     expect(page.querySelectorAll('.text-danger').length).toBe(0);
   });
 
-  it('asks for an email after the field is left empty', async () => {
-    const { fixture, page } = await render();
-
-    type(page.querySelector('#login-email')!, '');
-    await fixture.whenStable();
-
-    expect(page.textContent).toContain("Inserisci l'email.");
-  });
-
-  it('rejects an email without @', async () => {
+  it('shows no error when a field is left before the first submit', async () => {
     const { fixture, page } = await render();
 
     type(page.querySelector('#login-email')!, 'mario');
     await fixture.whenStable();
 
+    expect(page.querySelectorAll('.text-danger').length).toBe(0);
+  });
+
+  it('rejects an email without @ on submit', async () => {
+    const { fixture, page } = await render();
+
+    type(page.querySelector('#login-email')!, 'mario');
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await fixture.whenStable();
+
+    http.expectNone('/api/auth/login');
     expect(page.textContent).toContain("L'email non è valida.");
+  });
+
+  it('updates the errors while typing after the first submit', async () => {
+    const { fixture, page } = await render();
+
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    type(page.querySelector('#login-email')!, 'mario@example.com');
+    await fixture.whenStable();
+
+    expect(page.textContent).not.toContain("Inserisci l'email.");
+    expect(page.textContent).toContain('Inserisci la password.');
   });
 
   it('sends nothing and shows every error when submitted empty', async () => {
@@ -114,6 +141,22 @@ describe('Login', () => {
     expect(page.querySelector('.alert-danger')?.textContent).toContain(
       'Accesso non riuscito: riprova più tardi.',
     );
+  });
+
+  it('sends again with the same data after the server did not answer', async () => {
+    const { fixture, page } = await submitValidForm();
+    http.expectOne('/api/auth/login').error(new ProgressEvent('error'));
+    await settle(fixture);
+
+    page.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+    await fixture.whenStable();
+
+    http.expectOne('/api/auth/login').flush({
+      expiresAt: '2026-11-07T18:00:00Z',
+      user: { id: '1', email: 'mario@example.com', username: 'mario' },
+    });
+    await settle(fixture);
+    expect(TestBed.inject(AuthService).currentUser()?.username).toBe('mario');
   });
 
   it('goes to the home page after logging in', async () => {
