@@ -79,6 +79,7 @@
 }
 
 .btn-fav-detail,
+.btn-wishlist-detail,
 .btn-primary {
 	display: inline-flex;
 	align-items: center;
@@ -116,6 +117,37 @@
 
 .fav-icon {
 	font-size: 1.1rem;
+}
+
+.btn-wishlist-detail {
+	background: rgba(20, 28, 47, .82);
+	color: var(--ge-text);
+	border: 1px solid var(--ge-border);
+	backdrop-filter: blur(8px);
+}
+
+.btn-wishlist-detail:hover,
+.btn-wishlist-detail:focus-visible {
+	border-color: #79BBFF;
+	color: #79BBFF;
+}
+
+.btn-wishlist-detail--active {
+	background: #79BBFF;
+	border-color: #79BBFF;
+	color: #79BBFF;
+}
+
+.btn-wishlist-detail--active:hover,
+.btn-wishlist-detail--active:focus-visible {
+	background: #79BBFF;
+	color: #79BBFF;
+}
+
+.wishlist-icon {
+	width: 1.1rem;
+	height: 1.1rem;
+	fill: currentColor;
 }
 
 .meta-section {

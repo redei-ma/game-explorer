@@ -48,6 +48,19 @@
 						<span class="fav-icon">♥</span>
 						{{ isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti' }}
 					</button>
+					<button
+						type="button"
+						class="btn-wishlist-detail"
+						[class.btn-wishlist-detail--active]="isInWishlist()"
+						[attr.aria-pressed]="isInWishlist()"
+						[attr.aria-label]="isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist'"
+						(click)="toggleWishlist()"
+					>
+						<svg class="wishlist-icon" viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M6 3.75h12v16.5l-6-3.75-6 3.75z" />
+						</svg>
+						{{ isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist' }}
+					</button>
 				</div>
 				
 				<div class="game-subtext" *ngIf="g.developers && g.developers.length > 0">

@@ -1,0 +1,97 @@
+.wishlist-container {
+	position: relative;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: clamp(1.5rem, 4vw, 3rem) 1rem;
+}
+
+.wishlist-container::before {
+	content: "";
+	position: absolute;
+	top: -5rem;
+	right: 4%;
+	width: 18rem;
+	height: 18rem;
+	background: #00F5D4;
+	border-radius: 50%;
+	filter: blur(120px);
+	opacity: .1;
+	pointer-events: none;
+}
+
+.wishlist-header {
+	position: relative;
+	margin-bottom: 2rem;
+	padding: 1.5rem;
+	background: linear-gradient(135deg, var(--ge-surface), var(--ge-blue-panel));
+	border: 1px solid var(--ge-border);
+	border-radius: 16px;
+}
+
+.wishlist-header h1 {
+	margin: 0 0 .4rem;
+	font-size: clamp(1.8rem, 4vw, 2.5rem);
+	font-weight: 700;
+}
+
+.wishlist-count {
+	margin: 0;
+	color: var(--ge-blue-soft);
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: .75rem;
+}
+
+.games-grid {
+	position: relative;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+	gap: 1.25rem;
+}
+
+.empty-state {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: clamp(3rem, 8vw, 5rem) 1rem;
+	text-align: center;
+	background: linear-gradient(135deg, rgba(20, 28, 47, .96), rgba(23, 37, 84, .82));
+	border: 1px solid var(--ge-border);
+	border-radius: 16px;
+}
+
+.empty-icon {
+	margin-bottom: 1rem;
+	color: var(--ge-accent);
+	font-size: 3rem;
+	line-height: 1;
+}
+
+.empty-state h2 {
+	margin-bottom: .5rem;
+	font-size: 1.4rem;
+}
+
+.empty-state p {
+	max-width: 450px;
+	margin: 0 auto 1.5rem;
+	color: var(--ge-muted);
+	line-height: 1.6;
+}
+
+.btn-primary {
+	display: inline-block;
+	padding: .65rem 1.4rem;
+	background: var(--ge-blue-soft);
+	border: 0;
+	border-radius: 999px;
+	color: #0A0F1D;
+	font-weight: 700;
+	text-decoration: none;
+}
+
+.btn-primary:hover,
+.btn-primary:focus-visible {
+	background: var(--ge-blue-soft-hover);
+	color: #0A0F1D;
+}
