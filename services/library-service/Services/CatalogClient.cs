@@ -1,10 +1,12 @@
 using System.Net;
+using LibraryService.Dtos;
 
 namespace LibraryService.Services;
 
 /// <summary>The part of catalog-service's game-detail response that library-service needs.</summary>
-public record CatalogGame(int Id, string Name, DateOnly? Released, double? Rating, string? CoverImage);
-
+public record CatalogGame(int Id, string Name, DateOnly? Released, double? Rating, string? CoverImage,
+    List<PlatformEntryDto>? ParentPlatforms);
+    
 /// <summary>Contract for asking catalog-service about games. An interface lets tests replace it with a fake.</summary>
 public interface ICatalogClient
 {

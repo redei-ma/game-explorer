@@ -45,6 +45,10 @@ namespace LibraryService.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
+                    b.Property<string>("ParentPlatformsJson")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
                     b.Property<double?>("Rating")
                         .HasColumnType("float");
 

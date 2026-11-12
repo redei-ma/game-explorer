@@ -93,8 +93,8 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
             CoverUrl = game.CoverImage,
             Rating = game.Rating,
             ReleaseDate = game.Released,
-            AddedAt = DateTimeOffset.UtcNow,
             ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
+            AddedAt = DateTimeOffset.UtcNow
         });
 
         try

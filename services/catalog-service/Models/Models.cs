@@ -48,6 +48,7 @@ public record GameDetail(
     List<NamedItem>     Developers,
     List<NamedItem>     Publishers,
     List<PlatformEntry> Platforms,
+    List<PlatformEntry> ParentPlatforms,
     string?             CoverImage);
 
 /// <summary>
