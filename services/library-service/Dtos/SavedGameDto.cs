@@ -2,9 +2,9 @@
 namespace LibraryService.Dtos;
 
 /// <summary>
-/// What the API returns for a favorite.
+/// What the API returns for a game saved in a list (favorites or wishlist).
 /// </summary>
-public record FavoriteDto(
+public record SavedGameDto(
     int GameId,
     string Name,
     string? CoverUrl,

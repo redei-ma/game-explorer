@@ -3,7 +3,7 @@ namespace LibraryService.Models;
 
 /// <summary>
 /// One row of the WishlistItems table: a game a user wants to buy or try,
-/// plus a snapshot of the game's data taken from catalog-service when it was added.
+/// plus a snapshot of the game card the browser sent when it was added.
 /// </summary>
 public class WishlistItem
 {

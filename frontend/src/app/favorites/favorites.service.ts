@@ -3,17 +3,7 @@
 
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, effect, inject, signal, untracked } from '@angular/core';
-import {
-	Observable,
-	Subscription,
-	catchError,
-	concatMap,
-	from,
-	of,
-	tap,
-	throwError,
-	toArray,
-} from 'rxjs';
+import { Observable, Subscription, catchError, of, tap, throwError } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { Game, GamePlatform } from '../games/games.api';
 
@@ -87,7 +77,7 @@ export class FavoritesService {
 		// The X-CSRF-Token header is added by csrfInterceptor (app.config.ts)
 		const request = wasFavorite
 			? this.http.delete<void>(`/api/library/favorites/${game.id}`)
-			: this.http.put<void>(`/api/library/favorites/${game.id}`, null);
+			: this.http.put<void>(`/api/library/favorites/${game.id}`, game);
 
 		request.subscribe({
 			error: (error: HttpErrorResponse) => {
@@ -123,31 +113,23 @@ export class FavoritesService {
 	}
 
 	/**
-	 * Moves the guest's favorites into the account, at login and at registration. One PUT at a
-	 * time, since each one makes library ask catalog (and so IGDB) for the game. Local Storage is
-	 * emptied only when every game got there: a failed copy is tried again at the next login.
-	 * A game the catalog no longer has (404) counts as done, or the copy would never finish.
+	 * Moves the guest's favorites into the account, at login and at registration, in one request
+	 * with the cards saved in Local Storage: the server saves all of them or none. Local Storage is
+	 * emptied only when they got there: a failed copy is tried again at the next login. A list the
+	 * server rejects (400) counts as done, or the copy would never finish.
 	 */
 	private moveGuestFavorites(): Observable<unknown> {
-		return from(this.loadFavorites()).pipe(
-			concatMap(game => this.http.put<void>(`/api/library/favorites/${game.id}`, null).pipe(
-				catchError((error: HttpErrorResponse) => error.status === 404 ? of(null) : throwError(() => error))
-			)),
-			toArray(),
+		const guestFavorites = this.loadFavorites();
+		if (guestFavorites.length === 0) {
+			return of(null);
+		}
+
+		return this.http.post<FavoriteDto[]>('/api/library/favorites/import', guestFavorites).pipe(
+			catchError((error: HttpErrorResponse) => error.status === 400 ? of(null) : throwError(() => error)),
 			tap(() => this.saveFavorites([])),
 			catchError(error => {
 				console.error('Could not move the guest favorites to the account', error);
 				return of(null);
-			})
-		);
-	}
-
-	// Used when the account is deleted: removes every favorite on the server, then the local copy
-	deleteAll(): Observable<void> {
-		return this.http.delete<void>('/api/library/favorites').pipe(
-			tap(() => {
-				this.favorites.set([]);
-				this.saveFavorites([]);
 			})
 		);
 	}

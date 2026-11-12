@@ -19,7 +19,7 @@ namespace LibraryService.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/library/favorites")]
-public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, ILogger<FavoritesController> logger) : ControllerBase
+public class FavoritesController(LibraryDbContext db) : ControllerBase
 {
     /// <summary>
     /// The caller's user ID, read from the verified token. It never comes from the URL
@@ -28,13 +28,13 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
     private string UserId => User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
 
     /// <summary>Converts a database row into what the API returns; the platforms are read back from their JSON text.</summary>
-    private static FavoriteDto ToDto(Favorite f) => new(
+    private static SavedGameDto ToDto(Favorite f) => new(
         f.GameId, f.Name, f.CoverUrl, f.Rating, f.ReleaseDate,
         PlatformJson.FromJson(f.ParentPlatformsJson), f.AddedAt);
 
     /// <summary>GET /api/library/favorites: the whole list, newest first.</summary>
     [HttpGet]
-    public async Task<ActionResult<List<FavoriteDto>>> List(CancellationToken ct)
+    public async Task<ActionResult<List<SavedGameDto>>> List(CancellationToken ct)
     {
         var userId = UserId;
         var rows = await db.Favorites
@@ -57,45 +57,20 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
 
     /// <summary>
     /// PUT /api/library/favorites/{gameId}: adds the game. If it is already a favorite nothing happens (204).
-    /// Otherwise it asks catalog-service for the game data and saves a snapshot.
+    /// Otherwise it saves the card sent in the body as the snapshot.
     /// </summary>
     [HttpPut("{gameId:int}")]
-    public async Task<IActionResult> Add(int gameId, CancellationToken ct)
+    public async Task<IActionResult> Add(int gameId, GameSnapshotDto game, CancellationToken ct)
     {
-        if (gameId <= 0)
-            return Problem("gameId must be positive.", statusCode: StatusCodes.Status400BadRequest);
+        if (gameId != game.Id)
+            return Problem("The game ID in the URL and in the body must match.", statusCode: StatusCodes.Status400BadRequest);
 
         var userId = UserId;
 
-        // Already saved: answer without calling catalog-service
         if (await db.Favorites.AnyAsync(f => f.UserId == userId && f.GameId == gameId, ct))
             return NoContent();
 
-        CatalogGame? game;
-        try
-        {
-            game = await catalog.GetGameAsync(gameId, ct);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
-        {
-            logger.LogWarning(ex, "catalog-service call failed for game {GameId}", gameId);
-            return Problem("Catalog service is unavailable.", statusCode: StatusCodes.Status502BadGateway);
-        }
-
-        if (game is null)
-            return Problem("Game not found in the catalog.", statusCode: StatusCodes.Status404NotFound);
-
-        db.Favorites.Add(new Favorite
-        {
-            UserId = userId,
-            GameId = game.Id,
-            Name = game.Name,
-            CoverUrl = game.CoverImage,
-            Rating = game.Rating,
-            ReleaseDate = game.Released,
-            ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
-            AddedAt = DateTimeOffset.UtcNow
-        });
+        db.Favorites.Add(ToFavorite(userId, game));
 
         try
         {
@@ -106,7 +81,7 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
             // The unique index rejected the insert. Either a concurrent request already
             // saved this game (goal met: no-op) or something else failed (real error).
             var alreadySaved = await db.Favorites.AsNoTracking()
-                .AnyAsync(f => f.UserId == userId && f.GameId == game.Id, CancellationToken.None);
+                .AnyAsync(f => f.UserId == userId && f.GameId == gameId, CancellationToken.None);
 
             if (!alreadySaved)
                 throw;
@@ -130,21 +105,38 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
     }
 
     /// <summary>
-    /// DELETE /api/library/favorites: removes ALL of the caller's favorites.
-    /// The frontend calls it right after the account is deleted in auth-service,
-    /// so no data of a deleted user is left behind.
+    /// POST /api/library/favorites/import, body: a JSON array of game cards, each one like the PUT body.
+    /// Called right after login with the games added as a guest. Skips games already saved.
+    /// Returns the merged list.
     /// </summary>
-    [HttpDelete]
-    public async Task<IActionResult> RemoveAll(CancellationToken ct)
+    [HttpPost("import")]
+    public async Task<ActionResult<List<SavedGameDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
     {
         var userId = UserId;
+        var existingIds = await db.Favorites.Where(f => f.UserId == userId).Select(f => f.GameId).ToListAsync(ct);
 
-        // One DELETE statement for every row of this user; returns how many rows it removed
-        var removed = await db.Favorites
-            .Where(f => f.UserId == userId)
-            .ExecuteDeleteAsync(ct);
+        db.Favorites.AddRange(games
+            .DistinctBy(g => g.Id)
+            .Where(g => !existingIds.Contains(g.Id))
+            .Select(g => ToFavorite(userId, g)));
 
-        logger.LogInformation("Removed {Count} favorites of user {UserId}", removed, userId);
-        return NoContent();
+        await db.SaveChangesAsync(ct);
+        return await List(ct);
     }
+
+    /// <summary>
+    /// Builds the row to save from the card the browser sent. The card is trusted as it is:
+    /// only its owner ever sees this list, and opening the card loads the game from catalog-service again.
+    /// </summary>
+    private static Favorite ToFavorite(string userId, GameSnapshotDto game) => new()
+    {
+        UserId = userId,
+        GameId = game.Id,
+        Name = game.Name,
+        CoverUrl = game.BackgroundImage,
+        Rating = game.Rating,
+        ReleaseDate = game.Released,
+        ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
+        AddedAt = DateTimeOffset.UtcNow
+    };
 }
