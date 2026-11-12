@@ -112,6 +112,19 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
         Assert.Contains("Username", problem!.Errors.Keys);
     }
 
+    [Theory]
+    [InlineData(" spaces@test.com")]
+    [InlineData("spaces@test.com ")]
+    public async Task Register_Returns400_WhenTheEmailHasSpaces(string email)
+    {
+        var response = await CreateClient().PostAsJsonAsync(
+            "/api/auth/register", NewUser() with { Email = email });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        Assert.Contains("Email", problem!.Errors.Keys);
+    }
+
     [Fact]
     public async Task Login_ReturnsTheUser_WhenThePasswordIsRight()
     {

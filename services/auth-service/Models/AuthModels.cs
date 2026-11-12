@@ -10,8 +10,10 @@ namespace AuthService.Models;
 /// <param name="Username">Name shown in the app, 3 to 30 characters, unique among users.</param>
 /// <param name="Password">Plain-text password, hashed by Identity before saving.</param>
 public record RegisterRequest(
-    // 256 is the size of the Email column in AspNetUsers.
-    [Required, EmailAddress, MaxLength(256)] string Email,
+    // 256 is the size of the Email column in AspNetUsers. ^\S+$ means "no spaces anywhere":
+    // [EmailAddress] accepts " mario@test.com ", which would become a second account that
+    // logs in only with those spaces.
+    [Required, EmailAddress, MaxLength(256), RegularExpression(@"^\S+$")] string Email,
     [Required, Length(3, 30)] string Username,
     [Required] string Password);
 
