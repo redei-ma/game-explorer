@@ -7,7 +7,7 @@ import { NotFound } from './not-found/not-found';
 import { guestGuard, loggedInGuard } from './auth/auth.guards';
 
 export const routes: Routes = [
-	{ path: '', component: Home, title: 'Gaming Explorer' },
+	{ path: '', component: Home, title: 'Novaquest' },
 	// Route to the page with advanced search and grid
 	{ path: 'games', component: GamesList, title: 'Ricerca Giochi' },
 	// Route to the individual game detail sheet

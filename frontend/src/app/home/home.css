@@ -10,14 +10,31 @@
 	position: relative;
 	overflow: hidden;
 	padding: clamp(5rem, 14vw, 11rem) 0 4.5rem;
-	background: linear-gradient(180deg, #0e161d 0%, var(--ge-bg) 100%);
+	background: linear-gradient(180deg, #111a32 0%, var(--ge-bg) 100%);
 }
-.hero::before { /* stand-in for the hero image */
+.hero::before {
 	content: "";
 	position: absolute;
-	inset: 0 28%;
-	background: rgba(255, 255, 255, 0.025);
-	border-inline: 1px solid rgba(255, 255, 255, 0.06);
+	width: 22rem;
+	height: 22rem;
+	right: -6rem;
+	top: -7rem;
+	background: #9D4EDD;
+	border-radius: 50%;
+	filter: blur(120px);
+	opacity: .18;
+}
+.hero::after {
+	content: "";
+	position: absolute;
+	width: 18rem;
+	height: 18rem;
+	left: 42%;
+	bottom: -12rem;
+	background: #00F5D4;
+	border-radius: 50%;
+	filter: blur(120px);
+	opacity: .15;
 }
 .hero > .container-ge { position: relative; }
 .hero h1 { font-size: clamp(2rem, 6vw, 2.75rem); font-weight: 800; line-height: 1.2; margin: 0; }
@@ -29,11 +46,11 @@
 .skeleton { background: var(--ge-band); animation: pulse 1.2s ease-in-out infinite alternate; }
 .skeleton::after { display: none; }
 @keyframes pulse { to { opacity: .45; } }
-.state { padding: 2.5rem 1rem; text-align: center; color: var(--ge-muted); border: 1px solid var(--ge-border); border-radius: 3px; }
+.state { padding: 2.5rem 1rem; text-align: center; color: var(--ge-muted); border: 1px solid var(--ge-border); border-radius: 12px; }
 
 /* About + features */
 .about__title { max-width: 34rem; margin: 4rem 0 2rem; font-size: clamp(1.4rem, 3.4vw, 1.6rem); font-weight: 700; line-height: 1.3; }
-.features { padding: 1.5rem; background: var(--ge-surface); border: 1px solid var(--ge-border); border-radius: 3px; }
+.features { padding: 1.5rem; background: var(--ge-surface); border: 1px solid var(--ge-border); border-radius: 12px; }
 .features__n { color: var(--ge-accent); font-size: .72rem; font-weight: 700; }
 .features__title { margin: 1.4rem 0 .5rem; font-family: var(--bs-body-font-family); font-size: .9rem; font-weight: 700; letter-spacing: 0; }
 .features__text { margin: 0; color: var(--ge-muted); font-size: .72rem; line-height: 1.6; }
@@ -69,7 +86,7 @@
 .list__meta { margin: 0; color: var(--ge-muted); font-size: .64rem; }
 
 /* CTA */
-.cta { padding-block: 3.5rem; background: var(--ge-band); }
+.cta { padding-block: 3.5rem; background: var(--ge-band); border-top: 1px solid var(--ge-border); }
 .cta__title { max-width: 24rem; margin: 0; font-size: clamp(1.4rem, 3.4vw, 1.6rem); font-weight: 700; line-height: 1.25; }
 
 /* Placeholder colours (reviews and lists, static blocks) */
