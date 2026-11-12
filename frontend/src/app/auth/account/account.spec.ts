@@ -30,7 +30,8 @@ describe('Account', () => {
       .expectOne('/api/auth/me')
       .flush({ id: '1', email: 'mario@example.com', username: 'mario' });
     const fixture = TestBed.createComponent(Account);
-    // FavoritesService loads the account's favorites as soon as it is created.
+    // FavoritesService loads the account's favorites from an effect, which runs after creation.
+    await fixture.whenStable();
     http.expectOne({ method: 'GET', url: '/api/library/favorites' }).flush([]);
     await fixture.whenStable();
     const page = fixture.nativeElement as HTMLElement;
