@@ -158,6 +158,18 @@ describe('Account', () => {
     expect(navigate).toHaveBeenCalledWith('/', { replaceUrl: true });
   });
 
+  it('shows the message for too many attempts and deletes nothing', async () => {
+    const { fixture, page } = await submitDeletion();
+
+    expectAccountDeletion().flush(null, { status: 429, statusText: 'Too Many Requests' });
+    await settle(fixture);
+
+    expect(page.querySelector('form .alert-danger')?.textContent).toContain(
+      'Troppi tentativi sbagliati: riprova tra qualche minuto.',
+    );
+    http.expectNone({ method: 'DELETE', url: '/api/library/favorites' });
+  });
+
   it('shows a generic message when the account cannot be deleted', async () => {
     const { fixture, page } = await submitDeletion();
 

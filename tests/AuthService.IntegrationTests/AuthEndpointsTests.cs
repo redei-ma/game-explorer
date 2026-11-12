@@ -322,6 +322,24 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
     }
 
     [Fact]
+    public async Task DeleteAccount_Returns429AndKeepsTheAccount_WhenTheAccountIsLocked()
+    {
+        var client = CreateClient();
+        var (user, _) = await RegisterWithCode(client);
+        for (var i = 0; i < 5; i++)
+        {
+            await client.SendAsync(DeleteAccountRequestWith("Wrong123!"));
+        }
+
+        var response = await client.SendAsync(DeleteAccountRequestWith(user.Password));
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, response.StatusCode);
+        // Registering the same email again fails only if the account is still there.
+        var again = await client.PostAsJsonAsync("/api/auth/register", user);
+        Assert.Equal(HttpStatusCode.Conflict, again.StatusCode);
+    }
+
+    [Fact]
     public async Task DeleteAccount_Returns401_WithoutTheCookie()
     {
         var response = await CreateClient().SendAsync(DeleteAccountRequestWith(Password));
