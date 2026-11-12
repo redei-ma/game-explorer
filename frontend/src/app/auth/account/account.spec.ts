@@ -30,9 +30,6 @@ describe('Account', () => {
       .expectOne('/api/auth/me')
       .flush({ id: '1', email: 'mario@example.com', username: 'mario' });
     const fixture = TestBed.createComponent(Account);
-    // FavoritesService loads the account's favorites from an effect, which runs after creation.
-    await fixture.whenStable();
-    http.expectOne({ method: 'GET', url: '/api/library/favorites' }).flush([]);
     await fixture.whenStable();
     const page = fixture.nativeElement as HTMLElement;
     return { fixture, page, button: page.querySelector<HTMLButtonElement>('button')! };
@@ -113,14 +110,14 @@ describe('Account', () => {
     expect(page.textContent).toContain('Inserisci la password per confermare.');
   });
 
-  it('deletes the account, then the favorites, then logs out and goes home', async () => {
+  it('deletes the account, then the library data, then logs out and goes home', async () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
     const { fixture } = await submitDeletion();
 
     expectAccountDeletion().flush(null, { status: 204, statusText: 'No Content' });
     await settle(fixture);
     http
-      .expectOne({ method: 'DELETE', url: '/api/library/favorites' })
+      .expectOne({ method: 'DELETE', url: '/api/library' })
       .flush(null, { status: 204, statusText: 'No Content' });
     await settle(fixture);
     http.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
@@ -136,20 +133,18 @@ describe('Account', () => {
     expectAccountDeletion().flush(null, { status: 403, statusText: 'Forbidden' });
     await settle(fixture);
 
-    http.expectNone({ method: 'DELETE', url: '/api/library/favorites' });
+    http.expectNone({ method: 'DELETE', url: '/api/library' });
     const field = page.querySelector('#delete-password')!.closest('.mb-3')!;
     expect(field.textContent).toContain('Password errata.');
   });
 
-  it('logs out and goes home even when the favorites cannot be deleted', async () => {
+  it('logs out and goes home even when the library data cannot be deleted', async () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
     const { fixture, page } = await submitDeletion();
 
     expectAccountDeletion().flush(null, { status: 204, statusText: 'No Content' });
     await settle(fixture);
-    http
-      .expectOne({ method: 'DELETE', url: '/api/library/favorites' })
-      .error(new ProgressEvent('error'));
+    http.expectOne({ method: 'DELETE', url: '/api/library' }).error(new ProgressEvent('error'));
     await settle(fixture);
     http.expectOne('/api/auth/logout').flush(null, { status: 204, statusText: 'No Content' });
     await settle(fixture);

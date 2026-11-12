@@ -20,7 +20,7 @@ namespace LibraryService.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/library/wishlist")]
-public class WishlistController(LibraryDbContext db, ILogger<WishlistController> logger) : ControllerBase
+public class WishlistController(LibraryDbContext db) : ControllerBase
 {
     /// <summary>Max games per import, so one request can't insert an unbounded number of rows.</summary>
     private const int MaxImport = 50;
@@ -90,16 +90,6 @@ public class WishlistController(LibraryDbContext db, ILogger<WishlistController>
     {
         var userId = UserId;
         await db.WishlistItems.Where(w => w.UserId == userId && w.GameId == gameId).ExecuteDeleteAsync(ct);
-        return NoContent();
-    }
-
-    /// <summary>DELETE /api/library/wishlist: removes the whole list. Called on account deletion.</summary>
-    [HttpDelete]
-    public async Task<IActionResult> RemoveAll(CancellationToken ct)
-    {
-        var userId = UserId;
-        var removed = await db.WishlistItems.Where(w => w.UserId == userId).ExecuteDeleteAsync(ct);
-        logger.LogInformation("Removed {Count} wishlist items of user {UserId}", removed, userId);
         return NoContent();
     }
 

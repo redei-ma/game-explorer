@@ -3,7 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FieldTree, FormField, TreeValidationResult, form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { FavoritesService } from '../../favorites/favorites.service';
+import { LibraryService } from '../../library/library.service';
 import { AuthService } from '../auth.service';
 import { submitAgain } from '../submit-again';
 
@@ -14,7 +14,7 @@ import { submitAgain } from '../submit-again';
 })
 export class Account {
   private readonly auth = inject(AuthService);
-  private readonly favorites = inject(FavoritesService);
+  private readonly library = inject(LibraryService);
   private readonly router = inject(Router);
 
   protected readonly user = this.auth.currentUser;
@@ -39,9 +39,9 @@ export class Account {
           } catch (error) {
             return deleteAccountError(error, field);
           }
-          // The account is gone either way: if library fails, its favorites stay orphaned (a known
+          // The account is gone either way: if library fails, its data stays orphaned (a known
           // limit in decisions.md) instead of asking the user to retry.
-          await firstValueFrom(this.favorites.deleteAll()).catch(() => undefined);
+          await firstValueFrom(this.library.deleteAll()).catch(() => undefined);
           await this.logout();
           return undefined;
         },
