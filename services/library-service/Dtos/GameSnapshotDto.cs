@@ -4,14 +4,15 @@ using System.ComponentModel.DataAnnotations;
 namespace LibraryService.Dtos;
 
 /// <summary>
-/// Body of PUT /api/library/favorites/{gameId}: the game card the browser already shows.
-/// The names match the frontend's Game object, so the frontend sends it unchanged and
-/// library-service doesn't have to ask catalog-service (and so IGDB) for the same data.
-/// Extra fields of the card (id, metacritic) are ignored when the body is read.
+/// The game card the browser already shows: body of the favorites and wishlist PUT, and one
+/// item of the wishlist import. The names match the frontend's Game object, so the frontend
+/// sends it unchanged and library-service doesn't have to ask catalog-service (and so IGDB)
+/// for the same data. Extra fields of the card (e.g. metacritic) are ignored when the body is read.
 /// The text limits match the database columns (LibraryDbContext); ParentPlatforms is capped
 /// because it is saved as JSON text in a 2000-character column.
 /// </summary>
-public record FavoriteSnapshotDto(
+public record GameSnapshotDto(
+    [Range(1, int.MaxValue)] int Id,
     [Required, MaxLength(300)] string Name,
     [MaxLength(500)] string? BackgroundImage,
     DateOnly? Released,

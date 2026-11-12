@@ -60,10 +60,10 @@ public class FavoritesController(LibraryDbContext db, ILogger<FavoritesControlle
     /// Otherwise it saves the card sent in the body as the snapshot.
     /// </summary>
     [HttpPut("{gameId:int}")]
-    public async Task<IActionResult> Add(int gameId, FavoriteSnapshotDto game, CancellationToken ct)
+    public async Task<IActionResult> Add(int gameId, GameSnapshotDto game, CancellationToken ct)
     {
-        if (gameId <= 0)
-            return Problem("gameId must be positive.", statusCode: StatusCodes.Status400BadRequest);
+        if (gameId != game.Id)
+            return Problem("The game ID in the URL and in the body must match.", statusCode: StatusCodes.Status400BadRequest);
 
         var userId = UserId;
 

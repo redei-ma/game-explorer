@@ -20,9 +20,9 @@ namespace LibraryService.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/library/wishlist")]
-public class WishlistController(LibraryDbContext db, ICatalogClient catalog, ILogger<WishlistController> logger) : ControllerBase
+public class WishlistController(LibraryDbContext db, ILogger<WishlistController> logger) : ControllerBase
 {
-    /// <summary>Max games per import, so one request can't trigger hundreds of catalog calls.</summary>
+    /// <summary>Max games per import, so one request can't insert an unbounded number of rows.</summary>
     private const int MaxImport = 50;
 
     /// <summary>The caller's user ID, from the verified token (never from the URL or body).</summary>
@@ -56,32 +56,18 @@ public class WishlistController(LibraryDbContext db, ICatalogClient catalog, ILo
         return exists ? NoContent() : NotFound();
     }
 
-    /// <summary>PUT /api/library/wishlist/{gameId}: adds the game with a snapshot from catalog-service.</summary>
+    /// <summary>PUT /api/library/wishlist/{gameId}: adds the game, saving the card sent in the body as the snapshot.</summary>
     [HttpPut("{gameId:int}")]
-    public async Task<IActionResult> Add(int gameId, CancellationToken ct)
+    public async Task<IActionResult> Add(int gameId, GameSnapshotDto game, CancellationToken ct)
     {
-        if (gameId <= 0)
-            return Problem("gameId must be positive.", statusCode: StatusCodes.Status400BadRequest);
+        if (gameId != game.Id)
+            return Problem("The game ID in the URL and in the body must match.", statusCode: StatusCodes.Status400BadRequest);
 
         var userId = UserId;
         if (await db.WishlistItems.AnyAsync(w => w.UserId == userId && w.GameId == gameId, ct))
             return NoContent();
 
-        WishlistItem? item;
-        try
-        {
-            item = await BuildSnapshotAsync(userId, gameId, ct);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
-        {
-            logger.LogWarning(ex, "catalog-service call failed for game {GameId}", gameId);
-            return Problem("Catalog service is unavailable.", statusCode: StatusCodes.Status502BadGateway);
-        }
-
-        if (item is null)
-            return Problem("Game not found in the catalog.", statusCode: StatusCodes.Status404NotFound);
-
-        db.WishlistItems.Add(item);
+        db.WishlistItems.Add(ToItem(userId, game));
         try
         {
             await db.SaveChangesAsync(ct);
@@ -118,54 +104,41 @@ public class WishlistController(LibraryDbContext db, ICatalogClient catalog, ILo
     }
 
     /// <summary>
-    /// POST /api/library/wishlist/import, body: a JSON array of game IDs, e.g. [1942, 1020].
-    /// Called right after login with the games added as a guest. Skips games already saved
-    /// and games catalog-service can't provide. Returns the merged list.
+    /// POST /api/library/wishlist/import, body: a JSON array of game cards, each one like the PUT body.
+    /// Called right after login with the games added as a guest. Skips games already saved.
+    /// Returns the merged list.
     /// </summary>
     [HttpPost("import")]
-    public async Task<ActionResult<List<WishlistItemDto>>> Import(int[] gameIds, CancellationToken ct)
+    public async Task<ActionResult<List<WishlistItemDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
     {
-        if (gameIds.Length > MaxImport)
+        if (games.Count > MaxImport)
             return Problem($"At most {MaxImport} games per import.", statusCode: StatusCodes.Status400BadRequest);
 
         var userId = UserId;
         var existingIds = await db.WishlistItems.Where(w => w.UserId == userId).Select(w => w.GameId).ToListAsync(ct);
 
-        foreach (var gameId in gameIds.Where(id => id > 0).Distinct().Except(existingIds))
-        {
-            try
-            {
-                var item = await BuildSnapshotAsync(userId, gameId, ct);
-                if (item is not null)
-                    db.WishlistItems.Add(item);
-            }
-            catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
-            {
-                logger.LogWarning(ex, "Import: skipped game {GameId}, catalog-service failed", gameId);
-            }
-        }
+        db.WishlistItems.AddRange(games
+            .DistinctBy(g => g.Id)
+            .Where(g => !existingIds.Contains(g.Id))
+            .Select(g => ToItem(userId, g)));
 
         await db.SaveChangesAsync(ct);
         return await List(ct);
     }
 
-    /// <summary>Asks catalog-service for the game and builds the row to save; null if the game doesn't exist.</summary>
-    private async Task<WishlistItem?> BuildSnapshotAsync(string userId, int gameId, CancellationToken ct)
+    /// <summary>
+    /// Builds the row to save from the card the browser sent. The card is trusted as it is:
+    /// only its owner ever sees this list, and opening the card loads the game from catalog-service again.
+    /// </summary>
+    private static WishlistItem ToItem(string userId, GameSnapshotDto game) => new()
     {
-        var game = await catalog.GetGameAsync(gameId, ct);
-        if (game is null)
-            return null;
-
-        return new WishlistItem
-        {
-            UserId = userId,
-            GameId = game.Id,
-            Name = game.Name,
-            CoverUrl = game.CoverImage,
-            Rating = game.Rating,
-            ReleaseDate = game.Released,
-            ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
-            AddedAt = DateTimeOffset.UtcNow
-        };
-    }
+        UserId = userId,
+        GameId = game.Id,
+        Name = game.Name,
+        CoverUrl = game.BackgroundImage,
+        Rating = game.Rating,
+        ReleaseDate = game.Released,
+        ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
+        AddedAt = DateTimeOffset.UtcNow
+    };
 }
