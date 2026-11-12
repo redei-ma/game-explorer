@@ -22,9 +22,6 @@ namespace LibraryService.Controllers;
 [Route("api/library/wishlist")]
 public class WishlistController(LibraryDbContext db) : ControllerBase
 {
-    /// <summary>Max games per import, so one request can't insert an unbounded number of rows.</summary>
-    private const int MaxImport = 50;
-
     /// <summary>The caller's user ID, from the verified token (never from the URL or body).</summary>
     private string UserId => User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
 
@@ -101,9 +98,6 @@ public class WishlistController(LibraryDbContext db) : ControllerBase
     [HttpPost("import")]
     public async Task<ActionResult<List<WishlistItemDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
     {
-        if (games.Count > MaxImport)
-            return Problem($"At most {MaxImport} games per import.", statusCode: StatusCodes.Status400BadRequest);
-
         var userId = UserId;
         var existingIds = await db.WishlistItems.Where(w => w.UserId == userId).Select(w => w.GameId).ToListAsync(ct);
 

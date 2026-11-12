@@ -70,19 +70,7 @@ public class FavoritesController(LibraryDbContext db) : ControllerBase
         if (await db.Favorites.AnyAsync(f => f.UserId == userId && f.GameId == gameId, ct))
             return NoContent();
 
-        // The body is trusted as it is: only its owner ever sees this list, and opening
-        // the card loads the game from catalog-service again
-        db.Favorites.Add(new Favorite
-        {
-            UserId = userId,
-            GameId = gameId,
-            Name = game.Name,
-            CoverUrl = game.BackgroundImage,
-            Rating = game.Rating,
-            ReleaseDate = game.Released,
-            ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
-            AddedAt = DateTimeOffset.UtcNow
-        });
+        db.Favorites.Add(ToFavorite(userId, game));
 
         try
         {
@@ -115,4 +103,40 @@ public class FavoritesController(LibraryDbContext db) : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// POST /api/library/favorites/import, body: a JSON array of game cards, each one like the PUT body.
+    /// Called right after login with the games added as a guest. Skips games already saved.
+    /// Returns the merged list.
+    /// </summary>
+    [HttpPost("import")]
+    public async Task<ActionResult<List<FavoriteDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
+    {
+        var userId = UserId;
+        var existingIds = await db.Favorites.Where(f => f.UserId == userId).Select(f => f.GameId).ToListAsync(ct);
+
+        db.Favorites.AddRange(games
+            .DistinctBy(g => g.Id)
+            .Where(g => !existingIds.Contains(g.Id))
+            .Select(g => ToFavorite(userId, g)));
+
+        await db.SaveChangesAsync(ct);
+        return await List(ct);
+    }
+
+    /// <summary>
+    /// Builds the row to save from the card the browser sent. The card is trusted as it is:
+    /// only its owner ever sees this list, and opening the card loads the game from catalog-service again.
+    /// </summary>
+    private static Favorite ToFavorite(string userId, GameSnapshotDto game) => new()
+    {
+        UserId = userId,
+        GameId = game.Id,
+        Name = game.Name,
+        CoverUrl = game.BackgroundImage,
+        Rating = game.Rating,
+        ReleaseDate = game.Released,
+        ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
+        AddedAt = DateTimeOffset.UtcNow
+    };
 }
