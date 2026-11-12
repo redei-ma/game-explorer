@@ -19,7 +19,7 @@ namespace LibraryService.Controllers;
 [ApiController]
 [Authorize]
 [Route("api/library/favorites")]
-public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, ILogger<FavoritesController> logger) : ControllerBase
+public class FavoritesController(LibraryDbContext db, ILogger<FavoritesController> logger) : ControllerBase
 {
     /// <summary>
     /// The caller's user ID, read from the verified token. It never comes from the URL
@@ -57,40 +57,27 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
 
     /// <summary>
     /// PUT /api/library/favorites/{gameId}: adds the game. If it is already a favorite nothing happens (204).
-    /// Otherwise it asks catalog-service for the game data and saves a snapshot.
+    /// Otherwise it saves the card sent in the body as the snapshot.
     /// </summary>
     [HttpPut("{gameId:int}")]
-    public async Task<IActionResult> Add(int gameId, CancellationToken ct)
+    public async Task<IActionResult> Add(int gameId, FavoriteSnapshotDto game, CancellationToken ct)
     {
         if (gameId <= 0)
             return Problem("gameId must be positive.", statusCode: StatusCodes.Status400BadRequest);
 
         var userId = UserId;
 
-        // Already saved: answer without calling catalog-service
         if (await db.Favorites.AnyAsync(f => f.UserId == userId && f.GameId == gameId, ct))
             return NoContent();
 
-        CatalogGame? game;
-        try
-        {
-            game = await catalog.GetGameAsync(gameId, ct);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !ct.IsCancellationRequested)
-        {
-            logger.LogWarning(ex, "catalog-service call failed for game {GameId}", gameId);
-            return Problem("Catalog service is unavailable.", statusCode: StatusCodes.Status502BadGateway);
-        }
-
-        if (game is null)
-            return Problem("Game not found in the catalog.", statusCode: StatusCodes.Status404NotFound);
-
+        // The body is trusted as it is: only its owner ever sees this list, and opening
+        // the card loads the game from catalog-service again
         db.Favorites.Add(new Favorite
         {
             UserId = userId,
-            GameId = game.Id,
+            GameId = gameId,
             Name = game.Name,
-            CoverUrl = game.CoverImage,
+            CoverUrl = game.BackgroundImage,
             Rating = game.Rating,
             ReleaseDate = game.Released,
             ParentPlatformsJson = PlatformJson.ToJson(game.ParentPlatforms),
@@ -106,7 +93,7 @@ public class FavoritesController(LibraryDbContext db, ICatalogClient catalog, IL
             // The unique index rejected the insert. Either a concurrent request already
             // saved this game (goal met: no-op) or something else failed (real error).
             var alreadySaved = await db.Favorites.AsNoTracking()
-                .AnyAsync(f => f.UserId == userId && f.GameId == game.Id, CancellationToken.None);
+                .AnyAsync(f => f.UserId == userId && f.GameId == gameId, CancellationToken.None);
 
             if (!alreadySaved)
                 throw;

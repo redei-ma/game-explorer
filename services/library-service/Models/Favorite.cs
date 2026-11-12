@@ -3,7 +3,7 @@ namespace LibraryService.Models;
 
 /// <summary>
 /// One row of the Favorites table: a game saved by a browser, plus a snapshot
-/// of the game's data taken from catalog-service at the moment it was added.
+/// of the game card the browser sent when it was added.
 /// </summary>
 public class Favorite
 {

@@ -87,7 +87,7 @@ export class FavoritesService {
 		// The X-CSRF-Token header is added by csrfInterceptor (app.config.ts)
 		const request = wasFavorite
 			? this.http.delete<void>(`/api/library/favorites/${game.id}`)
-			: this.http.put<void>(`/api/library/favorites/${game.id}`, null);
+			: this.http.put<void>(`/api/library/favorites/${game.id}`, game);
 
 		request.subscribe({
 			error: (error: HttpErrorResponse) => {
@@ -124,14 +124,14 @@ export class FavoritesService {
 
 	/**
 	 * Moves the guest's favorites into the account, at login and at registration. One PUT at a
-	 * time, since each one makes library ask catalog (and so IGDB) for the game. Local Storage is
-	 * emptied only when every game got there: a failed copy is tried again at the next login.
-	 * A game the catalog no longer has (404) counts as done, or the copy would never finish.
+	 * time, each with the card saved in Local Storage, so the first failure stops the copy. Local
+	 * Storage is emptied only when every game got there: a failed copy is tried again at the next
+	 * login. A card the server rejects (400) counts as done, or the copy would never finish.
 	 */
 	private moveGuestFavorites(): Observable<unknown> {
 		return from(this.loadFavorites()).pipe(
-			concatMap(game => this.http.put<void>(`/api/library/favorites/${game.id}`, null).pipe(
-				catchError((error: HttpErrorResponse) => error.status === 404 ? of(null) : throwError(() => error))
+			concatMap(game => this.http.put<void>(`/api/library/favorites/${game.id}`, game).pipe(
+				catchError((error: HttpErrorResponse) => error.status === 400 ? of(null) : throwError(() => error))
 			)),
 			toArray(),
 			tap(() => this.saveFavorites([])),
