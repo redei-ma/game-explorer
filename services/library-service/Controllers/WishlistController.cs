@@ -8,10 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-// The HTTP controllers: classes that answer the requests forwarded by the gateway
 namespace LibraryService.Controllers;
-
-
 
 /// <summary>
 /// Manages the logged-in user's wishlist (games to buy or try), separate from favorites.
@@ -26,13 +23,13 @@ public class WishlistController(LibraryDbContext db) : ControllerBase
     private string UserId => User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
 
     /// <summary>Converts a database row into what the API returns; the platforms are read back from their JSON text.</summary>
-    private static WishlistItemDto ToDto(WishlistItem w) => new(
+    private static SavedGameDto ToDto(WishlistItem w) => new(
         w.GameId, w.Name, w.CoverUrl, w.Rating, w.ReleaseDate,
         PlatformJson.FromJson(w.ParentPlatformsJson), w.AddedAt);
 
     /// <summary>GET /api/library/wishlist: the whole list, newest first.</summary>
     [HttpGet]
-    public async Task<ActionResult<List<WishlistItemDto>>> List(CancellationToken ct)
+    public async Task<ActionResult<List<SavedGameDto>>> List(CancellationToken ct)
     {
         var userId = UserId;
         var rows = await db.WishlistItems
@@ -96,7 +93,7 @@ public class WishlistController(LibraryDbContext db) : ControllerBase
     /// Returns the merged list.
     /// </summary>
     [HttpPost("import")]
-    public async Task<ActionResult<List<WishlistItemDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
+    public async Task<ActionResult<List<SavedGameDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
     {
         var userId = UserId;
         var existingIds = await db.WishlistItems.Where(w => w.UserId == userId).Select(w => w.GameId).ToListAsync(ct);

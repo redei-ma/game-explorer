@@ -28,13 +28,13 @@ public class FavoritesController(LibraryDbContext db) : ControllerBase
     private string UserId => User.FindFirstValue(JwtRegisteredClaimNames.Sub)!;
 
     /// <summary>Converts a database row into what the API returns; the platforms are read back from their JSON text.</summary>
-    private static FavoriteDto ToDto(Favorite f) => new(
+    private static SavedGameDto ToDto(Favorite f) => new(
         f.GameId, f.Name, f.CoverUrl, f.Rating, f.ReleaseDate,
         PlatformJson.FromJson(f.ParentPlatformsJson), f.AddedAt);
 
     /// <summary>GET /api/library/favorites: the whole list, newest first.</summary>
     [HttpGet]
-    public async Task<ActionResult<List<FavoriteDto>>> List(CancellationToken ct)
+    public async Task<ActionResult<List<SavedGameDto>>> List(CancellationToken ct)
     {
         var userId = UserId;
         var rows = await db.Favorites
@@ -110,7 +110,7 @@ public class FavoritesController(LibraryDbContext db) : ControllerBase
     /// Returns the merged list.
     /// </summary>
     [HttpPost("import")]
-    public async Task<ActionResult<List<FavoriteDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
+    public async Task<ActionResult<List<SavedGameDto>>> Import(List<GameSnapshotDto> games, CancellationToken ct)
     {
         var userId = UserId;
         var existingIds = await db.Favorites.Where(f => f.UserId == userId).Select(f => f.GameId).ToListAsync(ct);
