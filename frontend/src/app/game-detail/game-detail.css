@@ -53,10 +53,26 @@
 
 .hero-header-top {
 	display: flex;
+	flex-direction: column;
+}
+
+.hero-actions {
+	display: flex;
 	justify-content: space-between;
-	align-items: flex-start;
-	gap: 1rem;
-	flex-wrap: wrap;
+	align-items: center;
+	gap: .75rem;
+	margin-bottom: 1.25rem;
+}
+
+@media (max-width: 639.98px) {
+	.hero-actions {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.hero-actions button {
+		justify-content: center;
+	}
 }
 
 .game-title {

@@ -34,33 +34,35 @@
 		<!-- HERO HEADER -->
 		<header class="hero-header" [style.background-image]="g.backgroundImage ? 'linear-gradient(to bottom, rgba(18,18,18,0.3), rgba(18,18,18,0.95)), url(' + g.backgroundImage + ')' : 'none'">
 			<div class="hero-body">
-				<!-- Added layout flex wrapper to align title and favorite button -->
+				<!-- Added layout flex wrapper to align title and favorite/wishlist button -->
 				<div class="hero-header-top">
 					<h1 class="game-title">{{ g.name }}</h1>
-					<button 
-						type="button" 
-						class="btn-fav-detail" 
-						[class.btn-fav-detail--active]="isFavorite()" 
-						[attr.aria-pressed]="isFavorite()"
-						[attr.aria-label]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
-						(click)="toggleFavorite()"
-					>
-						<span class="fav-icon">♥</span>
-						{{ isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti' }}
-					</button>
-					<button
-						type="button"
-						class="btn-wishlist-detail"
-						[class.btn-wishlist-detail--active]="isInWishlist()"
-						[attr.aria-pressed]="isInWishlist()"
-						[attr.aria-label]="isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist'"
-						(click)="toggleWishlist()"
-					>
-						<svg class="wishlist-icon" viewBox="0 0 24 24" aria-hidden="true">
-							<path d="M6 3.75h12v16.5l-6-3.75-6 3.75z" />
-						</svg>
-						{{ isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist' }}
-					</button>
+					<div class="hero-actions">
+						<button
+							type="button"
+							class="btn-fav-detail"
+							[class.btn-fav-detail--active]="isFavorite()"
+							[attr.aria-pressed]="isFavorite()"
+							[attr.aria-label]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+							(click)="toggleFavorite()"
+						>
+							<span class="fav-icon">♥</span>
+							{{ isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti' }}
+						</button>
+						<button
+							type="button"
+							class="btn-wishlist-detail"
+							[class.btn-wishlist-detail--active]="isInWishlist()"
+							[attr.aria-pressed]="isInWishlist()"
+							[attr.aria-label]="isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist'"
+							(click)="toggleWishlist()"
+						>
+							<svg class="wishlist-icon" viewBox="0 0 24 24" aria-hidden="true">
+								<path d="M6 3.75h12v16.5l-6-3.75-6 3.75z" />
+							</svg>
+							{{ isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist' }}
+						</button>
+					</div>
 				</div>
 				
 				<div class="game-subtext" *ngIf="g.developers && g.developers.length > 0">
