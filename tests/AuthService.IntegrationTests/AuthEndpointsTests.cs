@@ -383,6 +383,19 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
     }
 
     [Fact]
+    public async Task Me_Returns401_AfterTheAccountIsDeleted()
+    {
+        var client = CreateClient();
+        var user = NewUser();
+        await client.PostAsJsonAsync("/api/auth/register", user);
+        await client.SendAsync(DeleteAccountRequestWith(user.Password));
+
+        var response = await client.GetAsync("/api/auth/me");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
     public async Task Logout_DeletesTheCookie()
     {
         var client = CreateClient();
