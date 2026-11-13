@@ -55,8 +55,10 @@ export class Login {
 }
 
 function loginErrorMessage(error: unknown): string {
+  // auth-service answers a locked account like a wrong password, so the lock is mentioned to
+  // everyone: a user with the right password would not know why it fails.
   if (error instanceof HttpErrorResponse && error.status === 401) {
-    return 'Email o password errate.';
+    return "Email o password errate. Dopo troppi tentativi sbagliati l'accesso si blocca per qualche minuto.";
   }
   if (error instanceof HttpErrorResponse && error.status === 429) {
     return TOO_MANY_ATTEMPTS_MESSAGE;

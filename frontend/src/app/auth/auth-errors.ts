@@ -15,6 +15,9 @@ const passwordRules: Record<string, string> = {
 
 const italianList = new Intl.ListFormat('it');
 
+// Shown under the password field before any submit, so the rules are known up front.
+export const PASSWORD_RULES_HINT = `Deve avere ${italianList.format(Object.values(passwordRules))}.`;
+
 export function isPasswordRule(code: string): boolean {
   return code in passwordRules;
 }

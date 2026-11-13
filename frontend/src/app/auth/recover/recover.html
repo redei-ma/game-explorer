@@ -50,8 +50,10 @@
           type="password"
           class="form-control"
           autocomplete="new-password"
+          aria-describedby="recover-password-hint"
           [formField]="recoverForm.password"
         />
+        <div id="recover-password-hint" class="form-text">{{ passwordHint }}</div>
         @if (submitted()) {
           @for (error of recoverForm.password().errors(); track error.kind) {
             <div class="form-text text-danger">{{ error.message }}</div>

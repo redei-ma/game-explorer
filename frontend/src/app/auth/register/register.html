@@ -32,8 +32,13 @@
           type="text"
           class="form-control"
           autocomplete="username"
+          aria-describedby="register-username-hint"
           [formField]="registerForm.username"
         />
+        <div id="register-username-hint" class="form-text">
+          Da 3 a 30 caratteri: lettere senza accenti, numeri e i simboli
+          <span class="text-nowrap">- . _ &#64; +</span>
+        </div>
         @if (submitted()) {
           @for (error of registerForm.username().errors(); track error.kind) {
             <div class="form-text text-danger">{{ error.message }}</div>
@@ -48,8 +53,10 @@
           type="password"
           class="form-control"
           autocomplete="new-password"
+          aria-describedby="register-password-hint"
           [formField]="registerForm.password"
         />
+        <div id="register-password-hint" class="form-text">{{ passwordHint }}</div>
         @if (submitted()) {
           @for (error of registerForm.password().errors(); track error.kind) {
             <div class="form-text text-danger">{{ error.message }}</div>
