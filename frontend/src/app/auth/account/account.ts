@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FieldTree, FormField, TreeValidationResult, form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -50,6 +50,16 @@ export class Account {
     },
   );
 
+  constructor() {
+    // Also when the session ends from outside this page (another tab, expired cookie): a guest has
+    // nothing to do here. Replaces /account in the history, so Back does not return to it.
+    effect(() => {
+      if (this.user() === null) {
+        this.router.navigateByUrl('/', { replaceUrl: true });
+      }
+    });
+  }
+
   protected async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     this.submitted.set(true);
@@ -64,10 +74,7 @@ export class Account {
     } catch {
       this.logoutError.set('Uscita non riuscita: riprova.');
       this.loggingOut.set(false);
-      return;
     }
-    // Replaces /account in the history, so Back does not return to a page for logged-in users.
-    await this.router.navigateByUrl('/', { replaceUrl: true });
   }
 }
 
