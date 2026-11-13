@@ -11,7 +11,11 @@ import {
 } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { TOO_MANY_ATTEMPTS_MESSAGE, passwordRulesMessage } from '../auth-errors';
+import {
+  PASSWORD_RULES_HINT,
+  TOO_MANY_ATTEMPTS_MESSAGE,
+  passwordRulesMessage,
+} from '../auth-errors';
 import { AuthService } from '../auth.service';
 import { submitAgain } from '../submit-again';
 import { RecoveryCode } from '../recovery-code/recovery-code';
@@ -37,6 +41,8 @@ export class Recover {
     password: '',
     confirmPassword: '',
   });
+
+  protected readonly passwordHint = PASSWORD_RULES_HINT;
 
   // Field errors appear from the first submit, as in Login.
   protected readonly submitted = signal(false);

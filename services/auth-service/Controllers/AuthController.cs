@@ -167,6 +167,15 @@ public class AuthController(
         // 403 and not 401: the session is valid, only the confirmation failed.
         var check = await signInManager.CheckPasswordSignInAsync(
             user, request.Password, lockoutOnFailure: true);
+        // Unlike login, the user is already known here, so saying the account is locked reveals
+        // nothing; "Wrong password." would be false when the password is right.
+        if (check.IsLockedOut)
+        {
+            logger.LogWarning("Account deletion refused for locked user {UserId}", user.Id);
+            return Problem(
+                "Too many failed attempts. Try again later.",
+                statusCode: StatusCodes.Status429TooManyRequests);
+        }
         if (!check.Succeeded)
         {
             logger.LogWarning("Account deletion refused for user {UserId}", user.Id);

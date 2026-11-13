@@ -78,5 +78,9 @@ function deleteAccountError(
   if (error instanceof HttpErrorResponse && error.status === 403) {
     return { kind: 'server', message: 'Password errata.', fieldTree: form.password };
   }
+  // The account is locked after too many wrong passwords, even if this one is right.
+  if (error instanceof HttpErrorResponse && error.status === 429) {
+    return { kind: 'server', message: 'Troppi tentativi sbagliati: riprova tra qualche minuto.' };
+  }
   return { kind: 'server', message: 'Eliminazione non riuscita: riprova più tardi.' };
 }

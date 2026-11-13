@@ -112,6 +112,19 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
         Assert.Contains("Username", problem!.Errors.Keys);
     }
 
+    [Theory]
+    [InlineData(" spaces@test.com")]
+    [InlineData("spaces@test.com ")]
+    public async Task Register_Returns400_WhenTheEmailHasSpaces(string email)
+    {
+        var response = await CreateClient().PostAsJsonAsync(
+            "/api/auth/register", NewUser() with { Email = email });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var problem = await response.Content.ReadFromJsonAsync<ValidationProblemDetails>();
+        Assert.Contains("Email", problem!.Errors.Keys);
+    }
+
     [Fact]
     public async Task Login_ReturnsTheUser_WhenThePasswordIsRight()
     {
@@ -319,6 +332,24 @@ public class AuthEndpointsTests(AuthApiFactory factory) : IClassFixture<AuthApiF
         var login = await client.PostAsJsonAsync(
             "/api/auth/login", new LoginRequest(user.Email, user.Password));
         Assert.Equal(HttpStatusCode.OK, login.StatusCode);
+    }
+
+    [Fact]
+    public async Task DeleteAccount_Returns429AndKeepsTheAccount_WhenTheAccountIsLocked()
+    {
+        var client = CreateClient();
+        var (user, _) = await RegisterWithCode(client);
+        for (var i = 0; i < 5; i++)
+        {
+            await client.SendAsync(DeleteAccountRequestWith("Wrong123!"));
+        }
+
+        var response = await client.SendAsync(DeleteAccountRequestWith(user.Password));
+
+        Assert.Equal(HttpStatusCode.TooManyRequests, response.StatusCode);
+        // Registering the same email again fails only if the account is still there.
+        var again = await client.PostAsJsonAsync("/api/auth/register", user);
+        Assert.Equal(HttpStatusCode.Conflict, again.StatusCode);
     }
 
     [Fact]
