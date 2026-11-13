@@ -34,7 +34,7 @@
 		<!-- Reuse the shared game card for consistent wishlist and catalog rendering -->
 		<div class="games-grid">
 			@for (game of wishlist(); track game.id) {
-				<app-game-card [game]="game" />
+				<app-game-card [game]="game" mode="wishlist" />
 			}
 		</div>
 	}
