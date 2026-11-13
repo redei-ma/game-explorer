@@ -128,20 +128,21 @@
 
 .btn-wishlist-detail:hover,
 .btn-wishlist-detail:focus-visible {
-	border-color: #79BBFF;
-	color: #79BBFF;
+	border-color: var(--ge-wishlist);
+	color: var(--ge-wishlist);
 }
 
 .btn-wishlist-detail--active {
-	background: #79BBFF;
-	border-color: #79BBFF;
-	color: #79BBFF;
+	background: var(--ge-wishlist);
+	border-color: var(--ge-wishlist);
+	color: var(--ge-bg);
 }
 
 .btn-wishlist-detail--active:hover,
 .btn-wishlist-detail--active:focus-visible {
-	background: #79BBFF;
-	color: #79BBFF;
+	background: color-mix(in srgb, var(--ge-wishlist) 85%, #fff);
+	border-color: color-mix(in srgb, var(--ge-wishlist) 85%, #fff);
+	color: var(--ge-bg);
 }
 
 .wishlist-icon {
