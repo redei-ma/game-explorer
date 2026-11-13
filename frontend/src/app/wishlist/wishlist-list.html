@@ -21,7 +21,11 @@
 		</div>
 	} @else if (wishlist().length === 0) {
 		<div class="empty-state">
-			<div class="empty-icon" aria-hidden="true">♡</div>
+			<div class="empty-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24">
+					<path d="M6 3.75h12v16.5l-6-3.75-6 3.75z" />
+				</svg>
+			</div>
 			<h2>La tua wishlist è vuota</h2>
 			<p>Esplora il catalogo e salva i giochi che vuoi provare o acquistare.</p>
 			<a routerLink="/games" class="btn-primary">Esplora i giochi</a>
