@@ -34,11 +34,7 @@
         autocomplete="current-password"
         [formField]="deleteForm.password"
       />
-      @if (submitted()) {
-        @for (error of deleteForm.password().errors(); track error.kind) {
-          <div class="form-text text-danger">{{ error.message }}</div>
-        }
-      }
+      <app-field-errors [field]="deleteForm.password" [show]="submitted()" />
     </div>
 
     @for (error of deleteForm().errors(); track error.kind) {

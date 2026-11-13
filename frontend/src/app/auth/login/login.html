@@ -11,11 +11,7 @@
         autocomplete="email"
         [formField]="loginForm.email"
       />
-      @if (submitted()) {
-        @for (error of loginForm.email().errors(); track error.kind) {
-          <div class="form-text text-danger">{{ error.message }}</div>
-        }
-      }
+      <app-field-errors [field]="loginForm.email" [show]="submitted()" />
     </div>
 
     <div class="mb-3">
@@ -27,11 +23,7 @@
         autocomplete="current-password"
         [formField]="loginForm.password"
       />
-      @if (submitted()) {
-        @for (error of loginForm.password().errors(); track error.kind) {
-          <div class="form-text text-danger">{{ error.message }}</div>
-        }
-      }
+      <app-field-errors [field]="loginForm.password" [show]="submitted()" />
     </div>
 
     @for (error of loginForm().errors(); track error.kind) {

@@ -5,11 +5,12 @@ import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { LibraryService } from '../../library/library.service';
 import { AuthService } from '../auth.service';
+import { FieldErrors } from '../field-errors/field-errors';
 import { submitAgain } from '../submit-again';
 
 @Component({
   selector: 'app-account',
-  imports: [FormField, RouterLink],
+  imports: [FieldErrors, FormField, RouterLink],
   templateUrl: './account.html',
 })
 export class Account {
