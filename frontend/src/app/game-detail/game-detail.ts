@@ -7,6 +7,7 @@ import { forkJoin, of, combineLatest, Observable } from 'rxjs';
 import { catchError, map, startWith, switchMap } from 'rxjs/operators';
 import { GamesApi, GameDetailData, Screenshot, Game } from '../games/games.api';
 import { FavoritesService } from '../favorites/favorites.service';
+import { WishlistService } from '../wishlist/wishlist.service';
 
 // Internal state interface for reactive HTTP calls
 interface DetailState {
@@ -31,6 +32,7 @@ export class GameDetail implements OnDestroy {
 	private readonly router = inject(Router);
 	readonly location = inject(Location);
 	private readonly favoritesService = inject(FavoritesService);
+	private readonly wishlistService = inject(WishlistService);
 	private readonly document = inject(DOCUMENT);
 	private readonly closeLightboxButton = viewChild<ElementRef<HTMLButtonElement>>('closeLightboxButton');
 	private lightboxTrigger: HTMLElement | null = null;
@@ -96,6 +98,12 @@ export class GameDetail implements OnDestroy {
 	readonly isFavorite = computed(() => {
 		const g = this.game();
 		return g ? this.favoritesService.isFavorite(g.id) : false;
+	});
+
+	// Reactive signal to compute wishlist status independently from favorites.
+	readonly isInWishlist = computed(() => {
+		const g = this.game();
+		return g ? this.wishlistService.isInWishlist(g.id) : false;
 	});
 
 	// Triggered by the "Riprova" button in the template
@@ -171,6 +179,25 @@ export class GameDetail implements OnDestroy {
 		};
 
 		this.favoritesService.toggleFavorite(card);
+	}
+
+	// Uses the same lightweight card shape as favorites for the wishlist request.
+	toggleWishlist(): void {
+		const g = this.game();
+		if (!g) return;
+
+		const card: Game = {
+			id: g.id,
+			name: g.name,
+			slug: g.slug,
+			released: g.released,
+			backgroundImage: g.coverImage ?? null,
+			rating: g.rating,
+			metacritic: g.metacritic,
+			parentPlatforms: g.parentPlatforms,
+		};
+
+		this.wishlistService.toggleWishlist(card);
 	}
 
 /* 	MI SERVIVA PER TESTARE, DA TOGLIERE POI

@@ -32,15 +32,30 @@
 		</span>
 	</a>
 
-	<!-- Favorite Heart Button. Placed alongside the anchor tag for valid HTML -->
-	<button 
-		type="button" 
-		class="fav-btn" 
-		[class.fav-btn--active]="isFavorite()" 
-		(click)="toggleFavorite($event)"
-		[attr.aria-label]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
-		[title]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
-	>
-		♥
-	</button>
+	@if (mode() === 'wishlist') {
+		<!-- Quick removal: on the wishlist page every card is already in the wishlist -->
+		<button
+			type="button"
+			class="fav-btn fav-btn--wishlist"
+			(click)="removeFromWishlist($event)"
+			aria-label="Rimuovi dalla wishlist"
+			title="Rimuovi dalla wishlist"
+		>
+			<svg viewBox="0 0 24 24" aria-hidden="true">
+				<path d="M6 3.75h12v16.5l-6-3.75-6 3.75z" />
+			</svg>
+		</button>
+	} @else {
+		<!-- Favorite Heart Button. Placed alongside the anchor tag for valid HTML -->
+		<button
+			type="button"
+			class="fav-btn"
+			[class.fav-btn--active]="isFavorite()"
+			(click)="toggleFavorite($event)"
+			[attr.aria-label]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+			[title]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+		>
+			♥
+		</button>
+	}
 </div>

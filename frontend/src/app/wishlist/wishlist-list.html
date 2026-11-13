@@ -1,0 +1,41 @@
+<div class="wishlist-container">
+	<header class="wishlist-header">
+		<h1>Wishlist</h1>
+		@if (wishlistService.status() === 'ready') {
+			<p class="wishlist-count">
+				{{ wishlist().length }} {{ wishlist().length === 1 ? 'gioco salvato' : 'giochi salvati' }}
+			</p>
+		}
+	</header>
+
+	<!-- Keep loading and error states distinct from an empty wishlist -->
+	@if (wishlistService.status() === 'loading') {
+		<p class="d-flex align-items-center gap-2" role="status">
+			<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+			Caricamento della wishlist…
+		</p>
+	} @else if (wishlistService.status() === 'error') {
+		<div class="feedback-panel" role="alert">
+			<p>Impossibile caricare la wishlist. Controlla la connessione e riprova.</p>
+			<button type="button" class="btn-primary" (click)="wishlistService.refresh()">Riprova</button>
+		</div>
+	} @else if (wishlist().length === 0) {
+		<div class="empty-state">
+			<div class="empty-icon" aria-hidden="true">
+				<svg viewBox="0 0 24 24">
+					<path d="M6 3.75h12v16.5l-6-3.75-6 3.75z" />
+				</svg>
+			</div>
+			<h2>La tua wishlist è vuota</h2>
+			<p>Esplora il catalogo e salva i giochi che vuoi provare o acquistare.</p>
+			<a routerLink="/games" class="btn-primary">Esplora i giochi</a>
+		</div>
+	} @else {
+		<!-- Reuse the shared game card for consistent wishlist and catalog rendering -->
+		<div class="games-grid">
+			@for (game of wishlist(); track game.id) {
+				<app-game-card [game]="game" mode="wishlist" />
+			}
+		</div>
+	}
+</div>
