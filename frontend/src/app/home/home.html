@@ -77,33 +77,69 @@
 	</div>
 </section>
 
-<!-- REVIEWS + ACTIVITY -->
+<!-- UPCOMING + TOP OF THE YEAR (RAWG /games) -->
+<ng-template #gameRows let-res let-ranked="ranked">
+	@if (res.isLoading()) {
+		<ol class="rows" aria-busy="true" aria-label="Caricamento dei giochi">
+		@for (s of rowSkeletons; track s) {
+			<li><span class="row-item"><span class="row-item__cover skeleton"></span></span></li>
+		}
+		</ol>
+	}
+	@else if (res.error()) {
+		<div class="state" role="alert">
+		<p class="mb-3">Impossibile caricare i giochi. Controlla la connessione e riprova.</p>
+		<button type="button" class="btn btn-ge" (click)="res.reload()">Riprova</button>
+		</div>
+	}
+	@else {
+		@let games = res.value()?.results ?? [];
+		@if (games.length) {
+		<ol class="rows">
+			@for (game of games; track game.id; let i = $index) {
+			<li>
+				<a class="row-item" [routerLink]="['/games', game.id]">
+				@if (ranked) {
+					<span class="row-item__rank">{{ pad(i + 1) }}</span>
+				}
+				<span class="row-item__cover">
+					@if (game.backgroundImage) {
+					<img [src]="game.backgroundImage" alt="" loading="lazy" />
+					}
+				</span>
+				<span class="row-item__body">
+					<strong class="row-item__title">{{ game.name }}</strong>
+					<span class="row-item__meta">
+					@if (game.released) { {{ game.released | date: 'd MMM y' }} } @else { Data n.d. }
+					@if (platformNames(game)) { &middot; {{ platformNames(game) }} }
+					</span>
+				</span>
+				@if (ranked && game.metacritic !== null) {
+					<span class="row-item__score">{{ game.metacritic }}</span>
+				}
+				</a>
+			</li>
+			}
+		</ol>
+		}
+		@else {
+			<div class="state"><p class="mb-0">Nessun gioco da mostrare al momento.</p></div>
+		}
+	}
+</ng-template>
+
 <section class="band band--surface">
 	<div class="container-ge">
-	<div class="row gy-5">
-		<div class="col-lg-7">
-		<div class="section-head"><span>Recensioni popolari</span><span class="section-link--disabled">Altro</span></div>
-		@for (r of reviews; track r.n) {
-			<article class="review">
-			<span class="ph-poster review__poster" [class]="'c' + r.n"><span class="ph-poster__n">{{ pad(r.n) }}</span></span>
-			<div>
-				<div class="review__user"><span class="avatar">{{ r.initials }}</span>{{ r.user }}</div>
-				<h3 class="review__title">{{ r.title }} <span class="review__stars">{{ stars(r.rating) }}</span></h3>
-				<p class="review__text">{{ r.text }}</p>
-				<small class="review__likes">{{ r.likes }} apprezzamenti</small>
-			</div>
-			</article>
-		}
+	<div class="rows-block">
+		<div class="section-head"><span>Prossime uscite</span></div>
+		<ng-container [ngTemplateOutlet]="gameRows" [ngTemplateOutletContext]="{ $implicit: upcoming, ranked: false }" />
+	</div>
+	<div class="rows-block">
+		<div class="section-head">
+		<span>I migliori del {{ currentYear }} per Metacritic</span>
+		<a routerLink="/games" [queryParams]="{ ordering: '-metacritic', year: currentYear }">Tutti i giochi &gt;</a>
 		</div>
-		<div class="col-lg-4 offset-lg-1">
-		<div class="section-head"><span>Attività recente</span></div>
-		<ul class="activity">
-			@for (a of activity; track a.user) {
-			<li><span class="avatar">{{ a.initials }}</span><span><strong>{{ a.user }}</strong>{{ ' ' + a.verb }}<strong>{{ a.object }}</strong>{{ a.tail }}</span></li>
-			}
-		</ul>
-		<span class="activity__more activity__more--disabled">Esplora l’attività della community &gt;</span>
-		</div>
+		<ng-container [ngTemplateOutlet]="gameRows" [ngTemplateOutletContext]="{ $implicit: topOfYear, ranked: true }" />
 	</div>
 	</div>
 </section>
