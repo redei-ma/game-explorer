@@ -141,14 +141,23 @@ public class AuthController(
     }
 
     /// <summary>
-    /// Returns the logged-in user, read from the token. GET /api/auth/me
+    /// Returns the logged-in user. GET /api/auth/me
     /// </summary>
+    /// <remarks>
+    /// A token stays valid until it expires, also after the account is deleted, so the user is
+    /// looked up: on another device still logged in, the frontend then shows a guest.
+    /// </remarks>
     [Authorize]
     [HttpGet("me")]
-    public IActionResult Me() => Ok(new UserResponse(
-        User.FindFirstValue(JwtRegisteredClaimNames.Sub)!,
-        User.FindFirstValue(JwtRegisteredClaimNames.Email)!,
-        User.FindFirstValue(JwtRegisteredClaimNames.UniqueName)!));
+    public async Task<IActionResult> Me()
+    {
+        var user = await userManager.FindByIdAsync(User.FindFirstValue(JwtRegisteredClaimNames.Sub)!);
+        if (user is null)
+        {
+            return Problem("Account not found.", statusCode: StatusCodes.Status401Unauthorized);
+        }
+        return Ok(new UserResponse(user.Id, user.Email!, user.UserName!));
+    }
 
     /// <summary>
     /// Deletes the logged-in user's account. DELETE /api/auth/me

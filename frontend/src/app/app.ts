@@ -7,12 +7,16 @@ import { AuthService } from './auth/auth.service';
 	selector: 'app-root',
 	templateUrl: './app.html',
 	styleUrl: './app.css',
+	host: { '(document:visibilitychange)': 'onVisibilityChange()' },
 })
 export class App {
 	private readonly router = inject(Router);
 	private readonly searchInput = viewChild<ElementRef<HTMLInputElement>>('searchInput');
 
-	protected readonly currentUser = inject(AuthService).currentUser;
+	private readonly auth = inject(AuthService);
+
+	protected readonly currentUser = this.auth.currentUser;
+	protected readonly sessionExpired = this.auth.sessionExpired;
 
 	protected readonly menuOpen = signal(false);
 	protected readonly searchOpen = signal(false);
@@ -24,6 +28,17 @@ export class App {
 	{ label: 'Wishlist', path: '/wishlist' },
 	];
 	protected readonly footerLinks = ['Chi siamo', 'Aiuto', 'Termini', 'Privacy', 'Contatti'];
+
+	// A hidden tab does not see a logout or login made in another one: it asks again when shown.
+	protected onVisibilityChange(): void {
+	if (document.visibilityState === 'visible') {
+		this.auth.recheckCurrentUser();
+	}
+	}
+
+	protected dismissSessionExpired(): void {
+	this.auth.dismissSessionExpired();
+	}
 
 	protected toggleSearch(): void {
 	this.searchOpen.update((open) => !open);

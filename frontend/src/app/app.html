@@ -39,6 +39,16 @@
 	</nav>
 </header>
 
+<!-- Always in the page: screen readers announce text added inside a status region, not a new region -->
+<div role="status">
+	@if (sessionExpired()) {
+	<div class="session-expired" data-bs-theme="dark">
+		<p><strong>La sessione è terminata.</strong> Ora navighi come ospite.</p>
+		<button type="button" class="btn-close" aria-label="Chiudi l'avviso" (click)="dismissSessionExpired()"></button>
+	</div>
+	}
+</div>
+
 <main><router-outlet /></main>
 
 <footer class="site-footer">
