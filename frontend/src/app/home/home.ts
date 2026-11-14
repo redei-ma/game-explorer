@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { GameCard } from '../game-card/game-card';
 import { GamesApi, GamesQuery } from '../games/games.api';
 import { AuthService } from '../auth/auth.service';
+import { HeroParticles } from '../hero-particles/hero-particles';
+
 
 // Popular this week = most added games released in the last N days
 const POPULAR_WINDOW_DAYS = 7;
@@ -20,7 +22,7 @@ function popularQuery(): GamesQuery {
 
 @Component({
 	selector: 'app-home',
-	imports: [RouterLink, GameCard],
+	imports: [RouterLink, GameCard, HeroParticles],
 	changeDetection: ChangeDetectionStrategy.OnPush,
 	templateUrl: './home.html',
 	styleUrl: './home.css',
