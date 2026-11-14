@@ -34,15 +34,15 @@ h1, h2, h3, h4, h5 {
 	letter-spacing: -0.02em;
 }
 
-/* Colonna centrale dei contenuti */
+/* Central column for contents */
 .container-ge {
 	width: 100%;
-	max-width: 832px;
+	max-width: 1200px;
 	margin-inline: auto;
 	padding-inline: 1rem;
 }
 
-/* Intestazione di sezione: titolo a sinistra, link a destra, linea sotto */
+/* Section header: title on the left, link on the right, line below */
 .section-head {
 	display: flex;
 	justify-content: space-between;
