@@ -1,3 +1,21 @@
+# Same check for the three .NET services. The aspnet image has no curl or
+# wget, so bash's /dev/tcp sends the request. Healthy only on a 200, which
+# auth and library return only while their database answers.
+x-dotnet-healthcheck: &dotnet-healthcheck
+  test:
+    - CMD
+    - bash
+    - -c
+    - >-
+      exec 3<>/dev/tcp/127.0.0.1/8080 &&
+      printf 'GET /health HTTP/1.0\r\n\r\n' >&3 &&
+      head -1 <&3 | grep -q ' 200 '
+  interval: 10s
+  timeout: 5s
+  retries: 3
+  # Auth and library apply their migrations before answering
+  start_period: 30s
+
 services:
   sqlserver:
     # Pinned by digest like the Dockerfile base images. Keep in sync with
@@ -27,6 +45,7 @@ services:
     # answering; with it, the container exits (code 134)
     init: true
     restart: unless-stopped
+    healthcheck: *dotnet-healthcheck
     environment:
       Igdb__ClientId: ${IGDB_CLIENT_ID:?IGDB_CLIENT_ID is not set in .env}
       Igdb__ClientSecret: ${IGDB_CLIENT_SECRET:?IGDB_CLIENT_SECRET is not set in .env}
@@ -35,6 +54,7 @@ services:
     build: ./services/auth-service
     init: true
     restart: unless-stopped
+    healthcheck: *dotnet-healthcheck
     environment:
       # Connects as "sa", the SQL Server administrator. A production setup would
       # use a dedicated login with access to this database only.
@@ -48,6 +68,7 @@ services:
     build: ./services/library-service
     init: true
     restart: unless-stopped
+    healthcheck: *dotnet-healthcheck
     environment:
       # "sa" is the SQL Server administrator: fine for local development; a production
       # setup would use a dedicated login with access to this database only
