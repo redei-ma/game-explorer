@@ -9,7 +9,7 @@
 .hero {
 	position: relative;
 	overflow: hidden;
-	padding: clamp(5rem, 14vw, 11rem) 0 4.5rem;
+	padding-block: calc((clamp(5rem, 14vw, 11rem) + 4.5rem) / 2 + 1cm);
 	background: linear-gradient(180deg, #111a32 0%, var(--ge-bg) 100%);
 }
 .hero::before {
@@ -36,9 +36,16 @@
 	filter: blur(120px);
 	opacity: .15;
 }
-.hero > .container-ge { position: relative; }
+.hero > .container-ge {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 1.7rem;
+}
+.hero .eyebrow { margin: 0; }
 .hero h1 { font-size: clamp(2rem, 6vw, 2.75rem); font-weight: 800; line-height: 1.2; margin: 0; }
-.hero__lead { max-width: 29rem; margin: 1.1rem 0 1.5rem; color: #aab6c0; font-size: .9rem; line-height: 1.65; }
+.hero__lead { max-width: 29rem; margin: 0; color: #aab6c0; font-size: .9rem; line-height: 1.65; }
 .hero__note { color: var(--ge-muted); font-size: .68rem; }
 
 /* Popular games grid */
