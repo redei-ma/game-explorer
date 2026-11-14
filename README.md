@@ -50,14 +50,16 @@ the **.NET SDK 10** and **Node.js 24**.
 
 ```bash
 cp .env.example .env          # then fill in every value (see the comments)
-docker compose up -d --build
+docker compose up -d --build --wait
 ```
 
-Open https://localhost:8443 (http://localhost:8080 redirects there). The certificate is
-self-signed, generated when the gateway image is built, so the browser shows a warning:
-accept it once to continue. A build without cache (`--no-cache`) generates a new
-certificate, and the warning comes back. Stop with `docker compose down` (the database is
-kept; add `-v` to delete it).
+`--wait` returns once every service is running and the three backend services are
+healthy (`docker compose ps` shows their state). Then open https://localhost:8443
+(http://localhost:8080 redirects there). The certificate is self-signed, generated
+when the gateway image is built, so the browser shows a warning: accept it once to
+continue. A build without cache (`--no-cache`) generates a new certificate, and the
+warning comes back. Stop with `docker compose down` (the database is kept; add `-v` to
+delete it).
 
 ### Develop
 
