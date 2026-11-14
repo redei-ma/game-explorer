@@ -5,11 +5,8 @@ main { flex: 1; }
 .site-header { position: sticky; top: 0; z-index: 10; background: rgba(10, 15, 29, .92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--ge-border); }
 .navbar { --bs-navbar-padding-y: .55rem; min-height: 3.6rem; }
 
-.brand { display: inline-flex; align-items: center; gap: .55rem; color: var(--ge-text); font-family: 'Oxanium', system-ui, sans-serif; font-size: .9rem; font-weight: 700; letter-spacing: .04em; text-decoration: none; }
-.brand__dots { display: inline-flex; gap: 2px; }
-.brand__dots i { width: 7px; height: 7px; border-radius: 50%; background: var(--ge-accent); }
-.brand__dots i:nth-child(2) { background: #f5a623; }
-.brand__dots i:nth-child(3) { background: #e5544b; }
+.brand { display: inline-flex; align-items: center; text-decoration: none; }
+.brand__logo { height: 4.5rem; width: auto; display: block; }
 
 .nav-link { --bs-nav-link-padding-x: 0; --bs-navbar-nav-link-padding-x: 0; color: #c3ccd4; font-size: .62rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
 .nav-link:hover, .nav-link:focus-visible { color: var(--ge-text); }

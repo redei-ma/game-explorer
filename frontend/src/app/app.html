@@ -2,7 +2,7 @@
   <nav class="navbar navbar-expand-md" data-bs-theme="dark" aria-label="Navigazione principale">
 	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between">
 		<a class="brand" routerLink="/" aria-label="Novaquest, home" (click)="menuOpen.set(false)">
-		<span class="brand__dots" aria-hidden="true"><i></i><i></i><i></i></span>Novaquest
+			<img src="/assets/logo.svg" alt="Novaquest" class="brand__logo" />
 		</a>
 
 		<button class="navbar-toggler" type="button" aria-label="Apri il menu" [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())">
@@ -43,7 +43,9 @@
 
 <footer class="site-footer">
 	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between gap-3">
-	<a class="brand" routerLink="/"><span class="brand__dots" aria-hidden="true"><i></i><i></i><i></i></span>Novaquest</a>
+	<a class="brand" routerLink="/" aria-label="Novaquest, home">
+		<img src="assets/terranova.svg" alt="Novaquest" class="brand__logo" />
+	</a>
 	<ul class="footer-links">
 		@for (l of footerLinks; track l) {
 		<li><span class="footer-link footer-link--disabled">{{ l }}</span></li>
