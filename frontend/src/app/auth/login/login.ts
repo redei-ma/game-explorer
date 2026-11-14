@@ -5,11 +5,12 @@ import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { FieldErrors } from '../field-errors/field-errors';
 import { submitAgain } from '../submit-again';
 
 @Component({
   selector: 'app-login',
-  imports: [FormField, RouterLink],
+  imports: [FieldErrors, FormField, RouterLink],
   templateUrl: './login.html',
 })
 export class Login {
