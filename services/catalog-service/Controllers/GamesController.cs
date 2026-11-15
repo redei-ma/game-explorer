@@ -14,6 +14,14 @@ namespace CatalogService.Controllers;
 [Route("api/games")]
 public class GamesController(IgdbClient igdb) : ControllerBase
 {
+
+    /// <summary>
+    /// Highest page a client may ask for. 500 pages x 20 games = offset 9,960 at most, which stays
+    /// below the 10,000-result offset limit older IGDB versions had, so deep pages can't fail upstream.
+    /// The Angular constant MAX_PAGE has the same value: change both together if needed.
+    /// </summary>
+    public const int MaxPage = 500;
+
     /// <summary>
     /// Returns a page of games. With no parameters it returns the 20 most popular games.
     /// Example for the home page: GET /api/games?ordering=-rating&amp;pageSize=12
@@ -24,7 +32,7 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     /// <param name="genres">Optional comma-separated genre ids (from /api/genres).</param>
     /// <param name="parentPlatforms">Optional comma-separated platform group ids (from /api/parent-platforms).</param>
     /// <param name="platforms">Optional comma-separated platform ids (from /api/platforms).</param>
-    /// <param name="page">Page number, starting at 1.</param>
+    /// <param name="page">Page number, 1 to <see cref="MaxPage"/>. Anything else answers 400.</param>
     /// <param name="minMetacritic">Optional minimum critic score (0-100). With IGDB this is the aggregated critic rating.</param>
     /// <param name="maxMetacritic">Optional maximum critic score (0-100).</param>
     /// <param name="year">Optional release year; converted to a full-year date range.</param>
@@ -35,13 +43,12 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     [FromQuery] string? search = null, [FromQuery] string? ordering = null,
     [FromQuery] string? dates = null, [FromQuery] string? genres = null,
     [FromQuery] string? parentPlatforms = null, [FromQuery] string? platforms = null,
-    [FromQuery] int page = 1, [FromQuery, Range(0, 100)]
+    [FromQuery, Range(1, MaxPage)] int page = 1, [FromQuery, Range(0, 100)]
     int? minMetacritic = null, [FromQuery, Range(0, 100)] int? maxMetacritic = null,
     [FromQuery, Range(1970, 2100)] int? year = null,
     [FromQuery] int pageSize = 20, CancellationToken ct = default)
     {
         pageSize = Math.Clamp(pageSize, 1, 40);
-        page = Math.Max(page, 1);
 
         if (minMetacritic is not null && maxMetacritic is not null && minMetacritic > maxMetacritic)
             return Problem("minMetacritic cannot be greater than maxMetacritic.", statusCode: StatusCodes.Status400BadRequest);
