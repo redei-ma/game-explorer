@@ -120,6 +120,7 @@ h1, h2, h3, h4, h5 {
 
 .auth-page {
 	position: relative;
+	overflow: hidden; /* clips the ::before glow: sticking out 3rem on the right it widened the page on mobile */
 	max-width: 40rem;
 	margin-block: clamp(1rem, 5vw, 3rem);
 	padding: clamp(1.5rem, 5vw, 2.5rem) !important;
