@@ -41,7 +41,7 @@ export class GameDetail implements OnDestroy {
 	// Trigger to manually re-fetch data from the UI (error banner)
 	private readonly refreshTrigger = signal(0);
 
-	// Main declarative data pipeline replacing ngOnInit and manual subscriptions
+	// Reloads when the id in the URL changes or Riprova is pressed
 	private readonly detailState = toSignal(
 		combineLatest([
 			this.route.paramMap,
@@ -54,8 +54,7 @@ export class GameDetail implements OnDestroy {
 				}
 				const id = parseInt(idParam, 10);
 
-				// Run the request for basic information and screenshots in parallel
-				// Added catchError to screenshots to prevent the entire page from failing if images fail
+				// Detail and screenshots in parallel: a failed screenshots request must not hide the game
 				return forkJoin({
 					detail: this.gamesApi.getGame(id),
 					screenshotsRes: this.gamesApi.getScreenshots(id).pipe(catchError(() => of(null)))
@@ -81,7 +80,6 @@ export class GameDetail implements OnDestroy {
 		{ initialValue: { gameId: null, game: null, screenshots: [], isLoading: true, error: null } satisfies DetailState }
 	);
 
-	// State exposed to the template as computed signals to keep HTML bindings working perfectly
 	readonly gameId = computed(() => this.detailState().gameId);
 	readonly game = computed(() => this.detailState().game);
 	readonly screenshots = computed(() => this.detailState().screenshots);
@@ -106,7 +104,6 @@ export class GameDetail implements OnDestroy {
 		return g ? this.wishlistService.isInWishlist(g.id) : false;
 	});
 
-	// Triggered by the "Riprova" button in the template
 	fetchGameDetails(): void {
 		this.refreshTrigger.update(v => v + 1);
 	}

@@ -14,6 +14,5 @@ import { GameCard } from '../game-card/game-card';
 })
 export class FavoritesList {
 	protected readonly favoritesService = inject(FavoritesService);
-	// Bind directly to the service's reactive signal
 	protected readonly favorites = this.favoritesService.favorites;
 }

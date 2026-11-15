@@ -91,7 +91,6 @@ export class GamesList implements OnInit, OnDestroy {
 		return items;
 	});
 
-	// Filter Status mapped to your GamesQuery
 	currentQuery: GamesQuery = {
 		page: 1,
 		pageSize: 24,

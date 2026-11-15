@@ -36,7 +36,7 @@ export interface GamesPage {
 	results: Game[];
 }
 
-// Templates for Genres and Platforms (required for search filters)
+// Genres and platforms: the options of the search filters
 export interface Genre {
 	id: number;
 	name: string;
@@ -47,7 +47,6 @@ export interface PlatformItem {
 	name: string;
 	slug: string;
 }
-// Pagination for Genres and Platforms following the GamesPage pattern
 export interface GenresPage {
 	count: number;
 	results: Genre[];
@@ -57,7 +56,7 @@ export interface PlatformsPage {
 	results: PlatformItem[];
 }
 
-// Templates for the detail card and screenshots
+// Detail page: one game and its screenshots
 export interface Developer {
 	id: number;
 	name: string;
@@ -125,7 +124,7 @@ export class GamesApi {
 		return this.http.get<GamesPage>('/api/games', { params });
 	}
 
-	// Methods for retrieving curtain filter data
+	// Options of the search filters
 	getGenres(): Observable<GenresPage> {
 		return this.http.get<GenresPage>('/api/genres');
 	}

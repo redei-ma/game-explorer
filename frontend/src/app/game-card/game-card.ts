@@ -15,7 +15,6 @@ import { WishlistService } from '../wishlist/wishlist.service';
 	styleUrl: './game-card.css',
 })
 export class GameCard {
-	// Inject FavoritesService & wishlistService to manage the favorite and wishlist state
 	private readonly favoritesService = inject(FavoritesService);
 	private readonly wishlistService = inject(WishlistService);
 
@@ -26,7 +25,6 @@ export class GameCard {
 	// 'wishlist' replaces the favorite heart with a quick "remove from wishlist" button
 	readonly mode = input<'default' | 'wishlist'>('default');
 
-	// Reactive computed signal to check if the current game is favorited
 	protected readonly isFavorite = computed(() =>
 		this.favoritesService.isFavorite(this.game().id)
 	);
