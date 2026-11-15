@@ -20,9 +20,6 @@ interface SectionResult {
 	games: Game[];
 }
 
-// One request per genre, a few at a time: the page does not fire them all together
-const MAX_PARALLEL_REQUESTS = 4;
-
 @Component({
 	selector: 'app-collections',
 	imports: [RouterLink, DatePipe],
@@ -87,17 +84,15 @@ export class Collections {
 		dialog.showModal();
 	}
 
-	// Each card fills in as soon as its own answer arrives, and a failed one does not block the others
+	// Each card fills in as soon as its own answer arrives; rate limiting and caching live in CollectionsService
 	private loadGames(genres: Genre[]): void {
 		from(genres)
 			.pipe(
-				mergeMap(
-					(genre) =>
-						this.collections.getTopGames(genre).pipe(
-							map((games): SectionResult => ({ id: genre.id, status: 'ready', games })),
-							catchError(() => of<SectionResult>({ id: genre.id, status: 'error', games: [] })),
-						),
-					MAX_PARALLEL_REQUESTS,
+				mergeMap((genre) =>
+					this.collections.getTopGames(genre).pipe(
+						map((games): SectionResult => ({ id: genre.id, status: 'ready', games })),
+						catchError(() => of<SectionResult>({ id: genre.id, status: 'error', games: [] })),
+					),
 				),
 				takeUntilDestroyed(this.destroyRef),
 			)
