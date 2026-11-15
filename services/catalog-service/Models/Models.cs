@@ -28,14 +28,12 @@ public record GameSummary(
     List<PlatformEntry>?    ParentPlatforms,
     int?                    Metacritic);
 
-
 /// <summary>
 /// Answer of GET /api/games/{id}: full details of one game.
-/// <param name="BackgroundImage">Wide artwork shown as the banner of the detail page, or null if missing.</param>
-/// <param name="CoverImage">/// URL of the cover, built exactly like <see cref="GameSummary.BackgroundImage"/> in the list,
-/// so the card of a game looks the same in the list, in favorites and in the wishlist. Null if missing.
-
 /// </summary>
+/// <param name="BackgroundImage">Wide artwork shown as the banner of the detail page, or null if missing.</param>
+/// <param name="CoverImage">URL of the cover, built exactly like <see cref="GameSummary.BackgroundImage"/> in the list,
+/// so the card of a game looks the same in the list, in favorites and in the wishlist. Null if missing.</param>
 public record GameDetail(
     int                 Id,
     string              Name,

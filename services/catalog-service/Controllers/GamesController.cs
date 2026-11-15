@@ -14,11 +14,9 @@ namespace CatalogService.Controllers;
 [Route("api/games")]
 public class GamesController(IgdbClient igdb) : ControllerBase
 {
-
     /// <summary>
     /// Highest page a client may ask for.
-    /// The Angular constant MAX_PAGE in games-list.ts has the same value,
-    ///  change both together if needed.
+    /// The Angular constant MAX_PAGE in games-list.ts has the same value: change both together.
     /// </summary>
     public const int MaxPage = 800;
 
