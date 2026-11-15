@@ -23,7 +23,7 @@ function popularQuery(): GamesQuery {
 	return { dates: `${isoDay(start)},${isoDay(end)}`, ordering: '-added', pageSize: POPULAR_COUNT };
 }
 
-// Upcoming = most added games releasing in the next N days
+// Upcoming = most followed games releasing in the next N days: they have no votes yet
 const UPCOMING_WINDOW_DAYS = 30;
 const LIST_COUNT = 6;
 
@@ -31,7 +31,7 @@ function upcomingQuery(): GamesQuery {
 	const start = new Date();
 	const end = new Date();
 	end.setDate(start.getDate() + UPCOMING_WINDOW_DAYS);
-	return { dates: `${isoDay(start)},${isoDay(end)}`, ordering: '-added', pageSize: LIST_COUNT };
+	return { dates: `${isoDay(start)},${isoDay(end)}`, ordering: '-hypes', pageSize: LIST_COUNT };
 }
 
 // Best of the current year by Metacritic (60+ keeps unrated games out)
