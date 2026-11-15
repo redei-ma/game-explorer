@@ -8,16 +8,14 @@ and wishlist.
 > the catalog data now comes from IGDB (owned by Twitch). See
 > [Data source: IGDB instead of RAWG](#data-source-igdb-instead-of-rawg) for what changed.
 
-> 🚧 Work in progress — school project, delivery on 15 November 2026.
-
 ## Features
 
-Core:
+Required by the brief:
 
 - **Home page** with a search bar and a selection of games
 - **Search** by full or partial game name
-- **Advanced search** by genre, platform, release year and rating, with sorting
-  (name, release date, rating)
+- **Advanced search** by genre, platform, release year and critic score, with sorting
+  (user rating, critic score, release date, name)
 - **Game list** as a grid of cards: cover, title, release date, rating, main platforms
 - **Game detail page**: description, screenshots, genres, platforms, developer,
   publisher, rating and critic score (IGDB's aggregated critic rating, in place of
@@ -27,12 +25,17 @@ Core:
 - Clear **loading, error and empty-result** states
 - **Responsive** layout for desktop, tablet and smartphone
 
-Planned extras:
+Beyond the brief:
 
-- **User accounts**: register and log in (JWT). Everything stays usable without an
-  account; logging in keeps favorites and wishlist in the database, across devices
+- **User accounts**: registration, login and logout, password recovery with a one-time
+  code, account deletion. Everything stays usable without an account; with one,
+  favorites and wishlist are kept in the database, across devices
 - **Wishlist**: games to buy or try, separate from favorites
-- **Dark / light mode**, remembered across visits
+- **Collections**: the Top 10 of each genre by critic score
+- **Three services behind one HTTPS gateway**: catalog, accounts and lists, each with
+  its own data, started together with one command that waits for their health checks
+- **CI on every Pull Request**: builds, tests with a real SQL Server and a smoke test of
+  the delivered stack; a Pull Request is merged only when they pass and it is approved
 
 ## Stack
 
@@ -52,6 +55,31 @@ the **.NET SDK 10** and **Node.js 24**.
 cp .env.example .env          # then fill in every value (see the comments)
 docker compose up -d --build --wait
 ```
+
+| Variable | What |
+| -------- | ---- |
+| `MSSQL_SA_PASSWORD` | password of SQL Server's `sa` user: at least 8 characters, from three of upper case, lower case, digits and symbols |
+| `JWT_KEY` | signs the login tokens: at least 32 characters (`openssl rand -base64 32`) |
+| `IGDB_CLIENT_ID`, `IGDB_CLIENT_SECRET` | the Twitch application that gives access to IGDB: see [Credentials](#credentials) |
+
+The databases need no setup: on startup auth-service and library-service create
+`AuthDb` and `LibraryDb` if missing and apply their migrations.
+
+### If it does not start
+
+`docker compose ps` shows each container's state, `docker compose logs <service>` why it
+stopped.
+
+| Symptom | Cause and fix |
+| ------- | ------------- |
+| Compose stops at once: *required variable ... is missing a value* | `.env` is missing or a value is empty: copy `.env.example` and fill in every line |
+| `--wait` fails, `sqlserver` keeps restarting | the `sa` password does not meet SQL Server's policy (see the table above): `docker compose logs sqlserver` shows *Unable to set system administrator password* |
+| `--wait` fails on auth-service | `JWT_KEY` shorter than 32 characters |
+| auth-service or library-service: *Login failed for user 'sa'* | `MSSQL_SA_PASSWORD` changed after the first start: the password is stored in the database volume. `docker compose down -v` deletes the volume, and every account with it |
+| *port is already allocated* | 8080 or 8443 is used by another program or another copy of this stack |
+| The app opens, but the home and the search show an error | wrong IGDB keys: catalog-service answers `502`. Check them in the Twitch console, then `docker compose up -d catalog-service` |
+| The browser warns about the certificate | expected: it is self-signed, accept it once |
+| Apple Silicon: `sqlserver` crashes | the image is amd64 only: in Docker Desktop turn on *Use Rosetta for x86_64/amd64 emulation* |
 
 `--wait` returns once every service is running and the three backend services are
 healthy (`docker compose ps` shows their state). Then open https://localhost:8443
@@ -119,10 +147,9 @@ cd frontend && npm test -- --watch=false   # every *.spec.ts under frontend/src
 
 `dotnet test` needs Docker running: the auth-service and library-service tests
 start their own SQL Server in a container ([Testcontainers](https://dotnet.testcontainers.org/)).
-Every Pull Request into `dev` or `main` runs the same builds and tests in the CI
-(`.github/workflows/ci.yml`), then builds the Docker images and runs the smoke test
-on the stack as delivered. Run the smoke test at most once a minute: the login rate
-limit remembers the attempts.
+Every Pull Request runs the same tests in the CI, plus the smoke test on the stack as
+delivered. Run the smoke test at most once a minute: the login rate limit remembers the
+attempts.
 
 Backend tests use xUnit. A new test project goes in `tests/` and runs only once
 it is added to the solution:
@@ -162,12 +189,20 @@ docker-compose.override.example.yml   ports and Development for local work
 
 IGDB has no simple API key. It uses a **Twitch application**:
 
-1. Log in at [dev.twitch.tv/console](https://dev.twitch.tv/console) (two-factor
-   authentication must be enabled on the Twitch account).
-2. **Register Your Application**: any name, OAuth Redirect URL `http://localhost`,
-   category *Application Integration*, client type *Confidential*.
-3. Copy the **Client ID**, generate a **Client Secret**, and put both in `.env` as
+1. Have a Twitch account with two-factor authentication: on twitch.tv, *Settings →
+   Security and Privacy → Two-Factor Authentication* (it asks for a phone number).
+2. Log in at [dev.twitch.tv/console](https://dev.twitch.tv/console) and choose
+   **Register Your Application**: any name, OAuth Redirect URL `http://localhost`
+   (never used: the backend logs in as the application, not as a user), category
+   *Website Integration*, client type *Confidential*.
+3. Copy the **Client ID**, then **New Secret** and copy the **Client Secret** at once:
+   Twitch shows it only once (a new one can be generated later). Put both in `.env` as
    `IGDB_CLIENT_ID` and `IGDB_CLIENT_SECRET`.
+
+These are the steps of the course's *IGDB integration guide*, step 1. Twitch's own
+page: [Registering your app](https://dev.twitch.tv/docs/authentication/register-app).
+Nothing else to do: the token request and the headers (steps 2 and 3 of the guide) are
+done by catalog-service, as described below.
 
 catalog-service exchanges them for an access token at `https://id.twitch.tv/oauth2/token`
 (OAuth *client credentials* flow), keeps the token in memory, and renews it shortly
@@ -209,16 +244,63 @@ from `/api/genres`, `/api/platforms` and `/api/parent-platforms`, so it needed n
 
 Sorting by rating ignores games with fewer than 10 user ratings, so a single 100/100
 vote does not put an unknown game first. Allowed `ordering` values: `name`, `released`,
-`rating`, `metacritic`, `added` (popularity), `created`, `updated`, with `-` in front
-for descending. Invalid parameters now get a `400` with an explanation.
+`rating`, `metacritic`, `added` (popularity), `created`, `updated`, `hypes` (follows
+before release, for upcoming games), with `-` in front for descending. Invalid
+parameters now get a `400` with an explanation.
 
-## Contributing
+## Known limits
 
-- `main` is stable; `dev` is the integration branch.
-- Work on a branch created from `dev` and open a Pull Request into `dev`: it
-  needs one approval and the CI checks to pass.
-- Commits in [Conventional Commits](https://www.conventionalcommits.org/)
-  format: `feat(catalog): add genre filter`.
+Accepted for a project that runs locally.
+
+**Session and account**
+
+- A login lasts 24 hours, with no warning before it ends. The token is not revoked:
+  after logout or a password recovery, a copy of the cookie keeps working until it
+  expires.
+- After an account is deleted, other devices still logged in become guests at their
+  next request, or when their tab is shown again.
+- With two windows of the app side by side, the one not in use notices a logout only at
+  its next request; a heart clicked there is not saved.
+- Losing both the password and the recovery code means losing the account: the app
+  sends no email.
+- Five wrong passwords when deleting the account also lock the login for five minutes
+  (Identity has one counter).
+- If library-service fails during account deletion, the account is deleted anyway and
+  its favorites and wishlist stay in `LibraryDb`, linked to an id that no longer exists.
+
+**Data**
+
+- Game descriptions are in English: they come from IGDB.
+- The critic score is IGDB's average of critic reviews, not Metacritic.
+
+**Running locally**
+
+- The certificate is self-signed: the browser warns once (see
+  [Run everything](#run-everything)).
+- In Safari, login does not stay on http://localhost:4200 (`npm start`): Safari does
+  not send `Secure` cookies over plain HTTP. Use the gateway, https://localhost:8443.
+- Every service connects to SQL Server as `sa`: each service using only its own
+  database is a rule of the code, not a permission.
+- Port 8443 is also written in `gateway/nginx.conf`, for the HTTP redirect: change it
+  there too.
+
+## Git workflow and CI
+
+- `main` is stable, `dev` is the integration branch. Both are protected on GitHub: no
+  direct push, no force push, no deletion.
+- Work on a branch created from `dev` (`feat/`, `fix/`, `docs/`, `chore/`, `ci/`) and
+  open a Pull Request into `dev`. It is merged only with one approval, every review
+  thread resolved and the three CI checks green; a new push dismisses an earlier
+  approval. Merges keep a merge commit (squash is off), so each branch stays visible in
+  the history.
+- Commits follow [Conventional Commits](https://www.conventionalcommits.org/):
+  `feat(catalog): add genre filter`.
+- **CI** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) runs on every Pull
+  Request into `dev` or `main`, in three parallel jobs:
+  - .NET build and tests, with a real SQL Server through Testcontainers;
+  - Angular build and tests;
+  - Docker: builds the images, starts the delivered stack and checks it through the
+    gateway ([smoke test](scripts/smoke-test.sh)).
 
 ## Team
 
