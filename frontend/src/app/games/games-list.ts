@@ -152,17 +152,17 @@ export class GamesList implements OnInit, OnDestroy {
 	private loadGenresAndPlatforms(): void {
 		this.gamesApi.getGenres().subscribe({
 			next: res => this.genres.set(res.results || []),
-			error: () => console.error('Errore nel caricamento dei generi')
+			error: () => console.error('Could not load the genres')
 		});
 
 		this.gamesApi.getParentPlatforms().subscribe({
 			next: res => this.platforms.set(res.results || []),
-			error: () => console.error('Errore nel caricamento delle famiglie di piattaforme')
+			error: () => console.error('Could not load the platform groups')
 		});
 
 		this.gamesApi.getPlatforms().subscribe({
 			next: res => this.specificPlatforms.set(res.results || []),
-			error: () => console.error('Errore nel caricamento delle piattaforme')
+			error: () => console.error('Could not load the platforms')
 		});
 	}
 
