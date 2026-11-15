@@ -1,4 +1,4 @@
-/* Bootstrap CSS e' caricato da angular.json: sotto solo token e override */
+/* Bootstrap CSS is loaded by angular.json: below are only tokens and overrides */
 :root {
 	--ge-bg: #0A0F1D;
 	--ge-bg-alt: #0d1426;
@@ -97,7 +97,7 @@ h1, h2, h3, h4, h5 {
 	color: var(--ge-muted);
 }
 
-/* Pulsante verde cta (si usa insieme a .btn di Bootstrap). */
+/* Green call-to-action button, used together with Bootstrap's .btn */
 .btn-ge {
 	--bs-btn-padding-x: 1.1rem;
 	--bs-btn-padding-y: .55rem;
@@ -299,8 +299,7 @@ h1, h2, h3, h4, h5 {
 	text-transform: uppercase;
 }
 
-/* Segnaposto (usato da card senza cover e dalle sezioni statiche) */
-/* Segnaposto (colore + cerchio) per recensioni e liste statiche. */
+/* Placeholder poster (color + circle), shown until a cover loads or when there is none */
 .ph-poster {
 	position: relative;
 	display: block;
@@ -342,7 +341,7 @@ a:focus-visible, button:focus-visible, input:focus-visible {
 	outline-offset: 2px;
 }
 
-/* NB Accessibilita': chi ha disattivato le animazioni nel sistema non le vedra' */
+/* Accessibility: users who turned animations off in their system do not see them */
 @media (prefers-reduced-motion: reduce) {
 	* {
 	transition: none !important;

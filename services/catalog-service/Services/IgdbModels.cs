@@ -8,7 +8,7 @@ namespace CatalogService.Services;
 /// (nullable) because IGDB only sends the fields we ask for in the "fields" line,
 /// and omits any field that has no value for that game.
 /// </summary>
-/// <param name="Id">IGDB's game id. This is the id the frontend now receives and sends back.</param>
+/// <param name="Id">IGDB's game id. This is the id the frontend receives and sends back.</param>
 /// <param name="Name">Title.</param>
 /// <param name="Slug">URL-friendly name.</param>
 /// <param name="Summary">Plain-text description (used for GameDetail.DescriptionRaw).</param>

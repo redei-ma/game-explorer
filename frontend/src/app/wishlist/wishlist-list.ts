@@ -14,6 +14,5 @@ import { WishlistService } from './wishlist.service';
 })
 export class WishlistList {
 	protected readonly wishlistService = inject(WishlistService);
-	// Bind directly to the wishlist service's reactive signal
 	protected readonly wishlist = this.wishlistService.wishlist;
 }

@@ -16,8 +16,7 @@ namespace CatalogService.Services;
 /// </remarks>
 public sealed class PlatformCatalog
 {
-    // IGDB platform id -> (group id, display name, slug). The slugs match RAWG's,
-    // in case the frontend picks icons by slug.
+    // IGDB platform id -> (group id, display name, slug).
     private static readonly Dictionary<int, (int GroupId, string Name, string Slug)> StandaloneGroups = new()
     {
         [6]  = (1006, "PC", "pc"),                 // 6  = PC (Microsoft Windows)

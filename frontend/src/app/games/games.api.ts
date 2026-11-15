@@ -1,12 +1,10 @@
-// defines the RAWG data types (Game, GamesPage, GamesQuery) and a class with only
-// one method, getGames(query), which calls GET/api/games with the parameters to
-// keep API calls separate from graphics
+// The shapes of catalog-service's JSON and GamesApi, the only class that calls catalog-service
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 /*******************************************************************************
- *   Models (subset of the RAWG /games payload)                                *
+ *   Models (the JSON of catalog-service)                                      *
  ******************************************************************************/
 export interface Platform {
 	id: number;
@@ -38,7 +36,7 @@ export interface GamesPage {
 	results: Game[];
 }
 
-// Templates for Genres and Platforms (required for search filters)
+// Genres and platforms: the options of the search filters
 export interface Genre {
 	id: number;
 	name: string;
@@ -49,7 +47,6 @@ export interface PlatformItem {
 	name: string;
 	slug: string;
 }
-// Pagination for Genres and Platforms following the GamesPage pattern
 export interface GenresPage {
 	count: number;
 	results: Genre[];
@@ -59,7 +56,7 @@ export interface PlatformsPage {
 	results: PlatformItem[];
 }
 
-// Templates for the detail card and screenshots
+// Detail page: one game and its screenshots
 export interface Developer {
 	id: number;
 	name: string;
@@ -105,7 +102,7 @@ export interface GamesQuery {
 /*******************************************************************************
  *   API layer                                                                 *
  ******************************************************************************/
-/* Single entry point to the catalog-service. The RAWG key lives in the backend,
+/* Single entry point to the catalog-service. The IGDB keys live in the backend,
  * so the browser only ever talks to our own /api (proxy.conf.json in dev, nginx in Docker).
  * Components never build URLs: they call a method here */
 @Injectable({ providedIn: 'root' })
@@ -127,7 +124,7 @@ export class GamesApi {
 		return this.http.get<GamesPage>('/api/games', { params });
 	}
 
-	// Methods for retrieving curtain filter data
+	// Options of the search filters
 	getGenres(): Observable<GenresPage> {
 		return this.http.get<GenresPage>('/api/genres');
 	}

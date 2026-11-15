@@ -98,7 +98,7 @@
 		</div>
 	</section>
 
-  <!-- The search has results, but not on this page (for example ?page=200 typed in the address bar) -->
+	<!-- The search has results, but not on this page (for example ?page=200 typed in the address bar) -->
 	<section class="state-container state-banner empty-banner" *ngIf="!isLoading() && !hasError() && games().length === 0 && totalResults() > 0">
 		<div class="banner-content">
 			<p>Questa pagina è vuota: la ricerca ha {{ totalResults() }} risultati su meno pagine.</p>
@@ -108,11 +108,10 @@
 
 	<!-- Games Grid -->
 	<div class="games-grid" *ngIf="!isLoading() && !hasError() && games().length > 0">
-		<!-- Selector of GameCard  -->
 		<app-game-card *ngFor="let game of games()" [game]="game"></app-game-card>
 	</div>
 
-		<!-- Pagination Controls -->
+	<!-- Pagination Controls -->
 	<nav class="pagination-container" aria-label="Paginazione risultati" *ngIf="!isLoading() && !hasError() && totalPages() > 1">
 		<button type="button" class="pagination-btn" [disabled]="currentPage() <= 1"
 			(click)="onPageChange(currentPage() - 1)">

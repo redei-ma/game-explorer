@@ -1,6 +1,5 @@
 using System.Globalization;
 using System.Net;
-using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using CatalogService.Models;
@@ -11,8 +10,7 @@ namespace CatalogService.Services;
 /// <summary>
 /// The typed client for IGDB, and the only class that writes IGDB queries (the base
 /// URL is set in Program.cs). It translates the frontend's RAWG-style parameters into
-/// IGDB queries and translates IGDB's answers back into the existing models,
-/// so the controller and the frontend do not change.
+/// IGDB queries and translates IGDB's answers back into the models of Models.cs.
 /// </summary>
 /// <remarks>
 /// IGDB does not read filters from the URL. Every request is a POST whose body is a
@@ -24,7 +22,7 @@ namespace CatalogService.Services;
 /// limit 20; offset 40;
 /// </code>
 /// "cover.image_id" means "follow the cover reference and give me its image_id field":
-/// this is called expansion, and it replaces the extra calls RAWG sometimes needed.
+/// this is called expansion, and it saves extra calls.
 /// Authentication headers are added by <see cref="IgdbAuthHandler"/>, not here.
 /// </remarks>
 public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient> logger)
@@ -66,8 +64,7 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
     // ---------------------------------------------------------------- public API
 
     /// <summary>
-    /// Gets a page of games. Same parameters as the old RawgClient.GetGamesAsync,
-    /// so the controller did not need to change. Every filter is optional.
+    /// Gets a page of games. Every filter is optional.
     /// </summary>
     /// <param name="search">Words to look for in the name. Every word must appear (in any position).</param>
     /// <param name="ordering">RAWG-style sort, e.g. "-rating" (a leading "-" means descending).</param>
@@ -129,13 +126,13 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
         var whereClause = $"where {string.Join(" & ", where)};";
 
         // 3. Two requests, sent at the same time: the page of games, and the total count
-        //    (RAWG returned both in one answer; IGDB needs a separate "/count" call).
+        //    (IGDB gives the total only through a separate "/count" call).
         var gamesTask = QueryAsync<List<IgdbGame>>("games",
             $"{SummaryFields} {whereClause} {sort} limit {pageSize}; offset {(page - 1) * pageSize};", ct);
         var countTask = QueryAsync<IgdbCount>("games/count", whereClause, ct);
         await Task.WhenAll(gamesTask, countTask);
 
-        // 4. Convert to the model the frontend already understands.
+        // 4. Convert to the model the frontend understands.
         var results = gamesTask.Result.Select(g => ToSummary(g, catalog)).ToList();
         return new GameListResponse(countTask.Result.Count, results);
     }

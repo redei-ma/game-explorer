@@ -10,15 +10,10 @@ import { guestGuard, loggedInGuard } from './auth/auth.guards';
 
 export const routes: Routes = [
 	{ path: '', component: Home, title: 'Novaquest' },
-	// Route to the page with advanced search and grid
 	{ path: 'games', component: GamesList, title: 'Ricerca Giochi' },
-	// Route to the individual game detail sheet
 	{ path: 'games/:id', component: GameDetail, title: 'Dettagli Gioco' },
-	// Route to the user's favorite games section
 	{ path: 'favorites', component: FavoritesList, title: 'I miei Preferiti' },
-	// Route to the user's wishlist
 	{ path: 'wishlist', component: WishlistList, title: 'Wishlist' },
-	// Route to the genre collections (Top 10 by Metascore)
 	{ path: 'collections', component: Collections, title: 'Raccolte' },
 	{
 		path: 'login',

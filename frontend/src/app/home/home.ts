@@ -62,7 +62,7 @@ export class Home {
 	private readonly collectionsService = inject(CollectionsService);
 	protected readonly currentUser = inject(AuthService).currentUser;
 
-	// Data layer: loaded from RAWG through the catalog-service
+	// Data layer: loaded through the catalog-service
 	protected readonly popular = rxResource({ stream: () => this.api.getGames(popularQuery()) });
 	protected readonly skeletons = Array.from({ length: POPULAR_COUNT }, (_, i) => i);
 	protected readonly upcoming = rxResource({ stream: () => this.api.getGames(upcomingQuery()) });

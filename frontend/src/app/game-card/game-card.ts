@@ -6,7 +6,7 @@ import { FavoritesService } from '../favorites/favorites.service';
 import { WishlistService } from '../wishlist/wishlist.service';
 
 /* Reusable game card: cover, title, release date, average rating, main platforms.
-   Used by the Home grid now and by the search results list later */
+   Used by home, search, favorites and wishlist */
 @Component({
 	selector: 'app-game-card',
 	imports: [RouterLink, DatePipe, DecimalPipe],
@@ -15,7 +15,6 @@ import { WishlistService } from '../wishlist/wishlist.service';
 	styleUrl: './game-card.css',
 })
 export class GameCard {
-	// Inject FavoritesService & wishlistService to manage the favorite and wishlist state
 	private readonly favoritesService = inject(FavoritesService);
 	private readonly wishlistService = inject(WishlistService);
 
@@ -26,7 +25,6 @@ export class GameCard {
 	// 'wishlist' replaces the favorite heart with a quick "remove from wishlist" button
 	readonly mode = input<'default' | 'wishlist'>('default');
 
-	// Reactive computed signal to check if the current game is favorited
 	protected readonly isFavorite = computed(() =>
 		this.favoritesService.isFavorite(this.game().id)
 	);

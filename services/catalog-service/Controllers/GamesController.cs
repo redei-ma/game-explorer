@@ -8,23 +8,20 @@ namespace CatalogService.Controllers;
 /// <summary>
 /// Public endpoints of the catalog service. Each action receives a request from the
 /// frontend (or the gateway), asks IGDB through <see cref="IgdbClient"/>, and returns the result.
-/// The URLs, parameters and JSON shapes are the same as in the RAWG version, so the frontend did not change.
+/// The URLs, parameters and JSON shapes follow RAWG's API, which the frontend was written for.
 /// </summary>
 [ApiController]
 [Route("api/games")]
 public class GamesController(IgdbClient igdb) : ControllerBase
 {
-
     /// <summary>
     /// Highest page a client may ask for.
-    /// The Angular constant MAX_PAGE in games-list.ts has the same value,
-    ///  change both together if needed.
+    /// The Angular constant MAX_PAGE in games-list.ts has the same value: change both together.
     /// </summary>
     public const int MaxPage = 800;
 
     /// <summary>
     /// Returns a page of games. With no parameters it returns the 20 most popular games.
-    /// Example for the home page: GET /api/games?ordering=-rating&amp;pageSize=12
     /// </summary>
     /// <param name="search">Optional words to look for in game names.</param>
     /// <param name="ordering">Optional sort: name, released, rating, metacritic, added, created, updated, hypes; "-" prefix = descending.</param>

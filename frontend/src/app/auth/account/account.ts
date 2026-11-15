@@ -41,8 +41,8 @@ export class Account {
           } catch (error) {
             return deleteAccountError(error, field);
           }
-          // The account is gone either way: if library fails, its data stays orphaned (a known
-          // limit in decisions.md) instead of asking the user to retry.
+          // The account is gone either way: if library fails, its data stays orphaned instead
+          // of asking the user to retry.
           await firstValueFrom(this.library.deleteAll()).catch(() => undefined);
           await this.logout();
           return undefined;

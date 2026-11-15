@@ -170,12 +170,6 @@
 	cursor: not-allowed;
 }
 
-.pagination-info {
-	color: var(--ge-muted);
-	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-	font-size: .75rem;
-}
-
 @media (max-width: 767px) {
 	.filters-panel {
 		display: none;

@@ -3,7 +3,6 @@
 		<h1>I tuoi Preferiti</h1>
 		@if (favoritesService.status() === 'ready') {
 			<p class="favorites-count">
-				<!-- Simple pluralization logic -->
 				{{ favorites().length }} {{ favorites().length === 1 ? 'gioco salvato' : 'giochi salvati' }}
 			</p>
 		}

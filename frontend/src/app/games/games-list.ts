@@ -91,7 +91,6 @@ export class GamesList implements OnInit, OnDestroy {
 		return items;
 	});
 
-	// Filter Status mapped to your GamesQuery
 	currentQuery: GamesQuery = {
 		page: 1,
 		pageSize: 24,
@@ -129,7 +128,7 @@ export class GamesList implements OnInit, OnDestroy {
 				this.setResults([], 0);
 				this.hasError.set(true);
 			} else {
-				this.setResults(response.results || [], response.count || 0); // CHANGED
+				this.setResults(response.results || [], response.count || 0);
 			}
 			this.isLoading.set(false);
 		});
@@ -137,7 +136,7 @@ export class GamesList implements OnInit, OnDestroy {
 
 	/** Stops the URL listener and the screen-size listener when the page is closed. */
 	ngOnDestroy(): void {
-		this.narrowQuery.removeEventListener('change', this.onScreenChange); // NEW
+		this.narrowQuery.removeEventListener('change', this.onScreenChange);
 		this.destroy$.next();
 		this.destroy$.complete();
 	}
@@ -152,17 +151,17 @@ export class GamesList implements OnInit, OnDestroy {
 	private loadGenresAndPlatforms(): void {
 		this.gamesApi.getGenres().subscribe({
 			next: res => this.genres.set(res.results || []),
-			error: () => console.error('Errore nel caricamento dei generi')
+			error: () => console.error('Could not load the genres')
 		});
 
 		this.gamesApi.getParentPlatforms().subscribe({
 			next: res => this.platforms.set(res.results || []),
-			error: () => console.error('Errore nel caricamento delle famiglie di piattaforme')
+			error: () => console.error('Could not load the platform groups')
 		});
 
 		this.gamesApi.getPlatforms().subscribe({
 			next: res => this.specificPlatforms.set(res.results || []),
-			error: () => console.error('Errore nel caricamento delle piattaforme')
+			error: () => console.error('Could not load the platforms')
 		});
 	}
 
@@ -199,7 +198,7 @@ export class GamesList implements OnInit, OnDestroy {
 	}
 
 	onPageChange(newPage: number): void {
-		if (newPage === this.currentPage() || newPage < 1 || newPage > this.totalPages()) return; // CHANGED
+		if (newPage === this.currentPage() || newPage < 1 || newPage > this.totalPages()) return;
 		this.updateQueryParams(newPage);
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
@@ -273,7 +272,7 @@ export class GamesList implements OnInit, OnDestroy {
 			platforms: params['platforms'] || undefined,
 			metacritic: params['metacritic'] || undefined,
 			ordering: params['ordering'] || '-rating',
-			page: this.parsePage(params['page']), // CHANGED
+			page: this.parsePage(params['page']),
 			pageSize: this.pageSize,
 			dates: selectedYear
 				? `${selectedYear}-01-01,${selectedYear}-12-31`
