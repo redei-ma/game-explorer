@@ -8,7 +8,7 @@ import {
 	provideAppInitializer,
 	provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular/router';
 import { routes } from './app.routes';
 import { AuthService } from './auth/auth.service';
 import { csrfInterceptor } from './auth/csrf.interceptor';
@@ -20,7 +20,11 @@ registerLocaleData(localeIt);
 export const appConfig: ApplicationConfig = {
 	providers: [
 		provideBrowserGlobalErrorListeners(),
-		provideRouter(routes),
+		provideRouter(
+			routes,
+			withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
+			withRouterConfig({ onSameUrlNavigation: 'reload' }),
+		),
 		provideHttpClient(withInterceptors([csrfInterceptor, sessionInterceptor])),
 		// Waits for /api/auth/me, so the first page and route guard already know who is logged in.
 		provideAppInitializer(() => inject(AuthService).loadCurrentUser()),

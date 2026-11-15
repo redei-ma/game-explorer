@@ -34,15 +34,15 @@ h1, h2, h3, h4, h5 {
 	letter-spacing: -0.02em;
 }
 
-/* Colonna centrale dei contenuti */
+/* Central column for contents */
 .container-ge {
 	width: 100%;
-	max-width: 832px;
+	max-width: 1200px;
 	margin-inline: auto;
 	padding-inline: 1rem;
 }
 
-/* Intestazione di sezione: titolo a sinistra, link a destra, linea sotto */
+/* Section header: title on the left, link on the right, line below */
 .section-head {
 	display: flex;
 	justify-content: space-between;
@@ -120,6 +120,7 @@ h1, h2, h3, h4, h5 {
 
 .auth-page {
 	position: relative;
+	overflow: hidden; /* clips the ::before glow: sticking out 3rem on the right it widened the page on mobile */
 	max-width: 40rem;
 	margin-block: clamp(1rem, 5vw, 3rem);
 	padding: clamp(1.5rem, 5vw, 2.5rem) !important;

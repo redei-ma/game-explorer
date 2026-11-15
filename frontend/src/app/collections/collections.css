@@ -1,0 +1,68 @@
+:host { display: block; }
+
+.collections-container { padding-block: clamp(1.5rem, 4vw, 3rem); }
+
+.collections-header {
+	margin-bottom: 2.5rem;
+	padding: 1.5rem;
+	background: linear-gradient(135deg, var(--ge-surface), var(--ge-blue-panel));
+	border: 1px solid var(--ge-border);
+	border-radius: 16px;
+}
+.collections-header h1 { margin: 0 0 .4rem; font-size: clamp(1.8rem, 4vw, 2.5rem); font-weight: 700; }
+.collections-lead { margin: 0; color: var(--ge-blue-soft); font-size: .9rem; line-height: 1.6; }
+
+/* Cards: one per genre, same look as the popular lists blocks of the home */
+.collection-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr)); gap: 1.25rem; margin: 0; padding: 0; list-style: none; }
+.collection-grid > li { min-width: 0; }
+
+.collection-card { display: block; width: 100%; padding: 1.25rem; background: var(--ge-surface); border: 1px solid var(--ge-border); border-radius: 12px; color: inherit; font: inherit; text-align: left; transition: border-color .2s ease, transform .2s ease; }
+button.collection-card { cursor: pointer; }
+button.collection-card:hover, button.collection-card:focus-visible { border-color: var(--ge-blue-soft); transform: translateY(-2px); }
+button.collection-card:hover .list__title, button.collection-card:focus-visible .list__title { color: var(--ge-blue-soft); }
+
+/* Three overlapping posters */
+.stack { display: flex; margin-bottom: 1rem; }
+.stack .ph-poster { flex: none; width: 7rem; background: var(--ge-band); }
+.stack .ph-poster + .ph-poster { margin-left: -4.25rem; }
+.stack .ph-poster:nth-child(2) { z-index: 1; }
+.stack .ph-poster:nth-child(3) { z-index: 2; }
+.ph-poster--cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Hide the placeholder circle when the cover image is shown */
+.ph-poster--cover::after { display: none; }
+
+.list__title { display: block; margin: 0 0 .25rem; color: var(--ge-text); font-size: .95rem; font-weight: 700; }
+.list__meta { display: block; color: var(--ge-muted); font-size: .72rem; }
+.collection-card__cta { display: block; margin-top: .9rem; color: var(--ge-accent); font-size: .66rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+
+.skeleton { background: var(--ge-band); animation: pulse 1.2s ease-in-out infinite alternate; }
+.skeleton::after { display: none; }
+@keyframes pulse { to { opacity: .45; } }
+
+/* Dialog with the Top 10 (same frame as "Chi siamo" in app.css) */
+.collection-dialog { width: min(56rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); padding: 0; overflow-y: auto; overscroll-behavior: contain; background: var(--ge-surface); color: var(--ge-text); border: 1px solid var(--ge-border); border-radius: 16px; }
+.collection-dialog::backdrop { background: rgba(3, 7, 18, .8); }
+.collection-dialog__body { position: relative; padding: 1.75rem; }
+.collection-dialog__body h2 { margin: 0 0 1.25rem; padding-right: 2.5rem; font-size: 1.4rem; }
+.collection-dialog__close { position: absolute; top: .9rem; right: .9rem; display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; background: transparent; border: 1px solid var(--ge-border); border-radius: 50%; color: var(--ge-muted); cursor: pointer; }
+.collection-dialog__close:hover, .collection-dialog__close:focus-visible { background: var(--ge-bg); color: var(--ge-text); }
+.collection-dialog__close svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 2; }
+.collection-dialog__more { margin: 1.25rem 0 0; text-align: right; }
+.collection-dialog__more a { color: var(--ge-muted); font-size: .68rem; font-weight: 500; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }
+.collection-dialog__more a:hover, .collection-dialog__more a:focus-visible { color: var(--ge-text); }
+
+/* Ranked rows: one column on mobile, two columns of five from 900px */
+/* minmax(0, 1fr): without it the column grows to the longest nowrap title and pushes the score badge off screen on mobile */
+.rows { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 2.5rem; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 900px) {
+	.rows { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(5, auto); grid-auto-flow: column; }
+}
+.row-item { display: flex; align-items: center; gap: .9rem; padding-block: .75rem; border-bottom: 1px solid var(--ge-border); color: inherit; text-decoration: none; }
+.row-item:hover .row-item__title, .row-item:focus-visible .row-item__title { color: var(--ge-blue-soft); }
+.row-item__rank { flex: none; width: 1.6rem; color: var(--ge-accent); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem; font-weight: 700; }
+.row-item__cover { flex: none; width: 3.25rem; aspect-ratio: 2 / 3; overflow: hidden; border-radius: 8px; background: var(--ge-band); }
+.row-item__cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.row-item__body { display: flex; flex: 1; flex-direction: column; gap: .2rem; min-width: 0; }
+.row-item__title { overflow: hidden; color: var(--ge-text); font-size: .85rem; line-height: 1.3; text-overflow: ellipsis; white-space: nowrap; }
+.row-item__meta { overflow: hidden; color: var(--ge-muted); font-size: .66rem; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.row-item__score { flex: none; padding: .25rem .55rem; border-radius: 999px; background: var(--ge-blue-soft); color: #0A0F1D; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; font-weight: 700; }

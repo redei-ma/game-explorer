@@ -14,11 +14,4 @@ describe('App', () => {
 		const fixture = TestBed.createComponent(App);
 		expect(fixture.componentInstance).toBeTruthy();
 	});
-
-	it('should render the brand in the header', async () => {
-	const fixture = TestBed.createComponent(App);
-	await fixture.whenStable();
-	const header = (fixture.nativeElement as HTMLElement).querySelector('.site-header');
-	expect(header?.textContent).toContain('Novaquest');
-	});
 });

@@ -1,0 +1,101 @@
+<div class="container-ge collections-container">
+	<header class="collections-header">
+		<h1>Raccolte</h1>
+		<p class="collections-lead">Scegli un genere per vedere la sua Top 10, in base al Metascore.</p>
+	</header>
+
+	@if (genresStatus() === 'loading') {
+		<p class="d-flex align-items-center gap-2" role="status">
+			<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+			Caricamento delle raccolte…
+		</p>
+	} @else if (genresStatus() === 'error') {
+		<div class="feedback-panel" role="alert">
+			<p>Impossibile caricare le raccolte. Controlla la connessione e riprova.</p>
+			<button type="button" class="btn btn-ge" (click)="load()">Riprova</button>
+		</div>
+	} @else if (visibleSections().length === 0) {
+		<div class="feedback-panel">
+			<p>Nessuna raccolta disponibile al momento.</p>
+		</div>
+	} @else {
+		<ul class="collection-grid">
+			@for (section of visibleSections(); track section.genre.id) {
+				<li>
+					@if (section.status === 'ready') {
+						<!-- The whole card is the button: it opens the Top 10 in the dialog below -->
+						<button type="button" class="collection-card" (click)="open(section.genre.id, dialog)">
+							<span class="stack" aria-hidden="true">
+								@for (game of section.games.slice(0, previewCount); track game.id; let i = $index) {
+									<span class="ph-poster" [class.ph-poster--cover]="game.backgroundImage">
+										@if (game.backgroundImage) {
+											<img [src]="game.backgroundImage" alt="" loading="lazy" />
+										}
+										<span class="ph-poster__n">{{ pad(i + 1) }}</span>
+									</span>
+								}
+							</span>
+							<strong class="list__title">{{ section.genre.name }}</strong>
+							<span class="list__meta">Top {{ section.games.length }} per Metascore</span>
+							<span class="collection-card__cta">Apri la classifica &gt;</span>
+						</button>
+					} @else if (section.status === 'loading') {
+						<div class="collection-card collection-card--static" aria-busy="true">
+							<span class="stack" aria-hidden="true">
+								@for (s of posterSkeletons; track s) {
+									<span class="ph-poster skeleton"></span>
+								}
+							</span>
+							<strong class="list__title">{{ section.genre.name }}</strong>
+							<span class="list__meta">Caricamento…</span>
+						</div>
+					} @else {
+						<div class="collection-card collection-card--static" role="alert">
+							<strong class="list__title">{{ section.genre.name }}</strong>
+							<span class="list__meta">Impossibile caricare questa classifica.</span>
+							<button type="button" class="btn btn-ge mt-3" (click)="retry(section.genre)">Riprova</button>
+						</div>
+					}
+				</li>
+			}
+		</ul>
+	}
+</div>
+
+<!-- TOP 10 of the genre picked from a card. Always in the page, so the card can open it -->
+<dialog #dialog class="collection-dialog" aria-labelledby="collection-dialog-title" (close)="selectedId.set(null)" (click)="$event.target === dialog && dialog.close()">
+	<div class="collection-dialog__body">
+		<button type="button" class="collection-dialog__close" aria-label="Chiudi" (click)="dialog.close()">
+			<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+		</button>
+		@if (selected(); as section) {
+			<p class="eyebrow mb-1">Top {{ section.games.length }} per Metascore</p>
+			<h2 id="collection-dialog-title">{{ section.genre.name }}</h2>
+			<ol class="rows">
+				@for (game of section.games; track game.id; let i = $index) {
+					<li>
+						<a class="row-item" [routerLink]="['/games', game.id]" (click)="dialog.close()">
+							<span class="row-item__rank">{{ pad(i + 1) }}</span>
+							<span class="row-item__cover">
+								@if (game.backgroundImage) {
+									<img [src]="game.backgroundImage" alt="" loading="lazy" />
+								}
+							</span>
+							<span class="row-item__body">
+								<strong class="row-item__title">{{ game.name }}</strong>
+								<span class="row-item__meta">
+									@if (game.released) { {{ game.released | date: 'd MMM y' }} } @else { Data n.d. }
+									@if (platformNames(game)) { &middot; {{ platformNames(game) }} }
+								</span>
+							</span>
+							<span class="row-item__score"><span class="visually-hidden">Metascore </span>{{ game.metacritic }}</span>
+						</a>
+					</li>
+				}
+			</ol>
+			<p class="collection-dialog__more">
+				<a routerLink="/games" [queryParams]="{ genres: section.genre.id, ordering: '-metacritic' }" (click)="dialog.close()">Tutti i giochi {{ section.genre.name }} &gt;</a>
+			</p>
+		}
+	</div>
+</dialog>

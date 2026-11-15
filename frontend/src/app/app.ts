@@ -23,7 +23,8 @@ export class App {
 
 	// Navigation links with currently available routes
 	protected readonly navLinks = [
-	{ label: 'Giochi', path: '/games' },
+	{ label: 'Catalogo', path: '/games' },
+	{ label: 'Raccolte', path: '/collections' },
 	{ label: 'Preferiti', path: '/favorites' },
 	{ label: 'Wishlist', path: '/wishlist' },
 	];
@@ -32,8 +33,7 @@ export class App {
 	// A hidden tab does not see a logout or login made in another one: it asks again when shown.
 	protected onVisibilityChange(): void {
 	if (document.visibilityState === 'visible') {
-		this.auth.recheckCurrentUser();
-	}
+		this.auth.recheckCurrentUser();}
 	}
 
 	protected dismissSessionExpired(): void {

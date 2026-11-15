@@ -4,6 +4,7 @@ import { GamesList } from './games/games-list';
 import { GameDetail } from './game-detail/game-detail';
 import { FavoritesList } from './favorites/favorites-list';
 import { WishlistList } from './wishlist/wishlist-list';
+import { Collections } from './collections/collections';
 import { NotFound } from './not-found/not-found';
 import { guestGuard, loggedInGuard } from './auth/auth.guards';
 
@@ -17,6 +18,8 @@ export const routes: Routes = [
 	{ path: 'favorites', component: FavoritesList, title: 'I miei Preferiti' },
 	// Route to the user's wishlist
 	{ path: 'wishlist', component: WishlistList, title: 'Wishlist' },
+	// Route to the genre collections (Top 10 by Metascore)
+	{ path: 'collections', component: Collections, title: 'Raccolte' },
 	{
 		path: 'login',
 		loadComponent: () => import('./auth/login/login').then((m) => m.Login),

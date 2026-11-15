@@ -86,7 +86,7 @@
 			</div>
 			<div class="meta-card">
 				<span class="meta-label">Valutazione Utenti</span>
-				<span class="meta-value">{{ g.rating ? g.rating + ' / 5' : 'N/D' }}</span>
+				<span class="meta-value">{{ g.rating ? (g.rating | number: '1.1-1' : 'en-US') + ' / 5' : 'N/D' }}</span>
 			</div>
 			<div class="meta-card">
 				<span class="meta-label">Data di Uscita</span>
