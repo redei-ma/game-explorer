@@ -150,7 +150,7 @@ describe('Login', () => {
     await settle(fixture);
 
     expect(page.querySelector('.alert-danger')?.textContent).toContain(
-      'Troppi tentativi: riprova tra un minuto.',
+      'Troppi tentativi: riprova tra qualche minuto.',
     );
   });
 

@@ -171,7 +171,7 @@ describe('Account', () => {
     await settle(fixture);
 
     expect(page.querySelector('form .alert-danger')?.textContent).toContain(
-      'Troppi tentativi sbagliati: riprova tra qualche minuto.',
+      'Troppi tentativi: riprova tra qualche minuto.',
     );
   });
 
