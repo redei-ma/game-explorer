@@ -25,11 +25,41 @@ main { flex: 1; }
 .search-bar .form-control:focus { border-color: var(--ge-accent); box-shadow: none; }
 
 .site-footer { padding-block: 1.6rem; background: var(--ge-bg); border-top: 1px solid var(--ge-border); }
-.footer-links { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; margin: 0; padding: 0; list-style: none; }
-.footer-links a { color: var(--ge-muted); font-size: .62rem; text-decoration: none; }
-.footer-links a:hover { color: var(--ge-text); }
-.footer-link--disabled { color: var(--ge-muted); font-size: .62rem; }
-.footer-note { color: #5b6a77; font-size: .6rem; }
+.footer-inner { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 1rem; }
+.footer-inner > :first-child { justify-self: start; }
+.footer-inner > :last-child { justify-self: end; }
+
+.brand--footer .brand__logo { height: 3.75rem; }
+
+.footer-links { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .5rem 1.5rem; margin: 0; padding: 0; list-style: none; }
+.footer-links li { display: flex; align-items: center; }
+.footer-links a,
+.footer-link-btn,
+.footer-note,
+.footer-note a { font-size: .7rem; line-height: 1.4; }
+.footer-links a,
+.footer-link-btn { padding: 0; background: none; border: 0; color: var(--ge-muted); text-decoration: none; cursor: pointer; }
+.footer-links a:hover, .footer-links a:focus-visible,
+.footer-link-btn:hover, .footer-link-btn:focus-visible { color: var(--ge-text); }
+
+.footer-note { color: #5b6a77; }
+.footer-note a { color: inherit; text-decoration: none; }
+.footer-note a:hover, .footer-note a:focus-visible { color: var(--ge-text); }
+
+@media (max-width: 767.98px) {
+	.footer-inner { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+	.footer-inner > :first-child, .footer-inner > :last-child { justify-self: center; }
+}
+
+.project-dialog { width: min(36rem, calc(100% - 2rem)); padding: 0; background: var(--ge-surface); color: var(--ge-text); border: 1px solid var(--ge-border); border-radius: 16px; }
+.project-dialog::backdrop { background: rgba(3, 7, 18, .8); }
+.project-dialog__body { position: relative; padding: 2rem; }
+.project-dialog__body h2 { margin-bottom: 1rem; padding-right: 2.5rem; font-size: 1.4rem; }
+.project-dialog__body p { margin-bottom: 1rem; color: #c3ccd4; line-height: 1.5; }
+.project-dialog__body p:last-of-type { margin-bottom: 0; }
+.project-dialog__close { position: absolute; top: .9rem; right: .9rem; display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; background: transparent; border: 1px solid var(--ge-border); border-radius: 50%; color: var(--ge-muted); cursor: pointer; }
+.project-dialog__close:hover, .project-dialog__close:focus-visible { background: var(--ge-bg); color: var(--ge-text); }
+.project-dialog__close svg { width: 1rem; height: 1rem; fill: none; stroke: currentColor; stroke-linecap: round; stroke-width: 2; }
 
 @media (max-width: 767.98px) {
 	.navbar-nav { padding-block: .75rem; gap: .5rem; }

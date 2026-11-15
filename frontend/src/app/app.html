@@ -1,5 +1,5 @@
 <header class="site-header">
-  <nav class="navbar navbar-expand-md" data-bs-theme="dark" aria-label="Navigazione principale">
+	<nav class="navbar navbar-expand-md" data-bs-theme="dark" aria-label="Navigazione principale">
 	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between">
 		<a class="brand" routerLink="/" aria-label="Novaquest, home" (click)="menuOpen.set(false)">
 			<img src="/assets/logo.svg" alt="Novaquest" class="brand__logo" />
@@ -42,15 +42,32 @@
 <main><router-outlet /></main>
 
 <footer class="site-footer">
-	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between gap-3">
-	<a class="brand" routerLink="/" aria-label="Novaquest, home">
-		<img src="assets/terranova.svg" alt="Novaquest" class="brand__logo" />
+	<div class="container-ge footer-inner">
+	<a class="brand brand--footer" routerLink="/" aria-label="Novaquest, home">
+		<img src="assets/terranova.svg" alt="" class="brand__logo" />
 	</a>
 	<ul class="footer-links">
-		@for (l of footerLinks; track l) {
-		<li><span class="footer-link footer-link--disabled">{{ l }}</span></li>
-		}
+		<li><a routerLink="/games">Catalogo</a></li>
+		<li><a routerLink="/favorites">Preferiti</a></li>
+		<li><a routerLink="/wishlist">Wishlist</a></li>
+		<li><button type="button" class="footer-link-btn" (click)="projectDialog.showModal()">Chi siamo</button></li>
 	</ul>
-	<small class="footer-note">Interfaccia dimostrativa &bull; Nessun asset fotografico utilizzato</small>
+	<small class="footer-note">
+		<a href="https://github.com/redei-ma/game-explorer" target="_blank" rel="noopener">© 2026 Novaquest &bull; Interfaccia dimostrativa</a>
+	</small>
 	</div>
 </footer>
+
+<!-- CHI SIAMO -->
+<dialog #projectDialog class="project-dialog" aria-labelledby="project-title" (click)="$event.target === projectDialog && projectDialog.close()">
+	<div class="project-dialog__body">
+	<button type="button" class="project-dialog__close" aria-label="Chiudi" (click)="projectDialog.close()">
+		<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+	</button>
+	<h2 id="project-title">Chi siamo</h2>
+	<p>Ogni grande videogioco è un mondo nuovo che aspetta solo di essere raggiunto.</p>
+	<p>Oggi l’universo videoludico è vasto come non mai: migliaia di titoli, piattaforme diverse e novità continue. Un’abbondanza meravigliosa, ma che spesso finisce per farci sentire alla deriva, indecisi su quale direzione prendere.</p>
+	<p>Novaquest nasce proprio per cambiare questa sensazione. Non abbiamo voluto costruire l’ennesimo database freddo e dispersivo, ma un vero compagno di viaggio pensato per restituirti il piacere della scoperta. Un osservatorio chiaro ed essenziale dove orientarti con naturalezza: puoi esplorare un catalogo sconfinato, affinare la rotta grazie a filtri mirati, custodire nei Preferiti i giochi che ti hanno lasciato il segno e raccogliere nella Wishlist tutte le avventure che non vedi l’ora di vivere.</p>
+	<p>L’universo è immenso, ma con gli strumenti giusti orientarsi diventa un piacere. `Che tu abbia già una meta precisa o stia solo cercando ispirazione, prendi i comandi: la tua prossima missione inizia da qui.</p>
+	</div>
+</dialog>
