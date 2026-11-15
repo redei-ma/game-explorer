@@ -86,8 +86,6 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
         int? minMetacritic = null, int? maxMetacritic = null,
         int page = 1, int pageSize = 20, CancellationToken ct = default)
     {
-        var catalog = await GetPlatformCatalogAsync(ct);
-
         // 1. Build the "where" conditions. They are joined with "&" (AND) at the end.
         var where = new List<string> { MainGamesFilter };
 
@@ -105,6 +103,10 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
 
         if (!string.IsNullOrWhiteSpace(platforms))
             where.Add($"platforms = ({string.Join(',', ParseIds(platforms, nameof(platforms)))})");
+
+        // Loaded after the checks above, so a bad date range or id list gets its 400
+        // without waiting for IGDB, even when IGDB is down.
+        var catalog = await GetPlatformCatalogAsync(ct);
 
         if (!string.IsNullOrWhiteSpace(parentPlatforms))
         {
@@ -336,13 +338,17 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
     /// </summary>
     /// <param name="csv">Comma-separated ids.</param>
     /// <param name="paramName">Parameter name, used in the error message.</param>
-    /// <exception cref="ArgumentException">A value is not a positive whole number.</exception>
+    /// <exception cref="ArgumentException">A value is not a positive whole number, or the list is empty.</exception>
     private static List<int> ParseIds(string csv, string paramName)
-        => csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+    {
+        var ids = csv.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
               .Select(s => int.TryParse(s, NumberStyles.None, CultureInfo.InvariantCulture, out var n) && n > 0
                   ? n
                   : throw new ArgumentException($"'{s}' in {paramName} is not a valid id."))
               .ToList();
+
+        return ids.Count > 0 ? ids : throw new ArgumentException($"{paramName} has no ids.");
+    }
 
     /// <summary>
     /// Converts "2020-01-01,2020-12-31" into two Unix timestamps: the start, and the
