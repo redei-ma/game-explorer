@@ -76,7 +76,8 @@
 
 /* Row lists: upcoming releases and top of the year */
 .rows-block + .rows-block { margin-top: 3.5rem; }
-.rows { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 2.5rem; margin: 0; padding: 0; list-style: none; } /* minmax(0, 1fr): without it the single column grows to the longest nowrap title and pushes the score badge off screen on mobile */
+/* minmax(0, 1fr): without it the single column grows to the longest nowrap title and pushes the score badge off screen on mobile */
+.rows { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0 2.5rem; margin: 0; padding: 0; list-style: none; }
 @media (min-width: 768px) {
 	.rows { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, auto); grid-auto-flow: column; }
 }
@@ -90,25 +91,20 @@
 .row-item__meta { overflow: hidden; color: var(--ge-muted); font-size: .66rem; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
 .row-item__score { flex: none; padding: .25rem .55rem; border-radius: 999px; background: var(--ge-blue-soft); color: #0A0F1D; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .8rem; font-weight: 700; }
 
-.section-link--disabled { color: var(--ge-muted); }
-
 /* Popular lists: three overlapping posters */
 .stack { display: flex; margin-bottom: 1rem; }
-.stack .ph-poster { flex: none; width: 7rem; }
+.stack .ph-poster { flex: none; width: 7rem; background: var(--ge-band); }
 .stack .ph-poster + .ph-poster { margin-left: -4.25rem; }
 .stack .ph-poster:nth-child(2) { z-index: 1; }
 .stack .ph-poster:nth-child(3) { z-index: 2; }
+.ph-poster--cover img { display: block; width: 100%; height: 100%; object-fit: cover; }
+/* Hide the placeholder circle when the cover image is shown */
+.ph-poster--cover::after { display: none; }
 .list__title { margin: 0 0 .25rem; font-family: var(--bs-body-font-family); font-size: .82rem; font-weight: 700; letter-spacing: 0; }
 .list__meta { margin: 0; color: var(--ge-muted); font-size: .64rem; }
+.list { display: block; color: inherit; text-decoration: none; }
+.list:hover .list__title, .list:focus-visible .list__title { color: var(--ge-blue-soft); }
 
 /* CTA */
 .cta { padding-block: 3.5rem; background: var(--ge-band); border-top: 1px solid var(--ge-border); }
 .cta__title { max-width: 24rem; margin: 0; font-size: clamp(1.4rem, 3.4vw, 1.6rem); font-weight: 700; line-height: 1.25; }
-
-/* Placeholder colours (reviews and lists, static blocks) */
-.c1 { background: #2d4a6b; }
-.c2 { background: #7a3f32; }
-.c3 { background: #8a7355; }
-.c4 { background: #44525e; }
-.c5 { background: #56603a; }
-.c6 { background: #7a5c54; }

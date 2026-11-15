@@ -5,7 +5,7 @@
 	<p class="eyebrow">La tua storia, pixel dopo pixel</p>
 	<h1>Scopri nuovi giochi.<br />Racconta quelli che ami.</h1>
 	<p class="hero__lead">
-		Tieni traccia delle tue avventure, crea liste e scopri nuovi titoli insieme a una community di appassionati.
+		Tieni traccia delle tue avventure, lasciati ispirare e scopri nuovi titoli insieme a una community di appassionati.
 	</p>
 	<div class="d-flex flex-wrap align-items-center gap-3">
 		@if (currentUser()) {
@@ -137,30 +137,65 @@
 	<div class="rows-block">
 		<div class="section-head">
 		<span>I migliori del {{ currentYear }} per Metacritic</span>
-		<a routerLink="/games" [queryParams]="{ ordering: '-metacritic', year: currentYear }">Tutti i giochi &gt;</a>
+		<a routerLink="/games" [queryParams]="{ ordering: '-metacritic', year: currentYear }">Esplora il catalogo &gt;</a>
 		</div>
 		<ng-container [ngTemplateOutlet]="gameRows" [ngTemplateOutletContext]="{ $implicit: topOfYear, ranked: true }" />
 	</div>
 	</div>
 </section>
 
-<!-- POPULAR LISTS -->
+<!-- POPULAR LISTS: top 3 of a few genres, the full Top 10 is in /collections -->
 <section class="band band--alt">
 	<div class="container-ge">
-	<div class="section-head"><span>Liste popolari</span><span class="section-link--disabled">Tutte le liste &gt;</span></div>
-	<div class="row gy-4">
-		@for (l of lists; track l.title) {
-		<div class="col-md-4">
+	<div class="section-head"><span>Raccolte popolari</span><a routerLink="/collections">Vai alle raccolte &gt;</a></div>
+
+	@if (collectionsPreview.isLoading()) {
+		<div class="row gy-4" aria-busy="true" aria-label="Caricamento delle liste">
+		@for (s of previewSkeletons; track s) {
+		<div class="col-sm-6 col-lg-3">
 			<div class="stack">
-			@for (p of l.posters; track p) {
-				<span class="ph-poster" [class]="'c' + p"><span class="ph-poster__n">{{ pad(p) }}</span></span>
+			@for (c of coverSkeletons; track c) {
+				<span class="ph-poster skeleton"></span>
 			}
 			</div>
-			<h3 class="list__title">{{ l.title }}</h3>
-			<p class="list__meta">{{ l.desc }} &bull; {{ l.count }} titoli</p>
 		</div>
 		}
-	</div>
+		</div>
+	}
+	@else if (collectionsPreview.error()) {
+		<div class="state" role="alert">
+		<p class="mb-3">Impossibile caricare le raccolte. Controlla la connessione e riprova.</p>
+		<button type="button" class="btn btn-ge" (click)="collectionsPreview.reload()">Riprova</button>
+		</div>
+	}
+	@else {
+		@let previews = collectionsPreview.value() ?? [];
+		@if (previews.length) {
+		<div class="row gy-4">
+			@for (l of previews; track l.genre.id) {
+			<div class="col-sm-6 col-lg-3">
+				<a class="list" routerLink="/collections" [queryParams]="{ genre: l.genre.slug }">
+				<div class="stack" aria-hidden="true">
+				@for (game of l.games.slice(0, previewCovers); track game.id; let i = $index) {
+					<span class="ph-poster" [class.ph-poster--cover]="game.backgroundImage">
+						@if (game.backgroundImage) {
+							<img [src]="game.backgroundImage" alt="" loading="lazy" />
+						}
+						<span class="ph-poster__n">{{ pad(i + 1) }}</span>
+					</span>
+				}
+				</div>
+				<h3 class="list__title">{{ l.genre.name }}</h3>
+				<p class="list__meta">I migliori per Metascore &bull; {{ l.games.length }} titoli</p>
+				</a>
+			</div>
+			}
+		</div>
+		}
+		@else {
+			<div class="state"><p class="mb-0">Nessuna lista disponibile al momento.</p></div>
+		}
+	}
 	</div>
 </section>
 
