@@ -62,17 +62,17 @@
 		}
 	}
 
-	<h2 class="about__title">Novaquest ti aiuta a ricordare, scoprire e condividere i videogiochi.</h2>
-	<div class="features">
-		<div class="row row-cols-1 row-cols-md-3 gy-4">
+		<h2 class="about__title">Novaquest è la tua bussola per esplorare l’universo videoludico, conservare i tuoi titoli del cuore e pianificare le prossime avventure.</h2>
+		<div class="row row-cols-1 row-cols-md-3 g-3">
 		@for (f of features; track f.n) {
-			<div class="col">
+		<div class="col">
+			<div class="feature-box">
 			<span class="features__n">{{ f.n }}</span>
 			<h3 class="features__title">{{ f.title }}</h3>
 			<p class="features__text">{{ f.text }}</p>
 			</div>
-		}
 		</div>
+		}
 	</div>
 	</div>
 </section>

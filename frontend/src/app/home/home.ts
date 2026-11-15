@@ -57,12 +57,11 @@ export class Home {
 	protected readonly rowSkeletons = Array.from({ length: LIST_COUNT }, (_, i) => i);
 	protected readonly currentYear = new Date().getFullYear();
 
-	// Static content (no API in the spec for these blocks yet)
-
+	// Static content
 	protected readonly features = [
-	{ n: '01', title: 'Tieni un diario', text: 'Registra i tuoi momenti di gioco e conserva i tuoi gameplay in una libreria personale.' },
-	{ n: '02', title: 'Esprimi un giudizio', text: 'Valuta, recensisci e ritrova facilmente tutto ciò a cui hai giocato.' },
-	{ n: '03', title: 'Segui le persone', text: 'Scopri cosa appassiona gli altri giocatori e trova la tua prossima avventura.' },
+	{ n: '01', title: 'Naviga senza confini', text: 'Sfoglia un archivio sterminato di titoli e piattaforme per scovare subito l’esperienza giusta per te.' },
+	{ n: '02', title: 'Fissa i tuoi punti cardinali', text: 'Aggiungi ai preferiti i giochi indimenticabili per ritrovarli in un attimo ogni volta che vuoi.' },
+	{ n: '03', title: 'Traccia le prossime missioni', text: 'Salva in wishlist le uscite e i recuperi in programma per non perdere mai di vista il prossimo obiettivo.' },
 	];
 
 	protected readonly lists = [
