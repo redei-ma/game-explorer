@@ -4,6 +4,7 @@ import { FieldTree, FormField, TreeValidationResult, form, required } from '@ang
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { LibraryService } from '../../library/library.service';
+import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
 import { AuthService } from '../auth.service';
 import { FieldErrors } from '../field-errors/field-errors';
 import { submitAgain } from '../submit-again';
@@ -88,7 +89,7 @@ function deleteAccountError(
   }
   // The account is locked after too many wrong passwords, even if this one is right.
   if (error instanceof HttpErrorResponse && error.status === 429) {
-    return { kind: 'server', message: 'Troppi tentativi sbagliati: riprova tra qualche minuto.' };
+    return { kind: 'server', message: TOO_MANY_ATTEMPTS_MESSAGE };
   }
   return { kind: 'server', message: 'Eliminazione non riuscita: riprova più tardi.' };
 }

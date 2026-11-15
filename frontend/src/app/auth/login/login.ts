@@ -3,7 +3,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormField, email, form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
-import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
+import { LOCKOUT_HINT, TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
 import { AuthService } from '../auth.service';
 import { FieldErrors } from '../field-errors/field-errors';
 import { submitAgain } from '../submit-again';
@@ -56,10 +56,8 @@ export class Login {
 }
 
 function loginErrorMessage(error: unknown): string {
-  // auth-service answers a locked account like a wrong password, so the lock is mentioned to
-  // everyone: a user with the right password would not know why it fails.
   if (error instanceof HttpErrorResponse && error.status === 401) {
-    return "Email o password errate. Dopo troppi tentativi sbagliati l'accesso si blocca per qualche minuto.";
+    return `Email o password errate. ${LOCKOUT_HINT}`;
   }
   if (error instanceof HttpErrorResponse && error.status === 429) {
     return TOO_MANY_ATTEMPTS_MESSAGE;
