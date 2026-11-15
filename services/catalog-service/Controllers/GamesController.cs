@@ -16,9 +16,9 @@ public class GamesController(IgdbClient igdb) : ControllerBase
 {
 
     /// <summary>
-    /// Highest page a client may ask for. 800 pages x 20 games = offset 9,960 at most, which stays
-    /// below the 10,000-result offset limit older IGDB versions had, so deep pages can't fail upstream.
-    /// The Angular constant MAX_PAGE has the same value: change both together if needed.
+    /// Highest page a client may ask for.
+    /// The Angular constant MAX_PAGE in games-list.ts has the same value,
+    ///  change both together if needed.
     /// </summary>
     public const int MaxPage = 800;
 
