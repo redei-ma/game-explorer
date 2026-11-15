@@ -60,6 +60,7 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
         ["added"]      = "total_rating_count",  // closest thing to "popularity"
         ["created"]    = "created_at",
         ["updated"]    = "updated_at",
+        ["hypes"]      = "hypes",               // follows before release: interest in upcoming games
     };
 
     // ---------------------------------------------------------------- public API
@@ -313,7 +314,7 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
         // Games with no value for the sort field would otherwise mix into the results.
         if (field == "rating")
             where.Add($"rating_count >= {MinRatingVotes}");
-        else if (field is "aggregated_rating" or "first_release_date")
+        else if (field is "aggregated_rating" or "first_release_date" or "hypes")
             where.Add($"{field} != null");
 
         return $"sort {field} {(descending ? "desc" : "asc")};";
