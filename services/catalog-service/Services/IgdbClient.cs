@@ -27,7 +27,7 @@ namespace CatalogService.Services;
 /// this is called expansion, and it replaces the extra calls RAWG sometimes needed.
 /// Authentication headers are added by <see cref="IgdbAuthHandler"/>, not here.
 /// </remarks>
-public class IgdbClient(HttpClient http, IMemoryCache cache)
+public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient> logger)
 {
     // IGDB uses snake_case names (first_release_date); C# uses PascalCase (FirstReleaseDate).
     private static readonly JsonSerializerOptions JsonOptions =
@@ -254,6 +254,7 @@ public class IgdbClient(HttpClient http, IMemoryCache cache)
 
             if (response.StatusCode == HttpStatusCode.TooManyRequests && attempt == 1)
             {
+                logger.LogWarning("IGDB {Endpoint} answered 429 (rate limit), retrying in 1 second.", endpoint);
                 await Task.Delay(TimeSpan.FromSeconds(1), ct);
                 continue; // second and last try
             }

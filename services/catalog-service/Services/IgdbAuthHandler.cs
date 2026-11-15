@@ -12,7 +12,7 @@ namespace CatalogService.Services;
 /// It also handles one failure automatically: if IGDB answers 401 Unauthorized, the
 /// token is thrown away, a fresh one is obtained and the request is sent once more.
 /// </remarks>
-public sealed class IgdbAuthHandler(IgdbTokenProvider tokens) : DelegatingHandler
+public sealed class IgdbAuthHandler(IgdbTokenProvider tokens, ILogger<IgdbAuthHandler> logger) : DelegatingHandler
 {
     /// <summary>
     /// Called by HttpClient for every outgoing request. Adds the headers, forwards
@@ -30,6 +30,7 @@ public sealed class IgdbAuthHandler(IgdbTokenProvider tokens) : DelegatingHandle
             return response;
 
         // 401: the token is no longer accepted. Discard it, get a new one, try once more.
+        logger.LogWarning("IGDB rejected the access token (401), getting a new one and retrying.");
         response.Dispose();
         tokens.Invalidate();
         await AddAuthHeadersAsync(request, ct);

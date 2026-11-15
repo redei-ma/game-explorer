@@ -62,10 +62,6 @@ public class GamesController(IgdbClient igdb) : ControllerBase
             // IgdbClient rejected a parameter (bad id list, bad date range, unknown ordering).
             return Problem(ex.Message, statusCode: StatusCodes.Status400BadRequest);
         }
-        catch (HttpRequestException ex)
-        {
-            return Problem($"Upstream API error: {ex.StatusCode}", statusCode: 502);
-        }
     }
 
     /// <summary>Returns the full details of one game. GET /api/games/1942
@@ -75,15 +71,8 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([Range(1, int.MaxValue)] int id, CancellationToken ct = default)
     {
-        try
-        {
-            var game = await igdb.GetGameAsync(id, ct);
-            return game is null ? NotFound() : Ok(game);
-        }
-        catch (HttpRequestException ex)
-        {
-            return Problem($"Upstream API error: {ex.StatusCode}", statusCode: 502);
-        }
+        var game = await igdb.GetGameAsync(id, ct);
+        return game is null ? NotFound() : Ok(game);
     }
 
     /// <summary>Returns the screenshots of one game. GET /api/games/1942/screenshots</summary>
@@ -92,15 +81,8 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     [HttpGet("{id:int}/screenshots")]
     public async Task<IActionResult> GetScreenshots([Range(1, int.MaxValue)] int id, CancellationToken ct = default)
     {
-        try
-        {
-            var shots = await igdb.GetScreenshotsAsync(id, ct);
-            return shots is null ? NotFound() : Ok(shots);
-        }
-        catch (HttpRequestException ex)
-        {
-            return Problem($"Upstream API error: {ex.StatusCode}", statusCode: 502);
-        }
+        var shots = await igdb.GetScreenshotsAsync(id, ct);
+        return shots is null ? NotFound() : Ok(shots);
     }
 
     /// <summary>Lists all genres for the filter dropdown. GET /api/genres</summary>
@@ -110,36 +92,18 @@ public class GamesController(IgdbClient igdb) : ControllerBase
     /// base route.
     /// </remarks>
     [HttpGet("~/api/genres")]
-    public async Task<IActionResult> GetGenres(CancellationToken ct = default)
-    {
-        try { return Ok(await igdb.GetGenresAsync(ct)); }
-        catch (HttpRequestException ex)
-        {
-            return Problem($"Upstream API error: {ex.StatusCode}", statusCode: 502);
-        }
-    }
+    public async Task<IActionResult> GetGenres(CancellationToken ct = default) =>
+        Ok(await igdb.GetGenresAsync(ct));
 
     /// <summary>Lists platform groups (PC, PlayStation, Xbox...) for the first dropdown. GET /api/parent-platforms</summary>
     /// <param name="ct">Cancellation token.</param>
     [HttpGet("~/api/parent-platforms")]
-    public async Task<IActionResult> GetParentPlatforms(CancellationToken ct = default)
-    {
-        try { return Ok(await igdb.GetParentPlatformsAsync(ct)); }
-        catch (HttpRequestException ex)
-        {
-            return Problem($"Upstream API error: {ex.StatusCode}", statusCode: 502);
-        }
-    }
+    public async Task<IActionResult> GetParentPlatforms(CancellationToken ct = default) =>
+        Ok(await igdb.GetParentPlatformsAsync(ct));
 
     /// <summary>Lists specific platforms. GET /api/platforms</summary>
     /// <param name="ct">Cancellation token.</param>
     [HttpGet("~/api/platforms")]
-    public async Task<IActionResult> GetPlatforms(CancellationToken ct = default)
-    {
-        try { return Ok(await igdb.GetPlatformsAsync(ct)); }
-        catch (HttpRequestException ex)
-        {
-            return Problem($"Upstream API error: {ex.StatusCode}", statusCode: 502);
-        }
-    }
+    public async Task<IActionResult> GetPlatforms(CancellationToken ct = default) =>
+        Ok(await igdb.GetPlatformsAsync(ct));
 }
