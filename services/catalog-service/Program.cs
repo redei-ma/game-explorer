@@ -19,6 +19,13 @@ builder.Services.AddProblemDetails();
 builder.Services.AddMemoryCache();
 
 // --- IGDB -------------------------------------------------------------------
+// Validated at startup, so missing credentials stop the service instead of
+// failing on the first request while /health still says Healthy.
+builder.Services.AddOptions<IgdbOptions>()
+    .Bind(builder.Configuration.GetSection(IgdbOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
 // 1. An HttpClient that points to Twitch's login server, used only to get tokens.
 builder.Services.AddHttpClient(IgdbTokenProvider.HttpClientName, client =>
 {

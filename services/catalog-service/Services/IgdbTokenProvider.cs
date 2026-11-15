@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
 
 namespace CatalogService.Services;
 
@@ -16,7 +17,7 @@ namespace CatalogService.Services;
 /// </remarks>
 public sealed class IgdbTokenProvider(
     IHttpClientFactory httpFactory,
-    IConfiguration config,
+    IOptions<IgdbOptions> options,
     ILogger<IgdbTokenProvider> logger)
 {
     /// <summary>Name of the HttpClient (configured in Program.cs) that points to Twitch's login server.</summary>
@@ -39,12 +40,10 @@ public sealed class IgdbTokenProvider(
     /// Your Twitch application's Client ID. IGDB wants it in a "Client-ID" header
     /// on every request, so <see cref="IgdbAuthHandler"/> reads it from here.
     /// </summary>
-    public string ClientId { get; } = config["Igdb:ClientId"]
-        ?? throw new InvalidOperationException("Igdb:ClientId is missing (set it with dotnet user-secrets).");
+    public string ClientId { get; } = options.Value.ClientId;
 
     // The secret is only ever sent to Twitch, never to IGDB, and never leaves this class.
-    private readonly string _clientSecret = config["Igdb:ClientSecret"]
-        ?? throw new InvalidOperationException("Igdb:ClientSecret is missing (set it with dotnet user-secrets).");
+    private readonly string _clientSecret = options.Value.ClientSecret;
 
     /// <summary>
     /// Returns a valid access token, logging in to Twitch only when the cached one
