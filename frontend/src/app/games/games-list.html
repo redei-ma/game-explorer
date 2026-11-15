@@ -91,10 +91,18 @@
 		</div>
 	</section>
 
-	<section class="state-container state-banner empty-banner" *ngIf="!isLoading() && !hasError() && games().length === 0">
+	<section class="state-container state-banner empty-banner" *ngIf="!isLoading() && !hasError() && totalResults() === 0">
 		<div class="banner-content">
 			<p>Nessun videogioco trovato con i criteri selezionati.</p>
 			<button class="btn-primary" (click)="resetFilters()">Azzera Filtri</button>
+		</div>
+	</section>
+
+  <!-- The search has results, but not on this page (for example ?page=200 typed in the address bar) -->
+	<section class="state-container state-banner empty-banner" *ngIf="!isLoading() && !hasError() && games().length === 0 && totalResults() > 0">
+		<div class="banner-content">
+			<p>Questa pagina è vuota: la ricerca ha {{ totalResults() }} risultati su meno pagine.</p>
+			<button class="btn-primary" (click)="goToLastPage()">Vai all'ultima pagina</button>
 		</div>
 	</section>
 
@@ -104,17 +112,42 @@
 		<app-game-card *ngFor="let game of games()" [game]="game"></app-game-card>
 	</div>
 
-	<!-- Pagination Controls -->
+		<!-- Pagination Controls -->
 	<nav class="pagination-container" aria-label="Paginazione risultati" *ngIf="!isLoading() && !hasError() && totalPages() > 1">
-		<button class="pagination-btn" [disabled]="currentQuery.page === 1" 
-			(click)="onPageChange((currentQuery.page || 1) - 1)">
+		<button type="button" class="pagination-btn" [disabled]="currentPage() <= 1"
+			(click)="onPageChange(currentPage() - 1)">
 			Precedente
 		</button>
-		<span class="pagination-info">
-			Pagina {{ currentQuery.page }} di {{ totalPages() }}
-		</span>
-		<button class="pagination-btn" [disabled]="currentQuery.page === totalPages()"
-			(click)="onPageChange((currentQuery.page || 1) + 1)">
+
+		<div class="pagination-numbers">
+			@for (item of pageItems(); track $index) {
+				@if (item === 'gap') {
+					@if (editingGap() === $index) {
+						<input #jumpInput type="number" inputmode="numeric" min="1" [max]="totalPages()"
+							class="pagination-btn pagination-number pagination-jump"
+							[class.invalid]="jumpInvalid()"
+							[attr.aria-invalid]="jumpInvalid()"
+							[attr.aria-label]="'Vai alla pagina, da 1 a ' + totalPages()"
+							[title]="jumpInvalid() ? 'Inserisci un numero da 1 a ' + totalPages() : 'Invio per andare, Esc per annullare'"
+							(keydown.enter)="jump(jumpInput.value)"
+							(keydown.escape)="closeJump()"
+							(blur)="closeJump()" />
+					} @else {
+						<button type="button" class="pagination-btn pagination-number pagination-gap"
+							title="Vai alla pagina…" aria-label="Vai alla pagina…"
+							(click)="openJump($index)">…</button>
+					}
+				} @else {
+					<button type="button" class="pagination-btn pagination-number"
+						[class.current]="item === currentPage()"
+						[attr.aria-current]="item === currentPage() ? 'page' : null"
+						(click)="onPageChange(item)">{{ item }}</button>
+				}
+			}
+		</div>
+
+		<button type="button" class="pagination-btn" [disabled]="currentPage() >= totalPages()"
+			(click)="onPageChange(currentPage() + 1)">
 			Successiva
 		</button>
 	</nav>
