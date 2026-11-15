@@ -1,6 +1,13 @@
-// The gateway limits login, registration and recovery together and answers 429 for all three
-// (gateway/nginx.conf).
-export const TOO_MANY_ATTEMPTS_MESSAGE = 'Troppi tentativi: riprova tra un minuto.';
+// 429 comes from the gateway, which limits login, registration and recovery together
+// (gateway/nginx.conf), and from auth-service when a locked account confirms its deletion. Not
+// "a minute": the gateway lets six quick requests through, and five wrong passwords or codes
+// already lock the account for longer.
+export const TOO_MANY_ATTEMPTS_MESSAGE = 'Troppi tentativi: riprova tra qualche minuto.';
+
+// auth-service answers a locked account like a wrong password or code, so login and recovery
+// mention the lock to everyone: a user with the right data would not know why it fails.
+export const LOCKOUT_HINT =
+  "Dopo troppi tentativi sbagliati l'account si blocca per qualche minuto.";
 
 // Identity's codes for the password rules, used by registration and recovery, in the order the
 // sentence lists them. The number repeats Identity's default option (auth-service Program.cs)

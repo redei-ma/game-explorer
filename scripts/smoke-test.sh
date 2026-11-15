@@ -20,8 +20,12 @@ check() {
 # database migrations first.
 for service in catalog auth library; do
   echo "Waiting for $service"
-  curl --insecure --silent --show-error --fail --output /dev/null \
-    --retry 30 --retry-delay 2 --retry-all-errors "$base/health/$service"
+  # One message instead of curl's error on every attempt
+  if ! curl --insecure --silent --fail --output /dev/null \
+    --retry 30 --retry-delay 2 --retry-all-errors "$base/health/$service"; then
+    echo "$service is not answering"
+    exit 1
+  fi
 done
 
 check 301 http://localhost:8080/

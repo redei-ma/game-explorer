@@ -12,6 +12,7 @@ import { provideRouter, withInMemoryScrolling, withRouterConfig } from '@angular
 import { routes } from './app.routes';
 import { AuthService } from './auth/auth.service';
 import { csrfInterceptor } from './auth/csrf.interceptor';
+import { sessionInterceptor } from './auth/session.interceptor';
 
 // Italian dates and decimals (date / number pipes)
 registerLocaleData(localeIt);

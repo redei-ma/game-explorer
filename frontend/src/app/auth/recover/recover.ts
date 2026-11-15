@@ -12,11 +12,13 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import {
+  LOCKOUT_HINT,
   PASSWORD_RULES_HINT,
   TOO_MANY_ATTEMPTS_MESSAGE,
   passwordRulesMessage,
 } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { FieldErrors } from '../field-errors/field-errors';
 import { submitAgain } from '../submit-again';
 import { RecoveryCode } from '../recovery-code/recovery-code';
 
@@ -29,7 +31,7 @@ interface RecoverModel {
 
 @Component({
   selector: 'app-recover',
-  imports: [FormField, RecoveryCode, RouterLink],
+  imports: [FieldErrors, FormField, RecoveryCode, RouterLink],
   templateUrl: './recover.html',
 })
 export class Recover {
@@ -101,7 +103,7 @@ function recoverErrors(error: unknown, form: FieldTree<RecoverModel>): TreeValid
   }
   if (error instanceof HttpErrorResponse && error.status === 401) {
     // Unknown email, wrong code and locked account get the same answer from the server.
-    return { kind: 'server', message: 'Email o codice di recupero errati.' };
+    return { kind: 'server', message: `Email o codice di recupero errati. ${LOCKOUT_HINT}` };
   }
   if (error instanceof HttpErrorResponse && error.status === 429) {
     return { kind: 'server', message: TOO_MANY_ATTEMPTS_MESSAGE };

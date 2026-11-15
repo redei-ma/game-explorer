@@ -64,6 +64,17 @@ describe('Account', () => {
     expect(navigate).toHaveBeenCalledWith('/', { replaceUrl: true });
   });
 
+  it('goes to the home page when the session ends while the page is open', async () => {
+    const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
+    const { fixture } = await renderLoggedIn();
+    expect(navigate).not.toHaveBeenCalled();
+
+    TestBed.inject(AuthService).expireSession();
+    await fixture.whenStable();
+
+    expect(navigate).toHaveBeenCalledWith('/', { replaceUrl: true });
+  });
+
   it('shows an error and stays when the logout fails', async () => {
     const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl');
     const { fixture, page, button } = await renderLoggedIn();
@@ -160,7 +171,7 @@ describe('Account', () => {
     await settle(fixture);
 
     expect(page.querySelector('form .alert-danger')?.textContent).toContain(
-      'Troppi tentativi sbagliati: riprova tra qualche minuto.',
+      'Troppi tentativi: riprova tra qualche minuto.',
     );
   });
 

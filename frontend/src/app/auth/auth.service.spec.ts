@@ -149,4 +149,38 @@ describe('AuthService', () => {
     await expect(logout).rejects.toMatchObject({ status: 0 });
     expect(auth.currentUser()).toEqual(mario);
   });
+
+  it('shows a login made in another tab when asked again', async () => {
+    const result = firstValueFrom(auth.loadCurrentUser());
+    http.expectOne('/api/auth/me').flush(null, { status: 401, statusText: 'Unauthorized' });
+    await result;
+
+    auth.recheckCurrentUser();
+    http.expectOne('/api/auth/me').flush(mario);
+
+    expect(auth.currentUser()).toEqual(mario);
+  });
+
+  it('keeps the same user object when asked again, so the favorites do not load again', async () => {
+    const result = firstValueFrom(auth.loadCurrentUser());
+    http.expectOne('/api/auth/me').flush(mario);
+    await result;
+    const before = auth.currentUser();
+
+    auth.recheckCurrentUser();
+    http.expectOne('/api/auth/me').flush({ ...mario });
+
+    expect(auth.currentUser()).toBe(before);
+  });
+
+  it('stays logged in when asking again fails for the network', async () => {
+    const result = firstValueFrom(auth.loadCurrentUser());
+    http.expectOne('/api/auth/me').flush(mario);
+    await result;
+
+    auth.recheckCurrentUser();
+    http.expectOne('/api/auth/me').error(new ProgressEvent('error'));
+
+    expect(auth.currentUser()).toEqual(mario);
+  });
 });

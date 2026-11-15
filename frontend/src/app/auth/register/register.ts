@@ -19,6 +19,7 @@ import {
   passwordRulesMessage,
 } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { FieldErrors } from '../field-errors/field-errors';
 import { submitAgain } from '../submit-again';
 import { RecoveryCode } from '../recovery-code/recovery-code';
 
@@ -31,7 +32,7 @@ interface RegisterModel {
 
 @Component({
   selector: 'app-register',
-  imports: [FormField, RecoveryCode, RouterLink],
+  imports: [FieldErrors, FormField, RecoveryCode, RouterLink],
   templateUrl: './register.html',
 })
 export class Register {

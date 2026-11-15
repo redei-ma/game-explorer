@@ -18,11 +18,7 @@
           autocomplete="email"
           [formField]="registerForm.email"
         />
-        @if (submitted()) {
-          @for (error of registerForm.email().errors(); track error.kind) {
-            <div class="form-text text-danger">{{ error.message }}</div>
-          }
-        }
+        <app-field-errors [field]="registerForm.email" [show]="submitted()" />
       </div>
 
       <div class="mb-3">
@@ -39,11 +35,7 @@
           Da 3 a 30 caratteri: lettere senza accenti, numeri e i simboli
           <span class="text-nowrap">- . _ &#64; +</span>
         </div>
-        @if (submitted()) {
-          @for (error of registerForm.username().errors(); track error.kind) {
-            <div class="form-text text-danger">{{ error.message }}</div>
-          }
-        }
+        <app-field-errors [field]="registerForm.username" [show]="submitted()" />
       </div>
 
       <div class="mb-3">
@@ -57,11 +49,7 @@
           [formField]="registerForm.password"
         />
         <div id="register-password-hint" class="form-text">{{ passwordHint }}</div>
-        @if (submitted()) {
-          @for (error of registerForm.password().errors(); track error.kind) {
-            <div class="form-text text-danger">{{ error.message }}</div>
-          }
-        }
+        <app-field-errors [field]="registerForm.password" [show]="submitted()" />
       </div>
 
       <div class="mb-3">
@@ -73,11 +61,7 @@
           autocomplete="new-password"
           [formField]="registerForm.confirmPassword"
         />
-        @if (submitted()) {
-          @for (error of registerForm.confirmPassword().errors(); track error.kind) {
-            <div class="form-text text-danger">{{ error.message }}</div>
-          }
-        }
+        <app-field-errors [field]="registerForm.confirmPassword" [show]="submitted()" />
       </div>
 
       @for (error of registerForm().errors(); track error.kind) {

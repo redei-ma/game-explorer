@@ -1,15 +1,17 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, effect, inject, signal } from '@angular/core';
 import { FieldTree, FormField, TreeValidationResult, form, required } from '@angular/forms/signals';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { LibraryService } from '../../library/library.service';
+import { TOO_MANY_ATTEMPTS_MESSAGE } from '../auth-errors';
 import { AuthService } from '../auth.service';
+import { FieldErrors } from '../field-errors/field-errors';
 import { submitAgain } from '../submit-again';
 
 @Component({
   selector: 'app-account',
-  imports: [FormField, RouterLink],
+  imports: [FieldErrors, FormField, RouterLink],
   templateUrl: './account.html',
 })
 export class Account {
@@ -49,6 +51,16 @@ export class Account {
     },
   );
 
+  constructor() {
+    // Also when the session ends from outside this page (another tab, expired cookie): a guest has
+    // nothing to do here. Replaces /account in the history, so Back does not return to it.
+    effect(() => {
+      if (this.user() === null) {
+        this.router.navigateByUrl('/', { replaceUrl: true });
+      }
+    });
+  }
+
   protected async onSubmit(event: Event): Promise<void> {
     event.preventDefault();
     this.submitted.set(true);
@@ -63,10 +75,7 @@ export class Account {
     } catch {
       this.logoutError.set('Uscita non riuscita: riprova.');
       this.loggingOut.set(false);
-      return;
     }
-    // Replaces /account in the history, so Back does not return to a page for logged-in users.
-    await this.router.navigateByUrl('/', { replaceUrl: true });
   }
 }
 
@@ -80,7 +89,7 @@ function deleteAccountError(
   }
   // The account is locked after too many wrong passwords, even if this one is right.
   if (error instanceof HttpErrorResponse && error.status === 429) {
-    return { kind: 'server', message: 'Troppi tentativi sbagliati: riprova tra qualche minuto.' };
+    return { kind: 'server', message: TOO_MANY_ATTEMPTS_MESSAGE };
   }
   return { kind: 'server', message: 'Eliminazione non riuscita: riprova più tardi.' };
 }

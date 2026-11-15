@@ -1,0 +1,5 @@
+@if (show()) {
+  @for (error of field()().errors(); track error.kind) {
+    <div class="form-text text-danger">{{ error.message }}</div>
+  }
+}
