@@ -43,7 +43,8 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Value.Key)),
         };
 
-        // The token travels in a cookie, not in the Authorization header
+        // The app sends the token in the HttpOnly cookie. Without a cookie the handler still
+        // reads the Authorization header, which curl and Postman can use.
         bearer.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -67,9 +68,7 @@ builder.Services.AddHealthChecks()
 
 var app = builder.Build();
 
-// Create the database and apply pending migrations at startup.
-// Simple and fine for this project; production apps usually apply
-// migrations in a separate deployment step instead
+// Creates LibraryDb on first run and applies any pending migrations.
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<LibraryDbContext>();

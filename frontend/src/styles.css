@@ -299,8 +299,7 @@ h1, h2, h3, h4, h5 {
 	text-transform: uppercase;
 }
 
-/* Segnaposto (usato da card senza cover e dalle sezioni statiche) */
-/* Segnaposto (colore + cerchio) per recensioni e liste statiche. */
+/* Placeholder poster (color + circle), shown until a cover loads or when there is none */
 .ph-poster {
 	position: relative;
 	display: block;

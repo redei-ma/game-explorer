@@ -24,7 +24,6 @@ public class GamesController(IgdbClient igdb) : ControllerBase
 
     /// <summary>
     /// Returns a page of games. With no parameters it returns the 20 most popular games.
-    /// Example for the home page: GET /api/games?ordering=-rating&amp;pageSize=12
     /// </summary>
     /// <param name="search">Optional words to look for in game names.</param>
     /// <param name="ordering">Optional sort: name, released, rating, metacritic, added, created, updated; "-" prefix = descending.</param>

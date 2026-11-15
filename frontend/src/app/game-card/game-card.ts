@@ -6,7 +6,7 @@ import { FavoritesService } from '../favorites/favorites.service';
 import { WishlistService } from '../wishlist/wishlist.service';
 
 /* Reusable game card: cover, title, release date, average rating, main platforms.
-   Used by the Home grid now and by the search results list later */
+   Used by home, search, favorites and wishlist */
 @Component({
 	selector: 'app-game-card',
 	imports: [RouterLink, DatePipe, DecimalPipe],

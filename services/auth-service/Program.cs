@@ -53,7 +53,8 @@ builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationSc
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Value.Key)),
         };
 
-        // The token travels in a cookie, not in the Authorization header.
+        // The app sends the token in the HttpOnly cookie. Without a cookie the handler still
+        // reads the Authorization header, which curl and Postman can use.
         bearer.Events = new JwtBearerEvents
         {
             OnMessageReceived = context =>
@@ -75,8 +76,8 @@ builder.Services.AddScoped<TokenService>();
 
 builder.Services.AddScoped<RecoveryCodeService>();
 
-// Called by the gateway on /health/auth. The DbContext check reports Unhealthy
-// when the database is unreachable.
+// Used by Docker and the gateway (/health/auth) to know whether the service is up.
+// The DbContext check reports Unhealthy when the database is unreachable.
 builder.Services.AddHealthChecks()
     .AddDbContextCheck<AuthDbContext>();
 

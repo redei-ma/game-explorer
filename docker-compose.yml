@@ -70,8 +70,7 @@ services:
     restart: unless-stopped
     healthcheck: *dotnet-healthcheck
     environment:
-      # "sa" is the SQL Server administrator: fine for local development; a production
-      # setup would use a dedicated login with access to this database only
+      # Connects as "sa", like auth-service
       ConnectionStrings__LibraryDb: "Server=sqlserver;Database=LibraryDb;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True"
       Jwt__Key: ${JWT_KEY:?Set JWT_KEY in .env (see .env.example)}
     depends_on:

@@ -1,4 +1,4 @@
-/* Shared layout for cards rendered by home, search and favorites. */
+/* Shared layout for cards rendered by home, search, favorites and wishlist. */
 .game-card-container { position: relative; display: block; min-width: 0; width: 100%; }
 
 .game-card {

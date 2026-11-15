@@ -160,7 +160,6 @@ export class GameDetail implements OnDestroy {
 		}
 	}
 
-	// Extracts base game data to store in favorites without unnecessary heavy details
 	// Builds the same shape as a list item (cover + platform groups), so the favorite's
 	// card looks exactly like the card in the game list
 	toggleFavorite(): void {

@@ -1,12 +1,10 @@
-// defines the RAWG data types (Game, GamesPage, GamesQuery) and a class with only
-// one method, getGames(query), which calls GET/api/games with the parameters to
-// keep API calls separate from graphics
+// The shapes of catalog-service's JSON and GamesApi, the only class that calls catalog-service
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 /*******************************************************************************
- *   Models (subset of the RAWG /games payload)                                *
+ *   Models (the JSON of catalog-service)                                      *
  ******************************************************************************/
 export interface Platform {
 	id: number;
@@ -105,7 +103,7 @@ export interface GamesQuery {
 /*******************************************************************************
  *   API layer                                                                 *
  ******************************************************************************/
-/* Single entry point to the catalog-service. The RAWG key lives in the backend,
+/* Single entry point to the catalog-service. The IGDB keys live in the backend,
  * so the browser only ever talks to our own /api (proxy.conf.json in dev, nginx in Docker).
  * Components never build URLs: they call a method here */
 @Injectable({ providedIn: 'root' })

@@ -81,7 +81,7 @@ export class WishlistService {
 		});
 	}
 
-	// Loads the authenticated user's wishlist and preserves any cached card details
+	// Loads the authenticated user's wishlist
 	refresh(): Subscription {
 		this.status.set('loading');
 		return this.http.get<WishlistItemDto[]>('/api/library/wishlist').subscribe({

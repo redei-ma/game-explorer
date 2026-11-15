@@ -53,7 +53,7 @@ export class Register {
   // Only in this page: the server keeps just a hash, so the code cannot be shown again.
   protected readonly recoveryCode = signal<string | null>(null);
 
-  // Password and username rules are checked only by auth-service (decisions.md, 2026-11-07).
+  // Password and username rules are checked only by auth-service.
   // The confirmation is not a server rule: it only catches a typo before the request.
   protected readonly registerForm = form(
     this.model,

@@ -65,8 +65,7 @@ public class IgdbClient(HttpClient http, IMemoryCache cache, ILogger<IgdbClient>
     // ---------------------------------------------------------------- public API
 
     /// <summary>
-    /// Gets a page of games. Same parameters as the old RawgClient.GetGamesAsync,
-    /// so the controller did not need to change. Every filter is optional.
+    /// Gets a page of games. Every filter is optional.
     /// </summary>
     /// <param name="search">Words to look for in the name. Every word must appear (in any position).</param>
     /// <param name="ordering">RAWG-style sort, e.g. "-rating" (a leading "-" means descending).</param>
