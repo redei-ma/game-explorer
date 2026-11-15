@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
 			withInMemoryScrolling({ scrollPositionRestoration: 'enabled' }),
 			withRouterConfig({ onSameUrlNavigation: 'reload' }),
 		),
-		provideHttpClient(withInterceptors([csrfInterceptor])),
+		provideHttpClient(withInterceptors([csrfInterceptor, sessionInterceptor])),
 		// Waits for /api/auth/me, so the first page and route guard already know who is logged in.
 		provideAppInitializer(() => inject(AuthService).loadCurrentUser()),
 		{ provide: LOCALE_ID, useValue: 'it' },
