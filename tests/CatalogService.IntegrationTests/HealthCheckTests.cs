@@ -1,10 +1,9 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace CatalogService.IntegrationTests;
 
-public class HealthCheckTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>
+public class HealthCheckTests(CatalogApiFactory factory)
+    : IClassFixture<CatalogApiFactory>
 {
     [Fact]
     public async Task Health_ReturnsHealthy()
