@@ -17,7 +17,7 @@ import { GameCard } from '../game-card/game-card';
  * Highest page the catalog lets you open. Same value as GamesController.MaxPage
  * in catalog-service: change both together.
  */
-export const MAX_PAGE = 500;
+export const MAX_PAGE = 800;
 
 /** One entry of the numbered row: a page number, or 'gap' for a clickable "…". */
 type PageItem = number | 'gap';
