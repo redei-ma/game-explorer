@@ -8,7 +8,7 @@ namespace CatalogService.Controllers;
 /// <summary>
 /// Public endpoints of the catalog service. Each action receives a request from the
 /// frontend (or the gateway), asks IGDB through <see cref="IgdbClient"/>, and returns the result.
-/// The URLs, parameters and JSON shapes are the same as in the RAWG version, so the frontend did not change.
+/// The URLs, parameters and JSON shapes follow RAWG's API, which the frontend was written for.
 /// </summary>
 [ApiController]
 [Route("api/games")]

@@ -6,7 +6,7 @@ namespace CatalogService.Services;
 
 /// <summary>
 /// Obtains and remembers the access token that IGDB requires on every request.
-/// IGDB does not use a simple API key like RAWG: it uses a Twitch "app access token",
+/// IGDB has no simple API key: it uses a Twitch "app access token",
 /// obtained by sending your Client ID and Client Secret to Twitch's login server
 /// (the OAuth "client credentials" flow). The token lasts about 60 days, so we ask
 /// for it once, keep it in memory and only ask again shortly before it expires.

@@ -1,5 +1,5 @@
-// The JSON shapes the frontend reads. They keep the shapes of the RAWG version, so the
-// frontend did not change with the move to IGDB; IgdbClient fills them from IGDB data.
+// The JSON shapes the frontend reads. They follow RAWG's API, which the frontend was
+// written for; IgdbClient fills them from IGDB data.
 namespace CatalogService.Models;
 
 /// <summary>

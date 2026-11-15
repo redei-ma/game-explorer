@@ -108,7 +108,6 @@
 
 	<!-- Games Grid -->
 	<div class="games-grid" *ngIf="!isLoading() && !hasError() && games().length > 0">
-		<!-- Selector of GameCard  -->
 		<app-game-card *ngFor="let game of games()" [game]="game"></app-game-card>
 	</div>
 
