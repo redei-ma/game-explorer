@@ -12,6 +12,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import {
+  LOCKOUT_HINT,
   PASSWORD_RULES_HINT,
   TOO_MANY_ATTEMPTS_MESSAGE,
   passwordRulesMessage,
@@ -102,7 +103,7 @@ function recoverErrors(error: unknown, form: FieldTree<RecoverModel>): TreeValid
   }
   if (error instanceof HttpErrorResponse && error.status === 401) {
     // Unknown email, wrong code and locked account get the same answer from the server.
-    return { kind: 'server', message: 'Email o codice di recupero errati.' };
+    return { kind: 'server', message: `Email o codice di recupero errati. ${LOCKOUT_HINT}` };
   }
   if (error instanceof HttpErrorResponse && error.status === 429) {
     return { kind: 'server', message: TOO_MANY_ATTEMPTS_MESSAGE };

@@ -2,6 +2,11 @@
 // (gateway/nginx.conf).
 export const TOO_MANY_ATTEMPTS_MESSAGE = 'Troppi tentativi: riprova tra un minuto.';
 
+// auth-service answers a locked account like a wrong password or code, so login and recovery
+// mention the lock to everyone: a user with the right data would not know why it fails.
+export const LOCKOUT_HINT =
+  "Dopo troppi tentativi sbagliati l'account si blocca per qualche minuto.";
+
 // Identity's codes for the password rules, used by registration and recovery, in the order the
 // sentence lists them. The number repeats Identity's default option (auth-service Program.cs)
 // only in the text: the server still decides.
