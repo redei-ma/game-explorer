@@ -1,0 +1,80 @@
+name: CI
+
+# Checks every pull request into dev and main, the only way code reaches them.
+# Builds and tests the .NET services and the Angular app on the runner, then
+# builds the Docker images and runs a smoke test on the stack as delivered.
+
+on:
+  pull_request:
+    branches: [dev, main]
+
+# A new push to a pull request cancels the run still testing the previous commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: .NET build and tests
+    runs-on: ubuntu-latest
+    # GitHub's default is 360 minutes: a stuck job would use up the Actions quota.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: "10.0.x"
+      - name: Build
+        run: dotnet build GameExplorer.slnx
+      # Only test projects added to GameExplorer.slnx are run.
+      - name: Test
+        run: dotnet test GameExplorer.slnx --no-build
+
+  frontend:
+    name: Angular build and tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Test
+        run: npm test -- --watch=false
+
+  docker:
+    name: Docker build and smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # Test values, not secrets: Compose refuses to start without them, and
+      # this stack exists only inside the job.
+      MSSQL_SA_PASSWORD: Ci-Placeholder-1
+      IGDB_CLIENT_ID: placeholder
+      IGDB_CLIENT_SECRET: placeholder
+      JWT_KEY: ci-placeholder-key-at-least-32-characters
+    steps:
+      - uses: actions/checkout@v7
+      - name: Validate the Compose file
+        run: docker compose config --quiet
+      - name: Build the images
+        run: docker compose build
+      - name: Start the delivered stack
+        run: docker compose up -d
+      - name: Smoke test
+        run: ./scripts/smoke-test.sh
+      - name: Show the logs
+        if: failure()
+        run: docker compose logs

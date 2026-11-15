@@ -1,0 +1,155 @@
+<div class="detail-container">
+
+	<!-- BACK button -->
+	<button type="button" class="btn-back" (click)="goBack()">
+		&larr; Torna indietro
+	</button>
+
+	<!-- Skeleton Loader -->
+	<div class="skeleton-container" *ngIf="isLoading()">
+		<div class="skeleton-hero"></div>
+		<div class="skeleton-content">
+			<div class="skeleton-line"></div>
+			<div class="skeleton-line short"></div>
+		</div>
+	</div>
+
+	<!-- Error Banner -->
+	<div class="feedback-panel state-banner error-banner" *ngIf="!isLoading() && hasError()">
+		<div class="banner-content">
+			@if (error() === 'not-found') {
+				<h2>Gioco non trovato</h2>
+				<p>Il gioco richiesto non esiste o non è più disponibile.</p>
+				<a class="btn-primary" routerLink="/games">Torna alla ricerca</a>
+			} @else {
+				<h2>Impossibile caricare le informazioni del gioco</h2>
+				<p>Si è verificato un errore di connessione con il server.</p>
+				<button class="btn-primary" (click)="fetchGameDetails()">Riprova</button>
+			}
+		</div>
+	</div>
+
+	<!-- Game Detail Content -->
+	<div class="detail-content" *ngIf="!isLoading() && !hasError() && game(); let g">
+		<!-- HERO HEADER -->
+		<header class="hero-header" [style.background-image]="g.backgroundImage ? 'linear-gradient(to bottom, rgba(18,18,18,0.3), rgba(18,18,18,0.95)), url(' + g.backgroundImage + ')' : 'none'">
+			<div class="hero-body">
+				<div class="hero-header-top">
+					<h1 class="game-title">{{ g.name }}</h1>
+					<div class="hero-actions">
+						<button
+							type="button"
+							class="btn-fav-detail"
+							[class.btn-fav-detail--active]="isFavorite()"
+							[attr.aria-pressed]="isFavorite()"
+							[attr.aria-label]="isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'"
+							(click)="toggleFavorite()"
+						>
+							<span class="fav-icon">♥</span>
+							{{ isFavorite() ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti' }}
+						</button>
+						<button
+							type="button"
+							class="btn-wishlist-detail"
+							[class.btn-wishlist-detail--active]="isInWishlist()"
+							[attr.aria-pressed]="isInWishlist()"
+							[attr.aria-label]="isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist'"
+							(click)="toggleWishlist()"
+						>
+							<svg class="wishlist-icon" viewBox="0 0 24 24" aria-hidden="true">
+								<path d="M6 3.75h12v16.5l-6-3.75-6 3.75z" />
+							</svg>
+							{{ isInWishlist() ? 'Rimuovi dalla wishlist' : 'Aggiungi alla wishlist' }}
+						</button>
+					</div>
+				</div>
+				
+				<div class="game-subtext" *ngIf="g.developers && g.developers.length > 0">
+					<span>Sviluppato da: </span>
+					<strong *ngFor="let dev of g.developers; let last = last">{{ dev.name }}{{ last ? '' : ', ' }}</strong>
+				</div>
+				<div class="game-subtext" *ngIf="g.publishers && g.publishers.length > 0">
+					<span>Publisher: </span>
+					<strong *ngFor="let pub of g.publishers; let last = last">{{ pub.name }}{{ last ? '' : ', ' }}</strong>
+				</div>
+			</div>
+		</header>
+
+		<!-- Metadata section -->
+		<section class="meta-section">
+			<div class="meta-card">
+				<span class="meta-label">Metacritic</span>
+				<span class="metacritic-badge" [ngClass]="getMetacriticClass(g.metacritic)">
+					{{ g.metacritic !== null ? g.metacritic : 'N/D' }}
+				</span>
+			</div>
+			<div class="meta-card">
+				<span class="meta-label">Valutazione Utenti</span>
+				<span class="meta-value">{{ g.rating ? (g.rating | number: '1.1-1' : 'en-US') + ' / 5' : 'N/D' }}</span>
+			</div>
+			<div class="meta-card">
+				<span class="meta-label">Data di Uscita</span>
+				<span class="meta-value">{{ g.released ? (g.released | date: 'd MMM y') : 'N/D' }}</span>
+			</div>
+			<div class="meta-card" *ngIf="g.genres && g.genres.length > 0">
+				<span class="meta-label">Generi</span>
+				<div class="tags-list">
+					<span class="tag-badge" *ngFor="let genre of g.genres">{{ genre.name }}</span>
+				</div>
+			</div>
+			<div class="meta-card" *ngIf="g.parentPlatforms && g.parentPlatforms.length > 0">
+				<span class="meta-label">Famiglie di piattaforme</span>
+				<div class="tags-list">
+					<span class="tag-badge platform" *ngFor="let p of g.parentPlatforms">{{ p.platform.name }}</span>
+				</div>
+			</div>
+			<div class="meta-card" *ngIf="g.platforms && g.platforms.length > 0">
+				<span class="meta-label">Console</span>
+				<div class="tags-list">
+					<span class="tag-badge platform" *ngFor="let p of g.platforms">{{ p.platform.name }}</span>
+				</div>
+			</div>
+		</section>
+
+		<!-- Description Section -->
+		<section class="description-section" *ngIf="g.descriptionRaw">
+			<h2>Informazioni sul gioco</h2>
+			<p class="description-text">{{ g.descriptionRaw }}</p>
+		</section>
+
+		<!-- Screenshots Gallery -->
+		<section class="gallery-section" *ngIf="screenshots() as shots">
+			<ng-container *ngIf="shots.length > 0">
+				<h2>Galleria Screenshot</h2>
+				<div class="screenshots-grid">
+					<div class="screenshot-item" *ngFor="let shot of shots; let i = index">
+						<button type="button" class="screenshot-trigger" (click)="openScreenshot(i, $event)">
+							<img [src]="shot.image" [alt]="'Apri screenshot ' + (i + 1) + ' di ' + g.name" loading="lazy" />
+						</button>
+					</div>
+				</div>
+			</ng-container>
+		</section>
+
+	</div>
+</div>
+
+@if (selectedScreenshot(); as shot) {
+	<div class="lightbox-backdrop" role="presentation" (click)="closeScreenshot()">
+		<div class="lightbox" role="dialog" aria-modal="true" [attr.aria-label]="'Screenshot ingrandito di ' + (game()?.name ?? 'gioco')" (click)="$event.stopPropagation()">
+			<figure class="lightbox-figure">
+				<button #closeLightboxButton type="button" class="lightbox-close" aria-label="Chiudi screenshot" (click)="closeScreenshot()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+				</button>
+				<button type="button" class="lightbox-navigation lightbox-navigation--previous" aria-label="Screenshot precedente" (click)="showPreviousScreenshot()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+				</button>
+				<img [src]="shot.image" [alt]="'Screenshot ingrandito ' + (selectedScreenshotIndex()! + 1) + ' di ' + (game()?.name ?? 'gioco')" />
+				<button type="button" class="lightbox-navigation lightbox-navigation--next" aria-label="Screenshot successivo" (click)="showNextScreenshot()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg>
+				</button>
+				<figcaption>{{ selectedScreenshotIndex()! + 1 }} / {{ screenshots().length }}</figcaption>
+			</figure>
+		</div>
+	</div>
+}

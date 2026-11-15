@@ -1,0 +1,7 @@
+:host {
+	display: block;
+}
+
+.not-found {
+	margin-block: 2rem;
+}

@@ -1,0 +1,213 @@
+<!-- HERO -->
+<section class="hero">
+	<app-hero-particles />
+	<div class="container-ge">
+	<p class="eyebrow">La tua storia, pixel dopo pixel</p>
+	<h1>Scopri nuovi giochi.<br />Racconta quelli che ami.</h1>
+	<p class="hero__lead">
+		Tieni traccia delle tue avventure, lasciati ispirare e scopri nuovi titoli insieme a una community di appassionati.
+	</p>
+	<div class="d-flex flex-wrap align-items-center gap-3">
+		@if (currentUser()) {
+		<a class="btn btn-ge" routerLink="/games">Esplora i giochi</a>
+		} @else {
+		<a class="btn btn-ge" routerLink="/register">Crea il tuo account</a>
+		<small class="hero__note">È gratuito. Nessuna pubblicità invadente.</small>
+		}
+	</div>
+	</div>
+</section>
+
+<!-- INTRO -->
+<section class="band band--surface intro">
+	<div class="container-ge">
+	<p class="intro__text">
+		"L’universo dei videogiochi è vasto quanto lo spazio profondo, ma orientarsi non deve essere un’impresa. Novaquest è la tua bussola per esplorare, filtrare e scoprire la tua prossima avventura senza paura di andare alla deriva"
+	</p>
+	</div>
+</section>
+
+<!-- POPULAR GAMES + ABOUT -->
+<section class="band band--alt">
+	<div class="container-ge">
+	<div class="section-head">
+		<span>Giochi popolari questa settimana</span>
+		<a routerLink="/games">Tutti i giochi &gt;</a>
+	</div>
+
+	@if (popular.isLoading()) {
+		<div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 games-grid" aria-busy="true" aria-label="Caricamento dei giochi">
+		@for (s of skeletons; track s) {
+			<div class="col"><span class="ph-poster skeleton"></span></div>
+		}
+		</div>
+	}
+	@else if (popular.error()) {
+		<div class="state" role="alert">
+		<p class="mb-3">Impossibile caricare i giochi. Controlla la connessione e riprova.</p>
+		<button type="button" class="btn btn-ge" (click)="popular.reload()">Riprova</button>
+		</div>
+	}
+	@else {
+		@let games = popular.value()?.results ?? [];
+		@if (games.length) {
+		<div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 games-grid">
+			@for (game of games; track game.id; let i = $index) {
+			<div class="col"><app-game-card [game]="game" [index]="i + 1" /></div>
+			}
+		</div>
+		}
+		@else {
+			<div class="state"><p class="mb-0">Nessun gioco trovato per questa settimana.</p></div>
+		}
+	}
+
+		<h2 class="about__title">Conserva i tuoi titoli del cuore e pianifica le prossime avventure.</h2>
+		<div class="row row-cols-1 row-cols-md-3 g-3">
+		@for (f of features; track f.n) {
+		<div class="col">
+			<div class="feature-box">
+			<span class="features__n">{{ f.n }}</span>
+			<h3 class="features__title">{{ f.title }}</h3>
+			<p class="features__text">{{ f.text }}</p>
+			</div>
+		</div>
+		}
+	</div>
+	</div>
+</section>
+
+<!-- UPCOMING + TOP OF THE YEAR -->
+<ng-template #gameRows let-res let-ranked="ranked">
+	@if (res.isLoading()) {
+		<ol class="rows" aria-busy="true" aria-label="Caricamento dei giochi">
+		@for (s of rowSkeletons; track s) {
+			<li><span class="row-item"><span class="row-item__cover skeleton"></span></span></li>
+		}
+		</ol>
+	}
+	@else if (res.error()) {
+		<div class="state" role="alert">
+		<p class="mb-3">Impossibile caricare i giochi. Controlla la connessione e riprova.</p>
+		<button type="button" class="btn btn-ge" (click)="res.reload()">Riprova</button>
+		</div>
+	}
+	@else {
+		@let games = res.value()?.results ?? [];
+		@if (games.length) {
+		<ol class="rows">
+			@for (game of games; track game.id; let i = $index) {
+			<li>
+				<a class="row-item" [routerLink]="['/games', game.id]">
+				@if (ranked) {
+					<span class="row-item__rank">{{ pad(i + 1) }}</span>
+				}
+				<span class="row-item__cover">
+					@if (game.backgroundImage) {
+					<img [src]="game.backgroundImage" alt="" loading="lazy" />
+					}
+				</span>
+				<span class="row-item__body">
+					<strong class="row-item__title">{{ game.name }}</strong>
+					<span class="row-item__meta">
+					@if (game.released) { {{ game.released | date: 'd MMM y' }} } @else { Data n.d. }
+					@if (platformNames(game)) { &middot; {{ platformNames(game) }} }
+					</span>
+				</span>
+				@if (ranked && game.metacritic !== null) {
+					<span class="row-item__score">{{ game.metacritic }}</span>
+				}
+				</a>
+			</li>
+			}
+		</ol>
+		}
+		@else {
+			<div class="state"><p class="mb-0">Nessun gioco da mostrare al momento.</p></div>
+		}
+	}
+</ng-template>
+
+<section class="band band--surface">
+	<div class="container-ge">
+	<div class="rows-block">
+		<div class="section-head"><span>Prossime uscite</span></div>
+		<ng-container [ngTemplateOutlet]="gameRows" [ngTemplateOutletContext]="{ $implicit: upcoming, ranked: false }" />
+	</div>
+	<div class="rows-block">
+		<div class="section-head">
+		<span>I migliori del {{ currentYear }} per Metacritic</span>
+		<a routerLink="/games" [queryParams]="{ ordering: '-metacritic', year: currentYear }">Esplora il catalogo &gt;</a>
+		</div>
+		<ng-container [ngTemplateOutlet]="gameRows" [ngTemplateOutletContext]="{ $implicit: topOfYear, ranked: true }" />
+	</div>
+	</div>
+</section>
+
+<!-- POPULAR LISTS: top 3 of a few genres, the full Top 10 is in /collections -->
+<section class="band band--alt">
+	<div class="container-ge">
+	<div class="section-head"><span>Raccolte popolari</span><a routerLink="/collections">Vai alle raccolte &gt;</a></div>
+
+	@if (collectionsPreview.isLoading()) {
+		<div class="row gy-4" aria-busy="true" aria-label="Caricamento delle liste">
+		@for (s of previewSkeletons; track s) {
+		<div class="col-sm-6 col-lg-3">
+			<div class="stack">
+			@for (c of coverSkeletons; track c) {
+				<span class="ph-poster skeleton"></span>
+			}
+			</div>
+		</div>
+		}
+		</div>
+	}
+	@else if (collectionsPreview.error()) {
+		<div class="state" role="alert">
+		<p class="mb-3">Impossibile caricare le raccolte. Controlla la connessione e riprova.</p>
+		<button type="button" class="btn btn-ge" (click)="collectionsPreview.reload()">Riprova</button>
+		</div>
+	}
+	@else {
+		@let previews = collectionsPreview.value() ?? [];
+		@if (previews.length) {
+		<div class="row gy-4">
+			@for (l of previews; track l.genre.id) {
+			<div class="col-sm-6 col-lg-3">
+				<a class="list" routerLink="/collections" [queryParams]="{ genre: l.genre.slug }">
+				<div class="stack" aria-hidden="true">
+				@for (game of l.games.slice(0, previewCovers); track game.id; let i = $index) {
+					<span class="ph-poster" [class.ph-poster--cover]="game.backgroundImage">
+						@if (game.backgroundImage) {
+							<img [src]="game.backgroundImage" alt="" loading="lazy" />
+						}
+						<span class="ph-poster__n">{{ pad(i + 1) }}</span>
+					</span>
+				}
+				</div>
+				<h3 class="list__title">{{ l.genre.name }}</h3>
+				<p class="list__meta">I migliori per Metascore &bull; {{ l.games.length }} titoli</p>
+				</a>
+			</div>
+			}
+		</div>
+		}
+		@else {
+			<div class="state"><p class="mb-0">Nessuna lista disponibile al momento.</p></div>
+		}
+	}
+	</div>
+</section>
+
+<!-- CTA: only for guests, it invites them to sign up -->
+@if (!currentUser()) {
+<section class="cta">
+	<div class="container-ge d-flex flex-wrap align-items-center justify-content-between gap-4">
+	<div>
+		<p class="eyebrow mb-2">Inizia il tuo diario</p>
+		<h2 class="cta__title">Ogni gioco racconta anche qualcosa di te.</h2>
+	</div>
+	<a class="btn btn-ge" routerLink="/register">Unisciti alla community</a>
+	</div>
+</section>
+}

@@ -1,0 +1,49 @@
+<section class="container-ge py-5 auth-page">
+  <h1 class="mb-4">Il tuo account</h1>
+
+  @if (user(); as user) {
+    <dl class="account-details">
+      <dt>Email</dt>
+      <dd>{{ user.email }}</dd>
+      <dt>Username</dt>
+      <dd>{{ user.username }}</dd>
+    </dl>
+  }
+
+  <p><a routerLink="/favorites">I tuoi preferiti</a></p>
+
+  @if (logoutError(); as message) {
+    <div class="alert alert-danger py-2" role="alert">{{ message }}</div>
+  }
+
+  <button type="button" class="btn btn-ge" [disabled]="loggingOut()" (click)="logout()">
+    {{ loggingOut() ? 'Uscita in corso…' : 'Esci' }}
+  </button>
+
+  <section class="account-danger">
+  <h2 class="mb-3">Elimina l'account</h2>
+  <p>L'account e i preferiti salvati vengono cancellati per sempre.</p>
+
+  <form class="auth-form" novalidate (submit)="onSubmit($event)">
+    <div class="mb-3">
+      <label for="delete-password" class="form-label">Password</label>
+      <input
+        id="delete-password"
+        type="password"
+        class="form-control"
+        autocomplete="current-password"
+        [formField]="deleteForm.password"
+      />
+      <app-field-errors [field]="deleteForm.password" [show]="submitted()" />
+    </div>
+
+    @for (error of deleteForm().errors(); track error.kind) {
+      <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
+    }
+
+    <button type="submit" class="btn btn-ge btn-ge--danger" [disabled]="deleteForm().submitting()">
+      {{ deleteForm().submitting() ? 'Eliminazione in corso…' : "Elimina l'account" }}
+    </button>
+  </form>
+  </section>
+</section>

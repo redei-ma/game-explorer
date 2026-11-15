@@ -1,0 +1,78 @@
+<section class="container-ge py-5 auth-page">
+  @if (recoveryCode(); as code) {
+    <h1 class="mb-4">Account creato</h1>
+    <app-recovery-code [code]="code" />
+    <button type="button" class="btn btn-ge" (click)="continue()">
+      Ho salvato il codice, continua
+    </button>
+  } @else {
+    <h1 class="mb-4">Crea il tuo account</h1>
+
+    <form class="auth-form" novalidate (submit)="onSubmit($event)">
+      <div class="mb-3">
+        <label for="register-email" class="form-label">Email</label>
+        <input
+          id="register-email"
+          type="email"
+          class="form-control"
+          autocomplete="email"
+          [formField]="registerForm.email"
+        />
+        <app-field-errors [field]="registerForm.email" [show]="submitted()" />
+      </div>
+
+      <div class="mb-3">
+        <label for="register-username" class="form-label">Username</label>
+        <input
+          id="register-username"
+          type="text"
+          class="form-control"
+          autocomplete="username"
+          aria-describedby="register-username-hint"
+          [formField]="registerForm.username"
+        />
+        <div id="register-username-hint" class="form-text">
+          Da 3 a 30 caratteri: lettere senza accenti, numeri e i simboli
+          <span class="text-nowrap">- . _ &#64; +</span>
+        </div>
+        <app-field-errors [field]="registerForm.username" [show]="submitted()" />
+      </div>
+
+      <div class="mb-3">
+        <label for="register-password" class="form-label">Password</label>
+        <input
+          id="register-password"
+          type="password"
+          class="form-control"
+          autocomplete="new-password"
+          aria-describedby="register-password-hint"
+          [formField]="registerForm.password"
+        />
+        <div id="register-password-hint" class="form-text">{{ passwordHint }}</div>
+        <app-field-errors [field]="registerForm.password" [show]="submitted()" />
+      </div>
+
+      <div class="mb-3">
+        <label for="register-confirm-password" class="form-label">Conferma la password</label>
+        <input
+          id="register-confirm-password"
+          type="password"
+          class="form-control"
+          autocomplete="new-password"
+          [formField]="registerForm.confirmPassword"
+        />
+        <app-field-errors [field]="registerForm.confirmPassword" [show]="submitted()" />
+      </div>
+
+      @for (error of registerForm().errors(); track error.kind) {
+        <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
+      }
+
+      <button type="submit" class="btn btn-ge" [disabled]="registerForm().submitting()">
+        {{ registerForm().submitting() ? 'Registrazione in corso…' : "Crea l'account" }}
+      </button>
+    </form>
+
+    <p class="mt-4">Hai già un account? <a routerLink="/login">Accedi</a></p>
+  }
+</section>

@@ -1,0 +1,75 @@
+<section class="container-ge py-5 auth-page">
+  @if (recoveryCode(); as code) {
+    <h1 class="mb-4">Password cambiata</h1>
+    <p>Il codice che hai usato non vale più.</p>
+    <app-recovery-code [code]="code" />
+    <button type="button" class="btn btn-ge" (click)="continue()">
+      Ho salvato il codice, vai all'accesso
+    </button>
+  } @else {
+    <h1 class="mb-4">Password dimenticata</h1>
+    <p>Usa il codice di recupero che hai salvato quando hai creato l'account.</p>
+
+    <form class="auth-form" novalidate (submit)="onSubmit($event)">
+      <div class="mb-3">
+        <label for="recover-email" class="form-label">Email</label>
+        <input
+          id="recover-email"
+          type="email"
+          class="form-control"
+          autocomplete="email"
+          [formField]="recoverForm.email"
+        />
+        <app-field-errors [field]="recoverForm.email" [show]="submitted()" />
+      </div>
+
+      <div class="mb-3">
+        <label for="recover-code" class="form-label">Codice di recupero</label>
+        <input
+          id="recover-code"
+          type="text"
+          class="form-control font-monospace"
+          autocomplete="off"
+          [formField]="recoverForm.code"
+        />
+        <app-field-errors [field]="recoverForm.code" [show]="submitted()" />
+      </div>
+
+      <div class="mb-3">
+        <label for="recover-password" class="form-label">Nuova password</label>
+        <input
+          id="recover-password"
+          type="password"
+          class="form-control"
+          autocomplete="new-password"
+          aria-describedby="recover-password-hint"
+          [formField]="recoverForm.password"
+        />
+        <div id="recover-password-hint" class="form-text">{{ passwordHint }}</div>
+        <app-field-errors [field]="recoverForm.password" [show]="submitted()" />
+      </div>
+
+      <div class="mb-3">
+        <label for="recover-confirm-password" class="form-label">Conferma la nuova password</label>
+        <input
+          id="recover-confirm-password"
+          type="password"
+          class="form-control"
+          autocomplete="new-password"
+          [formField]="recoverForm.confirmPassword"
+        />
+        <app-field-errors [field]="recoverForm.confirmPassword" [show]="submitted()" />
+      </div>
+
+      @for (error of recoverForm().errors(); track error.kind) {
+        <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
+      }
+
+      <button type="submit" class="btn btn-ge" [disabled]="recoverForm().submitting()">
+        {{ recoverForm().submitting() ? 'Cambio in corso…' : 'Cambia la password' }}
+      </button>
+    </form>
+
+    <p class="mt-4"><a routerLink="/login">Torna all'accesso</a></p>
+  }
+</section>

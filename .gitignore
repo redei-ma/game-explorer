@@ -403,13 +403,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# VS Code files for those working on multiple tools
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+# VS Code settings are personal: each member keeps their own
+.vscode/
 
 # Local History for Visual Studio Code
 .history/
@@ -436,10 +431,13 @@ FodyWeavers.xsd
 .env.*
 !.env.example
 
-# Angular / Node
-.angular/
-dist/
-coverage/
+# Personal Compose settings for development: only the example is committed
+docker-compose.override.yml
+
+# Private keys and certificates
+secrets/
+*.pem
+*.key
 
 # OS files
 .DS_Store
@@ -452,3 +450,6 @@ Thumbs.db
 CLAUDE.md
 CLAUDE.local.md
 .claude/
+
+# Temporary scripts for development phase
+*addMigration.sh

@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/services/" />
+  <Folder Name="/services/auth-service/">
+    <Project Path="services/auth-service/AuthService.csproj" />
+  </Folder>
+  <Folder Name="/services/catalog-service/">
+    <Project Path="services/catalog-service/CatalogService.csproj" />
+  </Folder>
+  <Folder Name="/services/library-service/">
+    <Project Path="services/library-service/LibraryService.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AuthService.IntegrationTests/AuthService.IntegrationTests.csproj" />
+    <Project Path="tests/CatalogService.IntegrationTests/CatalogService.IntegrationTests.csproj" />
+    <Project Path="tests/LibraryService.IntegrationTests/LibraryService.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

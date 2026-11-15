@@ -1,0 +1,246 @@
+.games-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: clamp(1.5rem, 4vw, 3rem) 1rem;
+}
+
+.games-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: end;
+	gap: 1rem;
+	margin-bottom: 1.5rem;
+}
+
+.header-title h1 {
+	margin: 0 0 .35rem;
+	font-size: clamp(1.75rem, 4vw, 2.4rem);
+	font-weight: 700;
+}
+
+.results-badge {
+	color: var(--ge-muted);
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	font-size: .75rem;
+}
+
+.btn-toggle-filters,
+.btn-primary,
+.pagination-btn {
+	border: 0;
+	border-radius: 999px;
+	background: var(--ge-accent);
+	color: #111827;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.btn-toggle-filters {
+	padding: .55rem 1rem;
+}
+
+.filters-panel {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 1rem;
+	align-items: end;
+	margin-bottom: 2rem;
+	padding: 1.25rem;
+	background: var(--ge-surface);
+	border: 1px solid var(--ge-border);
+	border-radius: 16px;
+}
+
+.filter-group {
+	display: flex;
+	flex-direction: column;
+	gap: .4rem;
+}
+
+.filter-group label {
+	color: var(--ge-muted);
+	font-size: .7rem;
+	font-weight: 700;
+	letter-spacing: .08em;
+	text-transform: uppercase;
+}
+
+.filter-group input,
+.filter-group select {
+	min-height: 2.45rem;
+	padding: .5rem .65rem;
+	background: var(--ge-bg);
+	color: var(--ge-text);
+	border: 1px solid var(--ge-border);
+	border-radius: 10px;
+	font: inherit;
+	font-size: .875rem;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+	outline: 2px solid var(--ge-accent);
+	outline-offset: 2px;
+	border-color: var(--ge-accent);
+}
+
+.btn-reset {
+	min-height: 2.45rem;
+	padding: .5rem 1rem;
+	background: transparent;
+	color: #fca5a5;
+	border: 1px solid #ef4444;
+	border-radius: 999px;
+	font-weight: 700;
+	cursor: pointer;
+}
+
+.btn-reset:hover,
+.btn-reset:focus-visible {
+	background: rgba(239, 68, 68, .12);
+}
+
+.games-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr));
+	gap: 1.25rem;
+}
+
+.card-skeleton {
+	aspect-ratio: 2 / 3;
+	background: var(--ge-surface);
+	border: 1px solid var(--ge-border);
+	border-radius: 12px;
+	animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+	0%, 100% { opacity: .45; }
+	50% { opacity: .8; }
+}
+
+.state-container {
+	margin: 3rem 0;
+}
+
+.state-banner {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 3rem 1.5rem;
+	text-align: center;
+	background: var(--ge-surface);
+	border: 1px solid var(--ge-border);
+	border-radius: 16px;
+}
+
+.banner-content p {
+	margin-bottom: 1rem;
+	color: var(--ge-muted);
+}
+
+.btn-primary {
+	padding: .6rem 1.25rem;
+}
+
+.btn-toggle-filters:hover,
+.btn-toggle-filters:focus-visible,
+.btn-primary:hover,
+.btn-primary:focus-visible,
+.pagination-btn:not(:disabled):hover,
+.pagination-btn:not(:disabled):focus-visible {
+	background: var(--ge-accent-hover);
+}
+
+.pagination-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+	margin-top: 3rem;
+}
+
+.pagination-btn {
+	padding: .55rem 1.25rem;
+}
+
+.pagination-btn:disabled {
+	background: var(--ge-border);
+	color: var(--ge-muted);
+	cursor: not-allowed;
+}
+
+@media (max-width: 767px) {
+	.filters-panel {
+		display: none;
+	}
+
+	.filters-panel.show-mobile {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+	}
+}
+
+.pagination-numbers {
+	display: inline-flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: stretch;
+	gap: 0.25rem;
+	vertical-align: middle;
+}
+
+.pagination-btn.pagination-number {
+	min-width: 2.75rem;
+	padding-left: 0.25rem;
+	padding-right: 0.25rem;
+	text-align: center;
+	background-color: #1e3a8a;
+	border-color: #1e3a8a;
+	color: #ffffff;
+}
+
+.pagination-btn.pagination-number:hover {
+	background-color: #1e40af;
+	border-color: #1e40af;
+}
+
+.pagination-btn.pagination-number:focus-visible {
+	outline: 2px solid #93c5fd;
+	outline-offset: 2px;
+}
+
+.pagination-btn.pagination-number.current,
+.pagination-btn.pagination-number.current:hover {
+	background-color: #2563eb;
+	border-color: #2563eb;
+	font-weight: 700;
+	box-shadow: inset 0 0 0 2px #ffffff;
+	cursor: default;
+}
+
+.pagination-btn.pagination-jump,
+.pagination-btn.pagination-jump:hover {
+	width: 2.75rem;
+	box-sizing: border-box;
+	font: inherit;
+	line-height: inherit;
+	background-color: #ffffff;
+	border-color: #1e3a8a;
+	color: #1e3a8a;
+	cursor: text;
+	appearance: textfield;
+	-moz-appearance: textfield;
+}
+
+.pagination-jump::-webkit-outer-spin-button,
+.pagination-jump::-webkit-inner-spin-button {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.pagination-btn.pagination-jump.invalid {
+	outline: 2px solid #c62828;
+	outline-offset: -2px;
+}

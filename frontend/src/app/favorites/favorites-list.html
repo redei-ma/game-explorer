@@ -1,0 +1,39 @@
+<div class="favorites-container">
+	<header class="favorites-header">
+		<h1>I tuoi Preferiti</h1>
+		@if (favoritesService.status() === 'ready') {
+			<p class="favorites-count">
+				{{ favorites().length }} {{ favorites().length === 1 ? 'gioco salvato' : 'giochi salvati' }}
+			</p>
+		}
+	</header>
+
+	<!-- A logged-in user's list comes from the server: without these states, an error or a slow
+	     answer would look like an empty list -->
+	@if (favoritesService.status() === 'loading') {
+		<p class="d-flex align-items-center gap-2" role="status">
+			<span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+			Caricamento dei preferiti…
+		</p>
+	} @else if (favoritesService.status() === 'error') {
+		<div class="feedback-panel" role="alert">
+			<p>Impossibile caricare i preferiti. Controlla la connessione e riprova.</p>
+			<button type="button" class="btn-primary" (click)="favoritesService.refresh()">Riprova</button>
+		</div>
+	} @else if (favorites().length === 0) {
+		<!-- State to show when there are no favorites -->
+		<div class="empty-state">
+			<div class="empty-icon">♥</div>
+			<h2>Nessun gioco nei preferiti</h2>
+			<p>Esplora il catalogo e premi il cuore su un gioco per aggiungerlo alla tua lista personale.</p>
+			<a routerLink="/games" class="btn-primary">Esplora i giochi</a>
+		</div>
+	} @else {
+		<!-- Render the grid of favorited games reusing the GameCard component -->
+		<div class="games-grid">
+			@for (game of favorites(); track game.id) {
+				<app-game-card [game]="game" />
+			}
+		</div>
+	}
+</div>

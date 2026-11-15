@@ -1,0 +1,36 @@
+{
+  "/api/games": {
+    "target": "http://localhost:5001"
+  },
+  "/api/genres": {
+    "target": "http://localhost:5001"
+  },
+  "/api/platforms": {
+    "target": "http://localhost:5001"
+  },
+  "/api/parent-platforms": {
+    "target": "http://localhost:5001"
+  },
+  "/api/auth": {
+    "target": "http://localhost:5002"
+  },
+  "/api/library": {
+    "target": "http://localhost:5003"
+  },
+  "/health/catalog": {
+    "target": "http://localhost:5001",
+    "pathRewrite": {
+      "^/health/catalog": "/health"
+    }
+  },
+  "/health/auth": {
+    "target": "http://localhost:5002",
+    "pathRewrite": { "^/health/auth": "/health" }
+  },
+  "/health/library": {
+    "target": "http://localhost:5003",
+    "pathRewrite": {
+      "^/health/library": "/health"
+    }
+  }
+}

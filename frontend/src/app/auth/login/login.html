@@ -1,0 +1,40 @@
+<section class="container-ge py-5 auth-page">
+  <h1 class="mb-4">Accedi</h1>
+
+  <form class="auth-form" novalidate (submit)="onSubmit($event)">
+    <div class="mb-3">
+      <label for="login-email" class="form-label">Email</label>
+      <input
+        id="login-email"
+        type="email"
+        class="form-control"
+        autocomplete="email"
+        [formField]="loginForm.email"
+      />
+      <app-field-errors [field]="loginForm.email" [show]="submitted()" />
+    </div>
+
+    <div class="mb-3">
+      <label for="login-password" class="form-label">Password</label>
+      <input
+        id="login-password"
+        type="password"
+        class="form-control"
+        autocomplete="current-password"
+        [formField]="loginForm.password"
+      />
+      <app-field-errors [field]="loginForm.password" [show]="submitted()" />
+    </div>
+
+    @for (error of loginForm().errors(); track error.kind) {
+      <div class="alert alert-danger py-2" role="alert">{{ error.message }}</div>
+    }
+
+    <button type="submit" class="btn btn-ge" [disabled]="loginForm().submitting()">
+      {{ loginForm().submitting() ? 'Accesso in corso…' : 'Accedi' }}
+    </button>
+  </form>
+
+  <p class="mt-4 mb-2"><a routerLink="/recover">Password dimenticata?</a></p>
+  <p>Non hai un account? <a routerLink="/register">Crea il tuo account</a></p>
+</section>
