@@ -41,8 +41,16 @@ builder.Services.AddHttpClient<IgdbClient>(client =>
 
 var app = builder.Build();
 
-// Without these, unhandled exceptions and unknown routes return an empty body.
-app.UseExceptionHandler();
+// IgdbClient and IgdbTokenProvider throw HttpRequestException when Twitch or IGDB
+// fail: 502 tells the frontend the problem is upstream, not a bug in this service.
+// The middleware also logs the exception, with IGDB's explanation in its message.
+// UseStatusCodePages gives a body to errors that have none, like unknown routes.
+app.UseExceptionHandler(new ExceptionHandlerOptions
+{
+    StatusCodeSelector = ex => ex is HttpRequestException
+        ? StatusCodes.Status502BadGateway
+        : StatusCodes.Status500InternalServerError,
+});
 app.UseStatusCodePages();
 
 if (app.Environment.IsDevelopment())
